@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "node fix-new-urls && svelte-kit dev",
     "build": "node fix-new-urls && svelte-kit build",
-    "wasm": "wasm-pack build ./src/lib/kit-finder --target web",
+    "wasm": "wasm-pack build ./src/lib/kifapwa --target web",
     "package": "svelte-kit package",
     "preview": "svelte-kit preview",
     "check": "svelte-check --tsconfig ./tsconfig.json",
@@ -23,6 +23,7 @@
   },
   "type": "module",
   "dependencies": {
+    "@dopry/svelte-oidc": "^1.0.1",
     "@sveltejs/adapter-static": "^1.0.0-next.26"
   }
 }
