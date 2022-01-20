@@ -9,26 +9,28 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
-		adapter: adapter(),
+		adapter: adapter({
+            fallback: "index.html"
+        }),
 
 		// hydrate the <div id="svelte"> element in src/app.html
 		target: '#svelte',
 		vite: { 
+            options: {
+                ssr: false,
+            },
             plugins: [ 
                 // ViteRsw adds support for web-assembly written in rust.
                 // It adds compiling and importing of the modules.
                 ViteRsw({ 
                     root: "src/lib/",
-                    // crates: [{ name: "kit-finder" }],
-                    crates: ["kit-finder"],
+                    // crates: [{ name: "kifapwa" }],
+                    crates: ["kifapwa"],
                     unwatch: ["*/pkg/*"],
                     profile: process.env.NODE_ENV === 'production' ? "release" : "dev",
                     target: "web",
                 }) 
-            ],
-            optimizeDeps: {
-                exclude: ["kit-finder"],
-              },
+            ]
         }
 	}
 };
