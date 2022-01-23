@@ -24,6 +24,8 @@
   "type": "module",
   "dependencies": {
     "@dopry/svelte-oidc": "^1.0.1",
-    "@sveltejs/adapter-static": "^1.0.0-next.26"
+    "@sveltejs/adapter-static": "^1.0.0-next.26",
+    "lodash": "^4.17.21",
+    "svelte-css-vars": "^0.0.3"
   }
 }
