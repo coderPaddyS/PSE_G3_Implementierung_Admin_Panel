@@ -44,25 +44,25 @@
     "picomatch" "^2.2.2"
 
 "@sveltejs/adapter-auto@next":
-  "integrity" "sha512-VvFB5E/5y2aKr/XBS6fghT7aZF/D/Tm9/muscGIGtZK0mojL6SDdAhI3hqoWuHfBKz0D7YzLh4mlWEmERdmt/w=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-auto/-/adapter-auto-1.0.0-next.11.tgz"
-  "version" "1.0.0-next.11"
+  "integrity" "sha512-W69ooD5G5uurEkrL3RDTr6cKnWm5pgVu4UUUHS456nn2P5Qmm+/mTK5IXErupLTosxWGk/Wz79KEwEFNjVOMvQ=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-auto/-/adapter-auto-1.0.0-next.14.tgz"
+  "version" "1.0.0-next.14"
   dependencies:
-    "@sveltejs/adapter-cloudflare" "1.0.0-next.7"
-    "@sveltejs/adapter-netlify" "1.0.0-next.39"
-    "@sveltejs/adapter-vercel" "1.0.0-next.37"
+    "@sveltejs/adapter-cloudflare" "1.0.0-next.8"
+    "@sveltejs/adapter-netlify" "1.0.0-next.42"
+    "@sveltejs/adapter-vercel" "1.0.0-next.39"
 
-"@sveltejs/adapter-cloudflare@1.0.0-next.7":
-  "integrity" "sha512-P2rq+Tdvv9IKX4SVrIRqgZ2DnjmpPjp/bhAISs6cgbMzc2AmLMCeN++DXAZAVWugIjF1freLmtXcCl3/0HByNg=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-cloudflare/-/adapter-cloudflare-1.0.0-next.7.tgz"
-  "version" "1.0.0-next.7"
+"@sveltejs/adapter-cloudflare@1.0.0-next.8":
+  "integrity" "sha512-uje8eUfP1xrMEdKczvjl0rpu7WTZZrZCBTgH2sTSYYiAqpCevsmJNZ9Lgh5U5a4BYBYGVvAcYdh8nzoddxOZkw=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-cloudflare/-/adapter-cloudflare-1.0.0-next.8.tgz"
+  "version" "1.0.0-next.8"
   dependencies:
     "esbuild" "^0.13.15"
 
-"@sveltejs/adapter-netlify@1.0.0-next.39":
-  "integrity" "sha512-uBRscFmse2PkRZzIbRkG2sUNSIUveliiWFWUkIvxClfsT9x7JxVHgr1zsBwbIdrWs4EE7PvTAlUnv2wlEBEijQ=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-netlify/-/adapter-netlify-1.0.0-next.39.tgz"
-  "version" "1.0.0-next.39"
+"@sveltejs/adapter-netlify@1.0.0-next.42":
+  "integrity" "sha512-C7KV4Nkgpbgrxuw5q2asr3uTHo0HIkHrWTkJCRWECJPwoD3r/OhKjiY3tER9FopVDDAUyAfIUj7nNFCzTMpW1g=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-netlify/-/adapter-netlify-1.0.0-next.42.tgz"
+  "version" "1.0.0-next.42"
   dependencies:
     "@iarna/toml" "^2.2.5"
     "esbuild" "^0.13.15"
@@ -75,17 +75,17 @@
   dependencies:
     "tiny-glob" "^0.2.9"
 
-"@sveltejs/adapter-vercel@1.0.0-next.37":
-  "integrity" "sha512-SfaaakXjk6sBmSGozdrUQIsB3cFdo47ZFFEHMlPOScvXuAY8VPc1jCbGEQPadKW9Txf9xDuu6trm41OYztC+RA=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.37.tgz"
-  "version" "1.0.0-next.37"
+"@sveltejs/adapter-vercel@1.0.0-next.39":
+  "integrity" "sha512-YOPGKIILm26h22GN4/iliXce61aTG3Dq5hX8xpDx0cNuCocv0OoLfIqiGpdyJ9NIMpjwXmpVoL4+nV+yh2wcSA=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.39.tgz"
+  "version" "1.0.0-next.39"
   dependencies:
     "esbuild" "^0.13.15"
 
 "@sveltejs/kit@next":
-  "integrity" "sha512-STQ0hnJozIop8k9I313nwVasBIQ45Z2K1pUOkDVjCSOGijgsj+De5q0prQBtL1ZlqqisfkYlOf8W9gvDSyTLEA=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/kit/-/kit-1.0.0-next.232.tgz"
-  "version" "1.0.0-next.232"
+  "integrity" "sha512-cHdxdSKAdCuty2lYlRHXE4rJZuKd4wur9U63JtPwysTaReMEJl+s9J/LVvyBzaLW/13x8vm/kKqx+DDcI0udlA=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/kit/-/kit-1.0.0-next.240.tgz"
+  "version" "1.0.0-next.240"
   dependencies:
     "@sveltejs/vite-plugin-svelte" "^1.0.0-next.32"
     "sade" "^1.7.4"
@@ -432,6 +432,11 @@
   "resolved" "https://registry.npmjs.org/kleur/-/kleur-4.1.4.tgz"
   "version" "4.1.4"
 
+"lodash@^4.17.21":
+  "integrity" "sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg=="
+  "resolved" "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
+  "version" "4.17.21"
+
 "magic-string@^0.25.7":
   "integrity" "sha512-4CrMT5DOHTDk4HYDlzmwu4FVCcIYI8gauveasrdCu2IKIFOJ3f0v/8MDGJCDL9oD2ppz/Av1b0Nj345H9M+XIA=="
   "resolved" "https://registry.npmjs.org/magic-string/-/magic-string-0.25.7.tgz"
@@ -728,6 +733,11 @@
     "source-map" "^0.7.3"
     "svelte-preprocess" "^4.0.0"
     "typescript" "*"
+
+"svelte-css-vars@^0.0.3":
+  "integrity" "sha512-B7SLi7HGICpHI5oAx+NJRDsQChAIJ6wISwEUWN4CTU0h9WygKhcYwastnIoRkfdGE7tLfiKvEm+d102RRc8zwQ=="
+  "resolved" "https://registry.npmjs.org/svelte-css-vars/-/svelte-css-vars-0.0.3.tgz"
+  "version" "0.0.3"
 
 "svelte-hmr@^0.14.9":
   "integrity" "sha512-bKE9+4qb4sAnA+TKHiYurUl970rjA0XmlP9TEP7K/ncyWz3m81kA4HOgmlZK/7irGK7gzZlaPDI3cmf8fp/+tg=="
