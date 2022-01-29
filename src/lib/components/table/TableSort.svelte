@@ -38,13 +38,14 @@
 
 <script lang=ts>
     import { getContext, get_current_component, onMount } from "svelte/internal";
-    import { crawlerKey, invertSort, Sorter } from "./Store";
-    import { TableSortingCrawler } from "./crawler/SortingCrawler";
-    import type { iTableRow } from "./Types";
+    import { crawlerKey, invertSort, Sorter } from "$lib/model/table/Types";
+    import { TableSortingCrawler } from "$lib/model/table/crawler/SortingCrawler";
+    import type { TableRow } from "$lib/model/table/TableComponents";
 
-    // Define the generic Type:
-    //  R   -   R extends iTableRow
-    type R = $$Generic<iTableRow>
+    // Define the generic type:
+    //  R   -   R extends TableRow<T>
+    type T = $$Generic
+    type R = $$Generic<TableRow<T>>
 
     // Retreive the context of the table to change the sorting behaviour
     const { sorter } = getContext(crawlerKey);
@@ -53,9 +54,9 @@
     let state: SortState = SortState.NONE;
 
     // A reference to itself to manage the state of the other sorting elements
-    let thisElement: TableSort<R> = get_current_component();
+    let thisElement: TableSort<T, R> = get_current_component();
 
-    // add this sorting element to the context for state management
+    // Add this sorting element to the context for state management
     sortElements.add(thisElement);
 
     /** The sorting algorithm which should be applied. See {@link iTableRow}*/
@@ -63,9 +64,9 @@
     const identity: Sorter<R> = (a, b) => [a,b];
 
     // The crawlers to sort by
-    let identitySorter: TableSortingCrawler<R>;
-    let ascSorter: TableSortingCrawler<R>;
-    let descSorter: TableSortingCrawler<R>;
+    let identitySorter: TableSortingCrawler<T>;
+    let ascSorter: TableSortingCrawler<T>;
+    let descSorter: TableSortingCrawler<T>;
 
     /**
      * Advance the sorting state of this sorting element.
