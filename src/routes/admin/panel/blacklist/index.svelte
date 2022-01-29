@@ -1,20 +1,26 @@
 <script lang=ts>
-// import Cell from "$lib/components/table/Cell.svelte.txt";
-// import Row from "$lib/components/table/Row.svelte";
+    import { Table, Row, TitleRow, Cell, TableData, TitleCell } from "$lib/components/table/Types";
+    import type { iTableRow } from "$lib/components/table/Types"
+    import SvelteTable from "$lib/components/table/SvelteTable.svelte"
+    import type { Sorter } from "$lib/components/table/Store";
 
-    // import init, {TableData} from 'kifapwa';
-    import { Table, Row, TitleRow, data, Cell, dataFilter, TableData, tableDisplayData } from "$lib/components/table/Table";
+    // A rudimentary implementation to sort the table lexicographically
+    let sorter: Sorter<iTableRow> = (a: iTableRow, b: iTableRow) => {
+        if (a.data[0].data[0].data > b.data[0].data[0].data) {
+            return [b,a]
+        } else {
+            return [a, b]
+        }
+    }
 
-    import TableComp from "$lib/components/table/TableComp.svelte";
-    // import TitleRow from "$lib/components/table/TitleRow.svelte.txt"
-
-    let table: Table = 
-        new Table().add(
+    let counter = 0;
+    let table: Table<iTableRow> = 
+        new Table<iTableRow>().add(
             new TitleRow().add(
-                new Cell(new TableData("Title")),
-                new Cell(new TableData("Title")),
-                new Cell(new TableData("Title")),
-                new Cell(new TableData("Title"))
+                new TitleCell(new TableData("Title"), sorter),
+                new TitleCell(new TableData("Title"), sorter),
+                new TitleCell(new TableData("Title"), sorter),
+                new TitleCell(new TableData("Title"))
             ),
             new Row().add(
                 new Cell(new TableData("Cell")),
@@ -38,7 +44,7 @@
                 )
             ),
             new Row().add(
-                new Cell(new TableData("Cell")),
+                new Cell(new TableData("Cell 2")),
                 new Cell(new TableData("Cell")),
                 new Cell(new TableData("Cell")),
                 new Cell(
@@ -58,29 +64,18 @@
                     )
                 )
             )
-        )
-    data.set(table)
-    let filter = "";
-    let displayData;
-    dataFilter.set((a: TableData) => {
-        return true
-    })
-
-    $: dataFilter.set((a: TableData) => {
-        return a.data.includes(filter)
-    })
-    $: console.log($tableDisplayData, "abc")
-    // onMount(() => {
-    //     data.createHTML(document.getElementById('table'))
-    // })
+        );
 </script>
 
-<!-- {@debug $data} -->
-<button on:click={() => data.update(table => table.add(                        new Row().add(
-    new Cell(new TableData("Value")),
-    new Cell(new TableData("Value")),
-    new Cell(new TableData("Value")),
-    new Cell(new TableData("Value"))
-)))}> Add row </button>
-<input bind:value={filter} />
-<TableComp data={[$tableDisplayData]} size=5em/>
+<!-- Currently just debug stuff so ignore, just proof of concept -->
+<button on:click={() => {
+    counter++;
+    table = table.add(new Row().add(
+    new Cell(new TableData("A Value" + counter)),
+    new Cell(new TableData("A Value" + (10 - counter))),
+    new Cell(new TableData("A Value")),
+    new Cell(new TableData("A Value"))
+    ))
+    }}> Add row </button>
+
+<SvelteTable data={table} size=5em />
