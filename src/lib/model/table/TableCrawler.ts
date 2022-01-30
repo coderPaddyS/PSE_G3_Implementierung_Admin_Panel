@@ -2,8 +2,8 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { iTable, iTableCell, iTableComponent, iTableData, iTableRow } from "./Types";
-import { eTableData } from "./Types";
+import type { Table, TableCell, TableComponent, TableData, TableRow, TitleCell, TitleRow } from "$lib/model/table/TableComponents";
+import { eTableData } from "./TableComponents";
 
 /**
  * A generic TableCrawler to crawl a table.
@@ -14,7 +14,7 @@ import { eTableData } from "./Types";
  * @author Patrick Schneider
  * @version 1.0 
  */
-export abstract class TableCrawler<E extends TableCrawler<E>> {
+export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
     
     /**
      * Crawl on a given table element
@@ -22,8 +22,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param table {@code iTable<iTableRow} The table to crawl on
      * @returns The crawled-on table with perhaps changed data
      */
-    public crawlTable(crawler: E, table: iTable<iTableRow>): iTable<iTableRow> {
-        return table;
+    public crawlTable(crawler: E, table: Table<T>) {
+        return;
     }
 
     /**
@@ -32,8 +32,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param row {@code iTableRow} The row to crawl on
      * @returns The crawled-on row with perhaps changed data
      */
-    public crawlRow(crawler: E, row: iTableRow): iTableRow {
-        return row;
+    public crawlRow(crawler: E, row: TableRow<T>) {
+        return;
     }
 
     /**
@@ -42,8 +42,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param cell {@code iTableCell} The cell to crawl on
      * @returns The crawled-on cell with perhaps changed data
      */
-    public crawlCell(crawler: E, cell: iTableCell): iTableCell {
-        return cell;
+    public crawlCell(crawler: E, cell: TableCell<T>) {
+        return;
     }
 
     /**
@@ -52,8 +52,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param data {@code iTableData} The data to crawl on
      * @returns The crawled-on data with perhaps changed data
      */
-    public crawlData(crawler: E, data: iTableData): iTableData {
-        return data;
+    public crawlData(crawler: E, data: TableData<T>) {
+        return;
     }
 
     /**
@@ -62,8 +62,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param row {@code iTableRow} The title row to crawl on
      * @returns The crawled-on title row with perhaps changed data
      */
-    public crawlTitleRow(crawler: E, titleRow: iTableRow): iTableRow {
-        return titleRow;
+    public crawlTitleRow(crawler: E, titleRow: TitleRow<T>) {
+        return;
     }
 
     /**
@@ -72,8 +72,8 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param titlecell {@code iTableCell} The title cell to crawl on
      * @returns The crawled-on title cell with perhaps changed data
      */
-    public crawlTitleCell(crawler: E, titleCell: iTableCell): iTableCell {
-        return titleCell;
+    public crawlTitleCell(crawler: E, titleCell: TitleCell<T>) {
+        return;
     }
 
     /**
@@ -82,14 +82,14 @@ export abstract class TableCrawler<E extends TableCrawler<E>> {
      * @param component {@code iTableComponent} The component to crawl on
      * @returns The crawled-on component with perhaps changed data
      */
-    protected crawl(crawler: E, component: iTableComponent): iTableComponent {
+    public crawl(crawler: E, component: TableComponent<T>) {
         switch (component.comp) {
-            case eTableData.Table: return this.crawlTable(crawler, component as iTable<iTableRow>);
-            case eTableData.Row: return this.crawlRow(crawler, component as iTableRow);
-            case eTableData.Cell: return this.crawlCell(crawler, component as iTableCell);
-            case eTableData.Data: return this.crawlData(crawler, component as iTableData);
-            case eTableData.TitleRow: return this.crawlTitleRow(crawler, component as iTableRow);
-            case eTableData.TitleCell: return this.crawlTitleRow(crawler, component as iTableCell);
+            case eTableData.Table:      this.crawlTable(crawler, component as Table<T>); break;
+            case eTableData.Row:        this.crawlRow(crawler, component as TableRow<T>); break;
+            case eTableData.Cell:       this.crawlCell(crawler, component as TableCell<T>); break;
+            case eTableData.Data:       this.crawlData(crawler, component as TableData<T>); break;
+            case eTableData.TitleRow:   this.crawlTitleRow(crawler, component as TitleRow<T>); break;
+            case eTableData.TitleCell:  this.crawlTitleCell(crawler, component as TitleCell<T>); break;
         }
     }
 }

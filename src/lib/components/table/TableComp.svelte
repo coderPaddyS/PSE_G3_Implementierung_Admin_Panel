@@ -3,13 +3,28 @@
 
 <script lang=ts>
     import cssVars from "svelte-css-vars"
-    import { eTableData, iTableComponent } from "./Types";
+    import { eTableData, TableComponent, iTableData, Table, TableCell, TableData, TableRow } from "../../model/table/TableComponents";
     import TableSort from "./TableSort.svelte";
+    import TableDataComp from "./TableDataComp.svelte";
+    import { getContext } from "svelte";
+    import { crawlerKey, tail } from "$lib/model/table/Types";
+
+    type T = $$Generic;
 
     // Alter the minimum size of a column
     export let size;
-    export let data: iTableComponent[];
+    export let data: [Table<T>]| TableRow<T>[] | TableCell<T>[] | TableData<T>[];
+    export let index: Array<number> = [];
 
+    /**
+     * Convert the given Data to the inner type.
+     * Must be called only with type T, otherwise garbage will happen
+     * @param data T
+     */
+    function toData(data: iTableData<T> | TableComponent<T>[]) : iTableData<T> {
+        return data as iTableData<T>;
+    }
+    
     // Apply dynamic changes of size
     $: styleVars = {
         size: size
@@ -64,7 +79,7 @@
 </style>
 
 <!-- Traverse each child of the current iTableComponent -->
-{#each data as entry}
+{#each data as entry, i}
     {#if entry !== undefined}
 
         <div class={entry.comp} use:cssVars={styleVars}>
@@ -72,16 +87,16 @@
             {#if entry.comp != eTableData.Data} 
 
                 <!-- Therefore create a new TableComp child component with the child -->
-                <svelte:self data={entry.data} {size}/>
+                <svelte:self data={entry.data} {size} index={[...index, i]}/>
 
-                <!-- If it has a sorting algrotihm, then add a TableSort component -->
-                {#if entry.sorter}
-                    <TableSort algorithm={entry.sorter} />
+                <!-- If it has a sorting algorithm, then add a TableSort component -->
+                {#if entry.hasOwnProperty('sorter') && entry['sorter'] !== undefined}
+                    <TableSort algorithm={entry['sorter']} />
                 {/if}
             
             <!-- If it is TableData, display it -->
             {:else}
-                {entry.data}
+                <TableDataComp data={toData(entry.data)} index={tail([...index, i])} />
             {/if}
         </div>
     {/if}

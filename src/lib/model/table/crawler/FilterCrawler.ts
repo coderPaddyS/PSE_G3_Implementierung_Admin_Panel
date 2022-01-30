@@ -2,48 +2,48 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { iTable, iTableCell, iTableData, iTableRow } from "../Types";
-import { eTableData } from "../Types";
+import type { Table, TableCell, TableData, TableRow } from "../TableComponents";
+import { eTableData } from "../TableComponents";
 import { TableCrawler } from "../TableCrawler";
-import type { Predicate } from "../Store";
+import type { Predicate } from "../Types";
 
 /**
- * A {@link TableCrawler} to filter the whole table by a given {@link Predicate}
+ * A {../TableCrawler whole table by a given {@link Predicate}
  * 
  * @param R The {@link iTableRow} used in this table
  * 
  * @author Patrick Schneider
  * @version 1.0
  */
-export class TableFilterCrawler<R extends iTableRow> extends TableCrawler<TableFilterCrawler<R>>{
+export class TableFilterCrawler<T> extends TableCrawler<T, TableFilterCrawler<T>>{
 
     /**
      * The given {@link Predicate} to filter the table by
      */
-    private filter: Predicate<iTableData>;
+    private filter: Predicate<TableData<T>>;
 
     /**
      * Construct the TableFilterCrawler
      * @param filter {@link Predicate}
      */
-    public constructor(filter: Predicate<iTableData>) {
+    public constructor(filter: Predicate<TableData<T>>) {
         super();
         this.filter = filter;
     }
 
-    public crawlData<T extends iTableData>(crawler: TableFilterCrawler<R>, data: T): T {
+    public crawlData<TD extends TableData<T>>(crawler: TableFilterCrawler<T>, data: TD): TD {
         if (crawler.filter(data)) {
             return data;
         }
         return undefined;
     }
 
-    public crawlCell<T extends iTableCell>(crawler: TableFilterCrawler<R>, cell: T): T {
+    public crawlCell<TC extends TableCell<T>>(crawler: TableFilterCrawler<T>, cell: TC): TC {
         let filtered = cell.data.map((child) => {
             if (child.comp == eTableData.Table) {
-                return crawler.crawlTable(crawler, child);
+                return crawler.crawlTable(crawler, child as Table<T>);
             }
-            return crawler.crawlData(crawler, child);
+            return crawler.crawlData(crawler, child as TableData<T>);
         });
         if (filtered.find(e => e !== undefined)) {
             return cell;
@@ -51,7 +51,7 @@ export class TableFilterCrawler<R extends iTableRow> extends TableCrawler<TableF
         return undefined;
     }
 
-    public crawlRow<T extends iTableRow>(crawler: TableFilterCrawler<R>, row: T): T {
+    public crawlRow<TR extends TableRow<T>>(crawler: TableFilterCrawler<T>, row: TR): TR {
         let filtered = row.data
             .map(cell => crawler.crawlCell(crawler, cell))
             .filter(e => e !== undefined);
@@ -61,9 +61,9 @@ export class TableFilterCrawler<R extends iTableRow> extends TableCrawler<TableF
         return undefined
     }
 
-    public crawlTable(crawler: TableFilterCrawler<R>, table: iTable<R>): iTable<R> {
+    public crawlTable<TA extends Table<T>>(crawler: TableFilterCrawler<T>, table: TA): TA {
         
-        let filtered: R[] = [];
+        let filtered: TableRow<T>[] = [];
         table.data.forEach(row => {
             if (!row.filterable) {
                 filtered.push(row);

@@ -3,29 +3,34 @@
 
 <script lang=ts>
     import { setContext } from "svelte";
-    import { crawlerKey } from "./Store";
+    import { crawlerKey } from "$lib/model/table/Types";
 
     import TableComp from "./TableComp.svelte";
-    import type { TableCrawler } from "./TableCrawler";
-    import type { iTable, iTableRow } from "./Types";
+    import type { TableCrawler } from "$lib/model/table/TableCrawler";
+    import type { Table } from "$lib/model/table/TableComponents";
     import { cloneDeep } from "lodash"
-    import { TableFilterCrawler } from "./crawler/FilterCrawler";
-    import { TableSortingCrawler } from "./crawler/SortingCrawler";
+    import { TableFilterCrawler } from "$lib/model/table/crawler/FilterCrawler";
+    import { TableSortingCrawler } from "$lib/model/table/crawler/SortingCrawler";
 
 
     // Generic Types: 
     //      R extends iTableRow
     //      C extends TableCrawler<C>
-    type R = $$Generic<iTableRow>;
-    type C = $$Generic<TableCrawler<C>>
+    type T = $$Generic;
+    type TA = $$Generic<Table<T>>;
+    type C = $$Generic<TableCrawler<T, C>>;
 
     // Table and styling related customizables, which are given to this component
-    export let data: iTable<R>;
     export let size;
 
-    // Some extra Crawlers which are applied
+    // Some extra crawlers which are applied
     // Can add and alter behaviour
     export let extraCrawlers: Map<Symbol, any> = new Map();
+    export let supplier: () => TA;
+    export let updater: (listener: (table: TA) => void) => void;
+
+    let data = supplier();
+    updater(updateTableView)
 
     // Keys to the special filter and sorter crawlers
     const filterCrawlerKey = Symbol();
@@ -33,15 +38,15 @@
     const crawlers: Map<Symbol, any> = new Map();
 
     // Insert filter and sorter crawler first, such that they are applied first
-    crawlers.set(filterCrawlerKey, new TableFilterCrawler<R>((t) => true));
-    crawlers.set(sorterCrawlerKey, new TableSortingCrawler<R>((a,b) => [a,b]))
+    crawlers.set(filterCrawlerKey, new TableFilterCrawler<T>((t) => true));
+    crawlers.set(sorterCrawlerKey, new TableSortingCrawler<T>((a,b) => [a,b]))
 
     // Insert every given custom crawler
     extraCrawlers.forEach(crawlers.set);
 
     // The data which is displayed to the user
     // Always use a copy to return to the original state
-    let tableViewData: iTable<R> = cloneDeep(data);
+    let tableViewData: TA = cloneDeep(data);
 
     /**
      * Update the displayed data.
@@ -49,22 +54,26 @@
      * Does not alter the given table.
      * @param table: {@link iTable} The original table
      */
-    function updateTableView(table: iTable<R>) {
+    function updateTableView(table: TA) {
         tableViewData = cloneDeep(table);
         crawlers.forEach(crawler => {
-            tableViewData = crawler.crawl(crawler, tableViewData);
+            crawler.crawl(crawler, tableViewData);
         })
     }
 
     // Set the context such that child components can alter the filter and sorting behaviour
     setContext(crawlerKey, {
-        filter: (crawler: TableCrawler<C>) => {
+        filter: (crawler: TableCrawler<T,C>) => {
             crawlers.set(filterCrawlerKey, crawler);
             updateTableView(data);
         },
-        sorter: (crawler: TableCrawler<C>) => {
+        sorter: (crawler: TableCrawler<T,C>) => {
             crawlers.set(sorterCrawlerKey, crawler);
             updateTableView(data);
+        },
+        crawlOnView: (crawler: C) => {
+            crawler.crawl(crawler, tableViewData);
+            // updateTableView(tableV)
         }
     })
 </script>
