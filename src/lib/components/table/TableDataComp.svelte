@@ -3,20 +3,38 @@
     import { crawlerKey } from "$lib/model/table/Types";
     import { TableDataAdditions } from "$lib/model/table/TableDataAdditions";
 
-    import type { iTableData } from "$lib/model/table/TableComponents";
+    import type { Table, TableData } from "$lib/model/table/TableComponents";
+    import TableComp from "./TableComp.svelte";
 
     type T = $$Generic;
 
-    export let data: iTableData<T>;
+    export let data: TableData<T>;
     export let index: Array<number>;
+    export let size;
 
     let root: HTMLElement;
 
     const { crawlOnView } = getContext(crawlerKey);
 
-    onMount(async () => {
-        if (data.type == TableDataAdditions.COMPONENT) {
-            data.factory(root, {
+    let factory = (root: HTMLElement, props: Object) => new TableComp({
+        target: root,
+        props: {
+            size,
+            ...props
+        }
+    });
+
+    // $: if (root) {
+    //     data.render(root, {index, crawlOnView}, factory)
+    // };
+
+    function toTable(data: TableData<T>): Table<T> {
+        return data.getData()[0] as unknown as Table<T>
+    }
+
+    onMount(() => {
+        if (data.getType() == TableDataAdditions.COMPONENT) {
+            data.getFactory()(root, {
                 index,
                 crawlOnView,
             });
@@ -35,21 +53,25 @@
 </script>
 
 <style lang=scss>
-
+    .data {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+    }
 </style>
-
-{#if data.type == TableDataAdditions.HTML}
-    {@html data.data}
-<!-- {console.log(components)}
-{#each components as component}
-        {#await component}
-        {:then comp}
-            <svelte:component this={comp.default} />
-        {/await}
-    {/each} -->
-{:else if data.type == TableDataAdditions.COMPONENT}
-    <div id=component bind:this={root} />
-{:else}
-    {data.data}
+{#if data !== undefined} 
+    <div class=data bind:this={root}>
+        {#if data.getType() == TableDataAdditions.HTML}
+            {@html data.getData()}
+        {:else if data.getType() == TableDataAdditions.COMPONENT}
+            <div id=component bind:this={root} />
+        {:else if data.getType() == TableDataAdditions.TABLE}
+            <TableComp table={toTable(data)} {size} />
+        {:else}
+            {data.getData()}
+        {/if}
+    </div>
 {/if}
+
 

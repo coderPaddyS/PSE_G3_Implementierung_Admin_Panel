@@ -1,8 +1,6 @@
 <script lang=ts>
 import { Framework } from "$lib/controller/framework";
 
-import { dataset_dev } from "svelte/internal";
-
 import { TableActionCrawler } from "../../model/table/crawler/ActionCrawler";
 import type { CrawlerAction } from "../../model/table/Types";
 import type { TableCrawler } from "../../model/table/TableCrawler";

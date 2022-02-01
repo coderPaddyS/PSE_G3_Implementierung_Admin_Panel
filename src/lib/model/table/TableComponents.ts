@@ -1,44 +1,50 @@
 import type { SvelteComponent } from "svelte/internal";
 import type { Sorter } from "./Types"
 import { TableDataAdditions } from "./TableDataAdditions";
+import type { TableCrawler } from "./TableCrawler";
 
-export type SvelteComponentFactory = (root: HTMLElement, props: Object) => SvelteComponent;
-
-export enum eTableData {
-    Table = "table",
-    TitleRow = "titlerow",
-    Row = "row",
-    Cell = "cell",
-    TitleCell = "titlecell",
-    Data = "data"
-}
+export type SvelteComponentFactory = (root: HTMLElement, props?: Object) => SvelteComponent;
 
 export interface iTableData<T> {
     type: TableDataAdditions;
+    table?: Table<T>,
     data?: T;
     factory?: SvelteComponentFactory;
 }
 export abstract class TableComponent<T> {
-    comp: eTableData;
-    data: iTableData<T> | TableComponent<T> | TableComponent<T>[];
-    filterable: boolean;
-    sorter?: Sorter<TableComponent<T>>
+    protected data: iTableData<T> | TableComponent<T> | TableComponent<T>[];
+    protected filterable: boolean;
+    protected sorter?: Sorter<TableComponent<T>>
 
     public getChilds(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
         return this.data;
     }
 
     public abstract getData(): T[];
+
+    public abstract getCrawledOn<C extends TableCrawler<T, C>>(crawler: C);
+
+    public isFilterable() {
+        return this.filterable;
+    }
 }
 
 export class Table<T> extends TableComponent<T> {
-    comp = eTableData.Table;
-    data: TableRow<T>[];
-    filterable: boolean = true;
+    protected data: TableRow<T>[];
+    protected title: TitleRow<T>;
+    protected filterable: boolean = true;
 
-    public  constructor() {
+    public constructor() {
         super();
         this.data = new Array();
+    }
+
+    public getChilds(): TableRow<T>[] {
+        return this.data;
+    }
+
+    public setChilds(rows: TableRow<T>[]) {
+        this.data = rows;
     }
 
     public getData(): T[] {
@@ -56,17 +62,34 @@ export class Table<T> extends TableComponent<T> {
         this.data.push(...rows);
         return this;
     }
+
+    public setTitle(titlerow: TitleRow<T>): Table<T> {
+        this.title = titlerow;
+        return this;
+    }
+
+    public getTitle(): TitleRow<T> {
+        return this.title;
+    }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlTable(this);
+        this.data = newData? newData.data : undefined;
+    }
 }
 
 export class TableRow<T> extends TableComponent<T> {
-    comp = eTableData.Row;
-    data: TableCell<T>[];
-    filterable: boolean = true;
+    protected data: TableCell<T>[];
+    protected filterable: boolean = true;
 
     public constructor(filterable?: boolean) {
         super();
         this.filterable = filterable === undefined? true : filterable;
         this.data = new Array();
+    }
+
+    public getChilds(): TableCell<T>[] {
+        return this.data;
     }
 
     public getData(): T[] {
@@ -84,17 +107,25 @@ export class TableRow<T> extends TableComponent<T> {
         this.data.push(...cells);
         return this;
     }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlRow(this);
+        this.data = newData? newData.data : undefined;
+    }
 }
 
 export class TableCell<T> extends TableComponent<T> {
-    comp = eTableData.Cell;
-    data: [TableComponent<T>] | TableComponent<T>[];
-    filterable: boolean = true;
+    protected data: TableData<T>[];
+    protected filterable: boolean = true;
 
     public constructor(filterable?: boolean) {
         super();
         this.data = new Array();
         this.filterable = filterable === undefined? true : filterable;
+    }
+
+    public getChilds(): TableData<T>[] {
+        return this.data;
     }
 
     public getData(): T[] {
@@ -108,16 +139,20 @@ export class TableCell<T> extends TableComponent<T> {
         return data;
     }
 
-    public add( ...elem: TableData<T>[] | [Table<T>]): TableCell<T> {
+    public add( ...elem: TableData<T>[]): TableCell<T> {
         this.data.push(...elem);
         return this;
+    }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlCell(this);
+        this.data = newData? newData.data : undefined;
     }
 }
 
 export class TableData<T> extends TableComponent<T> {
-    comp = eTableData.Data;
-    data: iTableData<T>;
-    filterable: boolean = true;
+    protected data: iTableData<T>;
+    protected filterable: boolean = true;
 
     public constructor(data: T) {
         super();
@@ -127,28 +162,39 @@ export class TableData<T> extends TableComponent<T> {
         };
     }
 
-    public override getChilds(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
+    public override getChilds(): [Table<T>] {
         return undefined;
     }
 
     public getData(): T[] {
         return [this.data.data];
     }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlData(this);
+        this.data = newData? newData.data : undefined;
+    }
+
+    public getType(): TableDataAdditions {
+        return this.data.type;
+    }
+
+    public getFactory(): SvelteComponentFactory {
+        return this.data.factory;
+    }
 }
 
-export class TableDataHTML<T> implements TableComponent<T> {
-    comp = eTableData.Data;
-    data: iTableData<T>;
-    filterable: boolean = true;
+export class TableDataHTML<T> extends TableData<T> {
 
     public constructor(data: T) {
+        super(data);
         this.data = {
             data,
             type: TableDataAdditions.HTML
         };
     }
 
-    public getChilds(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
+    public getChilds(): [Table<T>] {
         return undefined;
     }
 
@@ -157,20 +203,18 @@ export class TableDataHTML<T> implements TableComponent<T> {
     }
 }
 
-export class TableDataSvelteComponent<T> implements TableComponent<T> {
-    comp = eTableData.Data;
-    data: iTableData<T>;
-    filterable: boolean = true;
+export class TableDataSvelteComponent<T> extends TableData<T> {
+    protected filterable: boolean = false;
 
     public constructor(factory: SvelteComponentFactory) {
+        super(undefined);
         this.data = {
-            data: undefined,
             type: TableDataAdditions.COMPONENT,
             factory
         };
     }
 
-    public getChilds(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
+    public getChilds(): [Table<T>] {
         return undefined;
     }
 
@@ -179,13 +223,32 @@ export class TableDataSvelteComponent<T> implements TableComponent<T> {
     }
 }
 
-export class TitleCell<T> extends TableCell<T> {
-    comp = eTableData.TitleCell;
-    data: TableComponent<T>[];
-    filterable: boolean = false;
-    sorter: Sorter<TableComponent<T>>;
+export class TableDataTable<T> extends TableData<T> {
+    protected filterable: boolean = true;
 
-    public constructor(sorter?: Sorter<TableComponent<T>>) {
+    public constructor(table: Table<T>) {
+        super(undefined);
+        this.data = {
+            table,
+            type: TableDataAdditions.TABLE
+        }
+    }
+
+    public getChilds(): [Table<T>] {
+        return [this.data.table];
+    }
+
+    public getData(): T[] {
+        return this.data.table.getData();
+    }
+}
+
+export class TitleCell<T> extends TableCell<T> {
+    protected data: TableData<T>[];
+    protected filterable: boolean = false;
+    protected sorter: Sorter<TableRow<T>>;
+
+    public constructor(sorter?: Sorter<TableRow<T>>) {
         super();
         this.data = new Array();
         this.sorter = sorter;
@@ -195,12 +258,15 @@ export class TitleCell<T> extends TableCell<T> {
         this.data = [elem];
         return this;
     }
+
+    public getSorter(): Sorter<TableRow<T>> {
+        return this.sorter;
+    }
 }
 
 export class TitleRow<T> extends TableRow<T> {
-    comp = eTableData.TitleRow;
-    data: TitleCell<T>[];
-    filterable: boolean = false;
+    protected data: TitleCell<T>[];
+    protected filterable: boolean = false;
 
     public constructor() {
         super(false);
@@ -209,6 +275,10 @@ export class TitleRow<T> extends TableRow<T> {
     public add(...cells: TitleCell<T>[]): TitleRow<T> {
         this.data.push(...cells);
         return this;
+    }
+
+    public getChilds(): TitleCell<T>[] {
+        return this.data;
     }
 }
 

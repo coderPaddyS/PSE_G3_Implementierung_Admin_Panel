@@ -31,10 +31,13 @@ export class TableSortingCrawler<T> extends TableCrawler<T,TableSortingCrawler<T
         this.sorter = sorter;
     }
 
-    public crawlTable(crawler: TableSortingCrawler<T>, table: Table<T>) : Table<T> {
-        for (let i: number = 1; i < table.data.length; ++i) {
-            for (let j: number = i + 1; j < table.data.length; ++j) {
-                [table.data[i], table.data[j]] = crawler.sorter(table.data[i], table.data[j]);
+    public crawlTable(table: Table<T>) : Table<T> {
+        let rows: TableRow<T>[] = table.getChilds();
+        if (rows) {
+            for (let i: number = 0; i < rows.length; ++i) {
+                for (let j: number = i + 1; j < rows.length; ++j) {
+                    [rows[i], rows[j]] = this.sorter(rows[i], rows[j]);
+                }
             }
         }
         return table;

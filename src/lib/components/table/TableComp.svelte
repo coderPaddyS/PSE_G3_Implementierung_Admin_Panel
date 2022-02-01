@@ -2,19 +2,19 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
+import { onMount } from "svelte";
+
     import cssVars from "svelte-css-vars"
-    import { eTableData, TableComponent, iTableData, Table, TableCell, TableData, TableRow } from "../../model/table/TableComponents";
-    import TableSort from "./TableSort.svelte";
-    import TableDataComp from "./TableDataComp.svelte";
-    import { getContext } from "svelte";
-    import { crawlerKey, tail } from "$lib/model/table/Types";
+    import type { TableComponent, iTableData, Table, TableCell, TableData, TableRow } from "../../model/table/TableComponents";
+import TableRowComp from "./TableRowComp.svelte";
+import TitleRowComp from "./TitleRowComp.svelte";
 
     type T = $$Generic;
 
     // Alter the minimum size of a column
     export let size;
-    export let data: [Table<T>]| TableRow<T>[] | TableCell<T>[] | TableData<T>[];
-    export let index: Array<number> = [];
+    export let table: Table<T>;
+    let root: HTMLElement;
 
     /**
      * Convert the given Data to the inner type.
@@ -24,7 +24,7 @@
     function toData(data: iTableData<T> | TableComponent<T>[]) : iTableData<T> {
         return data as iTableData<T>;
     }
-    
+
     // Apply dynamic changes of size
     $: styleVars = {
         size: size
@@ -77,27 +77,38 @@
         text-align: center;
     }
 </style>
-
+{#if table !== undefined}
+    <div class=table>
+        {#if table.getTitle()}
+            <TitleRowComp row={table.getTitle()} index={[0]} {size}/>
+        {/if}
+        {#if table.getChilds()}
+            {#each table.getChilds() as row,i}
+                <TableRowComp bind:row={row} index={[i]} {size} />
+            {/each}
+        {/if}
+    </div>
+{/if}
 <!-- Traverse each child of the current iTableComponent -->
-{#each data as entry, i}
-    {#if entry !== undefined}
+<!-- {#each data as entry, i} -->
+    <!-- {#if entry !== undefined} -->
 
-        <div class={entry.comp} use:cssVars={styleVars}>
+        <!-- <div class={entry.comp} use:cssVars={styleVars}> -->
             <!-- If it is not a eTableData.Data Element, then it has childrens -->
-            {#if entry.comp != eTableData.Data} 
+            <!-- {#if entry.comp != eTableData.Data}  -->
 
                 <!-- Therefore create a new TableComp child component with the child -->
-                <svelte:self data={entry.data} {size} index={[...index, i]}/>
+                <!-- <svelte:self data={entry.data} {size} index={[...index, i]}/> -->
 
                 <!-- If it has a sorting algorithm, then add a TableSort component -->
-                {#if entry.hasOwnProperty('sorter') && entry['sorter'] !== undefined}
-                    <TableSort algorithm={entry['sorter']} />
-                {/if}
+                <!-- {#if entry.hasOwnProperty('sorter') && entry['sorter'] !== undefined} -->
+                    <!-- <TableSort algorithm={entry['sorter']} /> -->
+                <!-- {/if} -->
             
             <!-- If it is TableData, display it -->
-            {:else}
-                <TableDataComp data={toData(entry.data)} index={tail([...index, i])} />
-            {/if}
-        </div>
-    {/if}
-{/each}
+            <!-- {:else} -->
+                <!-- <TableDataComp data={toData(entry.data)} index={tail([...index, i])} /> -->
+            <!-- {/if} -->
+        <!-- </div> -->
+    <!-- {/if} -->
+<!-- {/each} -->

@@ -10,7 +10,7 @@ export class Blacklist {
     private data: any[];
     // A rudimentary implementation to sort the table lexicographically
     private sorter: Sorter<TableRow<string>> = (a: TableRow<string>, b: TableRow<string>) => {
-        if (a.data[0].data[0].data > b.data[0].data[0].data) {
+        if (a.getData()[0] > b.getData()[0]) {
             return [b,a]
         } else {
             return [a, b]
@@ -20,7 +20,7 @@ export class Blacklist {
 
     private fromArray(data: any[]): Table<string> {
         let table = new Table<string>();
-        table.add(new TitleRow<string>().add(
+        table.setTitle(new TitleRow<string>().add(
             new TitleCell<string>(this.sorter).set(new TableData<string>("Eintrag")),
             new TitleCell<string>().set(new TableData<string>("Aktionen"))
         ));

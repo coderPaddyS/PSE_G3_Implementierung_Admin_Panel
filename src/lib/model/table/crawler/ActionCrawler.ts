@@ -2,7 +2,7 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { TableComponent, Table, TableCell, TableData, TableRow, TitleCell, TitleRow } from "../TableComponents";
+import { TableComponent, Table, TableCell, TableData, TableRow, TitleCell, TitleRow, TableDataTable } from "../TableComponents";
 import { TableCrawler } from "../TableCrawler";
 import type { CrawlerAction } from "../Types";
 
@@ -34,37 +34,44 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
         this.index = index === undefined ? undefined : index.reverse();
     }
 
-    public crawlTable(crawler: TableActionCrawler<T>, table: Table<T>) {
-        crawler.advance(crawler, table);
+    public crawlTable(table: Table<T>): Table<T> {
+        // if (this.index === undefined || this.index.length == 0) {
+            
+        // }
+        return this.advance(table, this.crawlRow);
     }
 
-    public crawlTitleRow(crawler: TableActionCrawler<T>, titleRow: TitleRow<T>): void {
-        crawler.advance(crawler, titleRow);
+    public crawlTitleRow(titleRow: TitleRow<T>): TitleRow<T> {
+        return this.advance(titleRow, this.crawlTitleCell);
     }
 
-    public crawlRow(crawler: TableActionCrawler<T>, row: TableRow<T>): void {
-        crawler.advance(crawler, row);
+    public crawlRow(row: TableRow<T>): TableRow<T> {
+        return this.advance(row, this.crawlCell);
     }
 
-    public crawlCell(crawler: TableActionCrawler<T>, cell: TableCell<T>): void {
-        crawler.advance(crawler, cell);
+    public crawlCell(cell: TableCell<T>): TableCell<T> {
+        return this.advance(cell, this.crawlData);
     }
 
-    public crawlTitleCell(crawler: TableActionCrawler<T>, titleCell: TitleCell<T>): void {
-        crawler.advance(crawler, titleCell);
+    public crawlTitleCell(titleCell: TitleCell<T>): TitleCell<T> {
+        return this.advance(titleCell, this.crawlData);
     }
 
-    public crawlData(crawler: TableActionCrawler<T>, data: TableData<T>): void {
-        crawler.advance(crawler, data);
-    }
-
-    private advance<C extends TableComponent<T>>(crawler: TableActionCrawler<T>, comp: C) {
-        if (crawler.index === undefined || crawler.index.length == 0) {
-            crawler.action(crawler, comp);
-        } else if (crawler.index.length > 1) {
-            crawler.crawl(crawler, comp.data[crawler.index.pop()]);
-        } else {
-            crawler.action(crawler, comp.data[crawler.index.pop()])
+    public crawlData(data: TableData<T>): TableData<T> {
+        if (data instanceof TableDataTable) {
+            return this.advance(data, this.crawlTable)
         }
+        return this.advance(data, this.crawlData);
+    }
+
+    private advance<C extends TableComponent<T>, R extends TableComponent<T>>(comp: C, crawl: (c: R) => R): C {
+        if (this.index === undefined || this.index.length == 0) {
+            this.action(this, comp);
+        } else if (this.index.length > 1) {
+            crawl(comp.getChilds()[this.index.pop()]);
+        } else {
+            this.action(this, comp.getChilds()[this.index.pop()])
+        }
+        return comp;
     }
 }
