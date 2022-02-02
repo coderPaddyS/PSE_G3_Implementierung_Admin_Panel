@@ -20,7 +20,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Count LoC
-        uses: Berke-Ates/LoC@v1.1
-        with:
-          folder: src
+      - run: cd src
+      - run: egrep "^ *(?!\n|\/| *\*)|^\$" -v (find . -name "*.ts" -or -name "*.svelte") | wc -l
