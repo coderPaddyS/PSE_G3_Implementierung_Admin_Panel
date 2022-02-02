@@ -21,4 +21,4 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
       - run: cd src
-      - run: egrep "^ *(?!\n|\/| *\*)|^\$" -v (find . -name "*.ts" -or -name "*.svelte") | wc -l
+      - run: egrep "^ *(?!\n|\/| *\*)|^\$" -v $(find . -name "*.ts" -or -name "*.svelte") | wc -l
