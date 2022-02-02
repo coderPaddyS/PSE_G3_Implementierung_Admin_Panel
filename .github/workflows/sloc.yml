@@ -18,7 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: No params
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Count LoC
         uses: Berke-Ates/LoC@v1.1
         with:
           folder: src
