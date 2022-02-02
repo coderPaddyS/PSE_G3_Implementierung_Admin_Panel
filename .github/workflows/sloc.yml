@@ -16,6 +16,8 @@ jobs:
   count:
     runs-on: ubutu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Check LoC
         uses: Berke-Ates/LoC@v1.1
         with:
