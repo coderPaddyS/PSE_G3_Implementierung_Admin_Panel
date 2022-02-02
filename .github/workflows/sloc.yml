@@ -15,12 +15,12 @@ on:
 jobs:
   test:
     name: Run tests
-    runs-on: ubuntu-latest
+    runs-on: alpine-latest
     
     steps:
       - name: Checkout
         uses: actions/checkout@v2
       - name: Count the lines
-        run: apt install cloc && cloc src
+        run: apk install cloc && cloc src
       
 
