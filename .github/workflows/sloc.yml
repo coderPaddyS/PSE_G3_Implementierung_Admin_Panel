@@ -27,5 +27,8 @@ jobs:
           debug: true
           directory: ./src
           badge: ./output/badge.svg
-          patterns: '*.js|*.ts'  # Patterns in the format of a '.gitignore' file, separated by pipes.
           ignore: 'node_modules'
+      - name: Print the output
+        run: |
+          echo "Scanned: ${{ steps.badge.outputs.counted_files }}";
+          echo "Line Count: ${{ steps.badge.outputs.total_lines }}";
