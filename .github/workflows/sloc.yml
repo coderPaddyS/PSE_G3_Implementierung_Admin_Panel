@@ -20,8 +20,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Count Lines of Code (cloc)
-        uses: djdefi/cloc-action@3
+      - name: Count Lines of Codes of AMF-Placer
+        uses: zslwyuan/cloc-badge-action@3.0
         with:
           path: src
 
