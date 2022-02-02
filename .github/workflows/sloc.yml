@@ -26,7 +26,7 @@ jobs:
         with:
           debug: true
           directory: ./src
-          badge: ./output/badge.svg
+          #badge: ./output/badge.svg
           #ignore: 'node_modules'
       - name: Print the output
         run: |
