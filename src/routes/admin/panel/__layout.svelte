@@ -1,5 +1,17 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- 2022, Patrick Schneider <patrick@itermori.de> -->
+
 <script>
-    import {LogoutButton} from "@dopry/svelte-oidc"
+    import { goto } from "$app/navigation";
+
+    import {LogoutButton} from "@dopry/svelte-oidc";
+    import { accessToken, isAuthenticated } from "@dopry/svelte-oidc/src/components/OidcContext.svelte";
+    
+    // $: if (!$isAuthenticated) {
+    //     goto("/admin", {
+    //         replaceState: true
+    //     })
+    // }
 </script>
 
 <style lang="scss">

@@ -1,36 +1,59 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- 2022, Patrick Schneider <patrick@itermori.de> -->
+
 <script lang=ts>
     import type { TableRow, TitleCell } from "$lib/model/table/TableComponents";
-import type { Sorter } from "$lib/model/table/Types";
-import TableDataComp from "./TableDataComp.svelte";
-import TableSort from "./TableSort.svelte";
+    import type { Sorter } from "$lib/model/table/Types";
+    import TableDataComp from "./TableDataComp.svelte";
+    import TableSort from "./TableSort.svelte";
 
+    // Generic Type T
     type T = $$Generic;
+
+    // Data provided externally to provide the possiblity to add custom behaviour
     export let cell: TitleCell<T>;
-    let sorter: Sorter<TableRow<T>> = cell.getSorter();
     export let index: Array<number>;
     export let size;
+
+    // The sorting algorithm used to sort the table
+    let sorter: Sorter<TableRow<T>> = cell.getSorter();
 </script>
 
 <style lang=scss>
     .titlecell {
         display: grid;
-        grid-template-columns: 1fr 2em;
-        padding-left: 2em;
+        grid-template-areas: "S C";
+        grid-template-columns: 2em 1fr;
         
         font-size: x-large;
         font-family: 'New Century Schoolbook', 'Courier New', Courier, monospace;
         font-weight: 600;
         color: white;
+
+        .sorter {
+            grid-area: S-start;
+            padding-right: 2em;
+            height: 100%;
+        }
+
+        .data {
+            grid-area: C-start;
+            height: 100%;
+        }
     }
 </style>
 
-{#if cell !== undefined} 
+{#if cell !== undefined && !cell.isHidden()} 
     <div class=titlecell>
-        {#each cell.getChilds() as data, i}
-            <TableDataComp {data} index={[...index, i]} {size} />
-        {/each}
         {#if sorter}
-            <TableSort algorithm={sorter} />
+            <div class=sorter>
+                <TableSort algorithm={sorter} />
+            </div>
         {/if}
+        {#each cell.getChilds() as data, i}
+            <div class=data>
+                <TableDataComp {data} index={[...index, i]} {size} />
+            </div>
+        {/each}
     </div>
 {/if}

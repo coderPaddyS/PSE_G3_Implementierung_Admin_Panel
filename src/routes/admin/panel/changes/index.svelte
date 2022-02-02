@@ -12,4 +12,4 @@
 </script>
 
 <FilterElement {filterOptions} />
-<SvelteTable supplier={async () => framework.getBlacklist()} updater={(listener) => framework.onBlacklistUpdate(listener)} size=5em />
+<SvelteTable supplier={async () => framework.getChanges()} updater={(listener) => framework.onChangesUpdate(listener)} size=5em />

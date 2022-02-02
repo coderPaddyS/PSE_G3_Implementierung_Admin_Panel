@@ -8,9 +8,8 @@ import type { Sorter } from "../Types";
 
 /** 
  * A {@link TableCrawler} to sort the given table by a given {@link Sorter}.
- * Only sorts the direct children of the given table.
  * 
- * @param R The {@link iTableRow} used in this table
+ * @param R The {@link TableRow} used in this table
  * 
  * @author Patrick Schneider
  * @version 1.0
@@ -31,11 +30,13 @@ export class TableSortingCrawler<T> extends TableCrawler<T,TableSortingCrawler<T
         this.sorter = sorter;
     }
 
-    public crawlTable(table: Table<T>) : Table<T> {
+    public override crawlTable(table: Table<T>) : Table<T> {
         let rows: TableRow<T>[] = table.getChilds();
         if (rows) {
+            // use a simple bubble-sort
             for (let i: number = 0; i < rows.length; ++i) {
                 for (let j: number = i + 1; j < rows.length; ++j) {
+                    // Sort the element and swap the places by using the automatic destructuring syntax
                     [rows[i], rows[j]] = this.sorter(rows[i], rows[j]);
                 }
             }
