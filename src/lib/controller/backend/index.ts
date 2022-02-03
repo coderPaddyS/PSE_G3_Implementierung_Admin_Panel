@@ -1,11 +1,9 @@
 import type { Table } from "$lib/model/table/TableComponents";
-import { Blacklist } from "$lib/model/Blacklist";
-import type { BlacklistListener } from "$lib/model/Blacklist";
-import { OfficialAliasses } from "$lib/model/OfficialAliases";
-import type { OfficialAliasesListener } from "$lib/model/OfficialAliases";
+import { Blacklist, BlacklistEntry } from "$lib/model/Blacklist";
+import { OfficialAliases } from "$lib/model/OfficialAliases";
 import { Alias } from "$lib/model/Alias";
 import { AliasSuggestions } from "$lib/model/AliasSuggestions";
-import type { AliasSuggestionsListener } from "$lib/model/AliasSuggestions";
+import type { TableListener } from "$lib/model/TableManager";
 
 /**
  * This class manages the communication with the remote backend on the server.
@@ -16,7 +14,7 @@ import type { AliasSuggestionsListener } from "$lib/model/AliasSuggestions";
 export class Backend {
 
     private blacklist: Blacklist;
-    private official: OfficialAliasses;
+    private official: OfficialAliases;
     private suggestions: AliasSuggestions;
 
     /**
@@ -24,8 +22,8 @@ export class Backend {
      */
     public constructor() {
         this.blacklist = new Blacklist();
-        this.blacklist.setData(["Eintrag 1", "Eintrag 42", "Eintrag 3"]);
-        this.official = new OfficialAliasses();
+        this.blacklist.setData(["Eintrag 1", "Eintrag 42", "Eintrag 3"].map(entry => new BlacklistEntry(entry)));
+        this.official = new OfficialAliases();
         this.official.setData([
             new Alias("Alias 1", "Gebäude 1", "Raum 1", 1),
             new Alias("Alias 2", "Gebäude 2", "Raum 2", 2),
@@ -56,14 +54,14 @@ export class Backend {
      * @param entry {@link string}
      */
     public async removeFromBlacklist(entry: string) {
-        this.blacklist.removeEntry(entry);
+        this.blacklist.removeData(new BlacklistEntry(entry));
     }
 
     /**
      * Observe changes on the backend
      * @param update {@link BlacklistListener}
      */
-    public onBlacklistUpdate(update: BlacklistListener) {
+    public onBlacklistUpdate(update: TableListener) {
         this.blacklist.addListener(update);
     }
 
@@ -72,10 +70,10 @@ export class Backend {
     }
 
     public async removeFromOfficialAliases(alias: Alias) {
-        this.official.removeEntry(alias);
+        this.official.removeData(alias);
     }
 
-    public onOfficialAliasesUpdate(update: OfficialAliasesListener) {
+    public onOfficialAliasesUpdate(update: TableListener) {
         this.official.addListener(update);
     }
 
@@ -84,10 +82,10 @@ export class Backend {
     }
 
     public async removeFromAliasSuggestions(alias: Alias) {
-        this.suggestions.removeEntry(alias);
+        this.suggestions.removeData(alias);
     }
 
-    public onAliasSuggestionsUpdate(update: AliasSuggestionsListener) {
+    public onAliasSuggestionsUpdate(update: TableListener) {
         this.suggestions.addListener(update);
     }
 }

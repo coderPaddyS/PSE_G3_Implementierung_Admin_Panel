@@ -2,7 +2,9 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-export class Alias {
+import type { ToDisplayData } from "./TableManager/ToDisplayData";
+
+export class Alias implements ToDisplayData {
     private name: string;
     private building: string;
     private room: string;
@@ -32,10 +34,10 @@ export class Alias {
     }
     
     public asArray(): string[] {
-        return [...this.asArrayWithoutId(), this.id.toString()];
+        return [...this.toDisplayData(), this.id.toString()];
     }
 
-    public asArrayWithoutId(): string[] {
+    public toDisplayData(): string[] {
         return [this.name, this.building, this.room];
     }
 }
