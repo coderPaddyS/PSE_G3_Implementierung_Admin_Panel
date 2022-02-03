@@ -41,12 +41,12 @@ export abstract class TableManager<T extends ToDisplayData> {
 
     /**
      * Construct a new table with initial values.
-     * The titles has to match to a column and all data entries have to match to a column.
+     * The titles and every entry of data have to match their length, as they define the number of columns.
      * @param title The titles of each column.
      * @param data The displayable data the table should be initiated with.
      * @param sorters The sorting algorithm used to sort the columns by.
      * @param actions   An object containing the actions and the title for the column. The actions are an array of objects,
-     *                  containing an array of onClick-Functions and a text to display the action.
+     *                  containing an array of onClick-functions and a text to display the action.
      */
     public constructor(
         title: T, 
@@ -123,7 +123,7 @@ export abstract class TableManager<T extends ToDisplayData> {
         // ... and if actions are specified ...
         if (this.actions && this.actions.length > 0) {
 
-            // ... append those actions in an Action Component inside the table data ...
+            // ... append those actions in an Action component inside the table data ...
             row.add(new TableCell<string>().add(
                 ...this.actions.map(action => {
                     return new TableDataComponent<string>((root, props: {index, crawlOnView}) => {
@@ -167,7 +167,7 @@ export abstract class TableManager<T extends ToDisplayData> {
 
     /**
      * Add data to the table.
-     * The titles has to match to a column and all data entries have to match to a column.
+     * The titles and every entry of data have to match their length, as they define the number of columns.
      * @param data The data to be added.
      */
     public addData(...data: T[]) {
