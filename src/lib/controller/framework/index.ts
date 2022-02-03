@@ -5,6 +5,8 @@ import type { Table } from "$lib/model/table/TableComponents"
 import { Backend } from "../backend";
 import type { Action } from "$lib/model/Changes/Action";
 import { ChangeAction } from "$lib/model/Changes/ChangeAction";
+import type { Alias } from "$lib/model/Alias";
+import type { OfficialAliasesListener } from "$lib/model/OfficialAliases";
 
 
 /**
@@ -63,6 +65,56 @@ export class Framework {
      */
     public onBlacklistUpdate(onUpdate: BlacklistListener) {
         this.backend.onBlacklistUpdate(onUpdate);
+    }
+
+    /**
+     * Retrieve the current blacklist
+     * @returns Promise of {@link Table<string>}
+     */
+    public async getOfficialAliases(): Promise<Table<string>> {
+        let table = this.backend.getOfficialAliases();
+        return table;
+    }
+
+    /**
+     * Remove the given entry from the blacklist.
+     * @param entry {@link string}
+     */
+    public async removeFromOfficialAliases(entry: Alias) {
+        this.backend.removeFromOfficialAliases(entry);
+    }
+
+    /**
+     * Observe changes on the official aliases
+     * @param update {@link OfficialAliassesListener}
+     */
+    public onOfficialAliasesUpdate(onUpdate: OfficialAliasesListener) {
+        this.backend.onOfficialAliasesUpdate(onUpdate);
+    }
+
+    /**
+     * Retrieve the current blacklist
+     * @returns Promise of {@link Table<string>}
+     */
+    public async getAliasSuggestions(): Promise<Table<string>> {
+        let table = this.backend.getAliasSuggestions();
+        return table;
+    }
+
+    /**
+     * Remove the given entry from the blacklist.
+     * @param entry {@link string}
+     */
+    public async removeFromAliasSuggestions(entry: Alias) {
+        this.backend.removeFromAliasSuggestions(entry);
+    }
+
+    /**
+     * Observe changes on the official aliases
+     * @param update {@link OfficialAliassesListener}
+     */
+    public onAliasSuggestionsUpdate(onUpdate: OfficialAliasesListener) {
+        this.backend.onAliasSuggestionsUpdate(onUpdate);
     }
 
     /**

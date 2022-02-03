@@ -64,14 +64,14 @@ export class Blacklist {
                             target: root,
                             props: {
                                 onClick: [
-                                    (entry: string[], metadata: Object) => {
-                                        Framework.getInstance().addChange(() => {this.removeEntry(entry[0]); return true;}, 
-                                        () => {this.show(entry[0]); return true;}, 
+                                    () => {
+                                        Framework.getInstance().addChange(() => {this.removeEntry(datum); return true;}, 
+                                        () => {this.show(datum); return true;}, 
                                         "Blacklist", 
                                         "Löschen", 
-                                        metadata)
+                                        this.table.matchData([datum]))
                                     },
-                                    (entry: string[], metadata: Object) => this.hide(entry[0])
+                                    () => this.hide(datum)
                                 ],
                                 text: "Löschen",
                                 ...props

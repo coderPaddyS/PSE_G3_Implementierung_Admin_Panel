@@ -56,7 +56,7 @@
 </style>
 {#if data !== undefined && !data.isHidden()} 
     <div class=data>
-        <!-- Switch over the types. Since Typesrcipt has no dynamic binding, this is the most suiting
+        <!-- Switch over the types. Since Typescript has no dynamic binding, this is the most suiting
              solution to maintain the three-tier architecture -->
         {#if data.getType() == TableDataAdditions.HTML}
             {@html data.getData()}
