@@ -15,6 +15,11 @@ export type Predicate<T> = (t: T) => boolean;
  */
 export type Sorter<T> = (a: T, b: T) => [T, T];
 
+/**
+ * An action used by an TableCrawler crawling the table.
+ * @template T the type of the table.
+ * @template C the crawler which uses this action.
+ */
 export type CrawlerAction<T, C extends TableCrawler<T,C>> = (crawler: C, component: TableComponent<T>) => void;
 
 /**
@@ -32,4 +37,8 @@ export function invertSort<R>(sorter: Sorter<R>): Sorter<R> {
 // The individual key to access the crawler context of the table
 export const crawlerKey = Symbol();
 
-export const tail = ([x, ...xs]: number[]) => xs;
+/**
+ * Remove the first element of the array
+ * @returns the remaining array
+ */
+export const tail = ([x, ...xs]: any[]) => xs;

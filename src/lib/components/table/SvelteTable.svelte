@@ -2,20 +2,21 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import { setContext } from "svelte";
+    import { onMount, setContext } from "svelte";
     import { crawlerKey } from "$lib/model/table/Types";
 
-    import TableComp from "./TableComp.svelte";
-    import type { TableCrawler } from "$lib/model/table/TableCrawler";
     import type { Table } from "$lib/model/table/TableComponents";
-    import { cloneDeep } from "lodash"
+    import type { TableCrawler } from "$lib/model/table/TableCrawler";
     import { TableFilterCrawler } from "$lib/model/table/crawler/FilterCrawler";
     import { TableSortingCrawler } from "$lib/model/table/crawler/SortingCrawler";
+    
+    import TableComp from "./TableComp.svelte";
+    import lodash from "lodash"
 
 
     // Generic Types: 
-    //      R extends iTableRow
-    //      C extends TableCrawler<C>
+    //      TA extends Table<T>
+    //      C extends TableCrawler<T, C>
     type T = $$Generic;
     type TA = $$Generic<Table<T>>;
     type C = $$Generic<TableCrawler<T, C>>;
@@ -26,11 +27,20 @@
     // Some extra crawlers which are applied
     // Can add and alter behaviour
     export let extraCrawlers: Map<Symbol, any> = new Map();
-    export let supplier: () => TA;
+
+    // A supplier and an updater to retreive table data
+    export let supplier: () => Promise<TA>;
     export let updater: (listener: (table: TA) => void) => void;
 
-    let data = supplier();
-    updater(updateTableView)
+    // Get the table data, but only work on a copy to preserve the original state
+    let data: TA;
+    let tableViewData: TA = lodash.cloneDeep(data);
+
+    // Add the listener to update the table data
+    updater(newTable => {
+        data = lodash.cloneDeep(newTable);
+        updateTableView();
+    })
 
     // Keys to the special filter and sorter crawlers
     const filterCrawlerKey = Symbol();
@@ -44,20 +54,19 @@
     // Insert every given custom crawler
     extraCrawlers.forEach(crawlers.set);
 
-    // The data which is displayed to the user
-    // Always use a copy to return to the original state
-    let tableViewData: TA = cloneDeep(data);
-
     /**
      * Update the displayed data.
      * Creates a new table and applies the crawlers to it.
      * Does not alter the given table.
      * @param table: {@link iTable} The original table
      */
-    function updateTableView(table: TA) {
-        tableViewData = cloneDeep(table);
+    function updateTableView() {
+
+        // A clone is sadly currently needed as otherwise the changes to the
+        // data are not detected and reflected.
+        tableViewData = lodash.cloneDeep(data);
         crawlers.forEach(crawler => {
-            crawler.crawl(crawler, tableViewData);
+            tableViewData.getCrawledOn(crawler);
         })
     }
 
@@ -65,16 +74,20 @@
     setContext(crawlerKey, {
         filter: (crawler: TableCrawler<T,C>) => {
             crawlers.set(filterCrawlerKey, crawler);
-            updateTableView(data);
+            updateTableView();
         },
         sorter: (crawler: TableCrawler<T,C>) => {
             crawlers.set(sorterCrawlerKey, crawler);
-            updateTableView(data);
+            updateTableView();
         },
         crawlOnView: (crawler: C) => {
-            crawler.crawl(crawler, tableViewData);
-            // updateTableView(tableV)
+            data.getCrawledOn(crawler);
         }
+    })
+
+    onMount(async () => {
+        data = await supplier();
+        tableViewData = lodash.cloneDeep(data);
     })
 </script>
 
@@ -82,4 +95,4 @@
 
 </style>
 
-<TableComp data={[tableViewData]} {size}/>
+<TableComp bind:table={tableViewData} {size}/>

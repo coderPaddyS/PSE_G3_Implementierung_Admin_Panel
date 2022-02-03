@@ -1,55 +1,71 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- 2022, Patrick Schneider <patrick@itermori.de> -->
+
 <script lang=ts>
     import { getContext, onMount } from "svelte";
     import { crawlerKey } from "$lib/model/table/Types";
     import { TableDataAdditions } from "$lib/model/table/TableDataAdditions";
 
-    import type { iTableData } from "$lib/model/table/TableComponents";
+    import type { TableData } from "$lib/model/table/TableComponents";
+    import TableComp from "./TableComp.svelte";
 
+    // Generic Type T
     type T = $$Generic;
 
-    export let data: iTableData<T>;
+    // Data provided externally to provide the possiblity to add custom behaviour
+    export let data: TableData<T>;
     export let index: Array<number>;
+    export let size;
 
+    // Render Components as a child to this element
     let root: HTMLElement;
 
+    // Pass the crawlOnView method to the child component to provide the possibility to add custom behaviour
     const { crawlOnView } = getContext(crawlerKey);
 
-    onMount(async () => {
-        if (data.type == TableDataAdditions.COMPONENT) {
-            data.factory(root, {
+    onMount(() => {
+        if (data.getType() == TableDataAdditions.COMPONENT) {
+            
+            // Create the component, TableData::getFactory returns a function object,
+            // on which the function can be called on directly.
+            data.getFactory()(root, {
                 index,
                 crawlOnView,
             });
         }
-        // if (containsComponent) {
-            // let matches = ["/src/lib/components/table_actions/Blacklist.svelte"];
-            // console.log(matches);
-            // for (let component in matches) {
-            //     let comp = import(/* @vite-ignore */ component)
-            //     components.push(comp);
-            //     console.log(comp)
-            // }
-        // }
     })
 
 </script>
 
 <style lang=scss>
+    .data {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        width: 100%;
+        height: 100%;
 
+        .component {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+    }
 </style>
-
-{#if data.type == TableDataAdditions.HTML}
-    {@html data.data}
-<!-- {console.log(components)}
-{#each components as component}
-        {#await component}
-        {:then comp}
-            <svelte:component this={comp.default} />
-        {/await}
-    {/each} -->
-{:else if data.type == TableDataAdditions.COMPONENT}
-    <div id=component bind:this={root} />
-{:else}
-    {data.data}
+{#if data !== undefined && !data.isHidden()} 
+    <div class=data>
+        <!-- Switch over the types. Since Typesrcipt has no dynamic binding, this is the most suiting
+             solution to maintain the three-tier architecture -->
+        {#if data.getType() == TableDataAdditions.HTML}
+            {@html data.getData()}
+        {:else if data.getType() == TableDataAdditions.COMPONENT}
+            <div class=component bind:this={root} />
+        {:else if data.getType() == TableDataAdditions.TABLE}
+            <TableComp table={data.getChilds()[0]} {size} />
+        {:else}
+            {data.getData()}
+        {/if}
+    </div>
 {/if}
-

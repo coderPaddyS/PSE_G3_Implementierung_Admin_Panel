@@ -2,56 +2,44 @@ import type { Table } from "$lib/model/table/TableComponents";
 import { Blacklist } from "$lib/model/Blacklist";
 import type { BlacklistListener } from "$lib/model/Blacklist";
 
+/**
+ * This class manages the communication with the remote backend on the server.
+ * 
+ * @author Patrick Schneider
+ * @version 0.1
+ */
 export class Backend {
 
     private blacklist: Blacklist;
 
+    /**
+     * Construct a new instance of the Backend
+     */
     public constructor() {
-
+        this.blacklist = new Blacklist();
+        this.blacklist.setData(["Eintrag 1", "Eintrag 42", "Eintrag 3"]);
     }
 
-    public getBlacklist(): Table<string> {
-
-        if (this.blacklist === undefined) {
-            this.blacklist = new Blacklist(["Eintrag 1", "Eintrag 2", "Eintrag 3"])
-        }
+    /**
+     * Fetches the blacklist data and returns a parsed table.
+     * @returns Promise of {@link Table<string>}
+     */
+    public async getBlacklist(): Promise<Table<string>> {
         return this.blacklist.getTable();
-
-        // return this.blacklist.getTable();
-            // return new Table<string>().add(
-            //     new TitleRow<string>().add(
-            //         new TitleCell<string>(sorter).set(new TableData<string>("Title")),
-            //         new TitleCell<string>().set(new TableData<string>("Title"))
-            //     ),
-            //     new TableRow<string>().add(
-            //         new TableCell<string>().add(new TableData("Cell")),
-            //         new TableCell<string>().add(new TableDataSvelteComponent((root, props: {index}) => {
-            //             return new Remove({
-            //                 target: root,
-            //                 props: {
-            //                     id: "Patrick",
-            //                     ...props
-            //                 }
-            //             })
-            //         })
-            //     ),
-            //     new TableRow<string>().add(
-            //         new TableCell<string>().add(new TableData("Cell 2")),
-            //         new TableCell<string>().add(
-            //         new TableDataSvelteComponent((root, props: {index, crawlOnView}) => {
-            //             return new Blacklist({
-            //                 target: root,
-            //                 props
-            //             })
-            //         })),
-            //     )
-            // );
     }
 
-    public removeFromBlacklist(entry: string) {
+    /**
+     * Removes the given entry from the blacklist.
+     * @param entry {@link string}
+     */
+    public async removeFromBlacklist(entry: string) {
         this.blacklist.removeEntry(entry);
     }
 
+    /**
+     * Observe changes on the backend
+     * @param update {@link BlacklistListener}
+     */
     public onBlacklistUpdate(update: BlacklistListener) {
         this.blacklist.addListener(update);
     }
