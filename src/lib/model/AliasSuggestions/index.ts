@@ -38,7 +38,7 @@ export class AliasSuggestions extends TableManager<Alias> {
         = new AliasSuggestionsTitle(AliasSuggestions.colAlias, AliasSuggestions.colBuilding, AliasSuggestions.colRoom);
 
     /**
-     * Create the official aliases and set the data accordingly.
+     * Create the alias suggestions and set the data accordingly.
      * @param data If provided sets the data of the table. 
      */
      public constructor(data?: Alias[]) {
