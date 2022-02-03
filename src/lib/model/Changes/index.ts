@@ -115,7 +115,7 @@ export class Changes {
      * Performs the onRemoval-Action.
      * 
      * @param action {@link ChangeAction} to be removed.
-     * @returns boolean `true` iff removal was successfull
+     * @returns boolean `true` iff removal was successful
      */
     public remove(action: ChangeAction): boolean {
         if (this.contains(action)) {

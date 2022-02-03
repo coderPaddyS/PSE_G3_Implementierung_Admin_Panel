@@ -11,8 +11,9 @@ import type { TableCrawler } from "./TableCrawler";
  * A function which given an html element root and some values renders its data as a child of root.
  * @param root {@link HTMLElement} the data should be rendered to as a child.
  * @param props An Object containing all needed parameters to render the data.
+ * @returns May return an identifier to the created component
  */
-export type ComponentFactory = (root: HTMLElement, props?: Object) => void;
+export type ComponentFactory = (root: HTMLElement, props?: Object) => any;
 
 /**
  * The common interface of all table data components.
@@ -449,7 +450,7 @@ export class TableDataComponent<T> extends TableData<T> {
         super(undefined);
         this.data = {
             type: TableDataAdditions.COMPONENT,
-            factory
+            factory,
         };
     }
 

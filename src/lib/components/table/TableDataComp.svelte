@@ -2,7 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import { getContext, onMount } from "svelte";
+    import { getContext, onMount, SvelteComponent } from "svelte";
     import { crawlerKey } from "$lib/model/table/Types";
     import { TableDataAdditions } from "$lib/model/table/TableDataAdditions";
 
@@ -19,6 +19,19 @@
 
     // Render Components as a child to this element
     let root: HTMLElement;
+    let comp: SvelteComponent = undefined;
+
+    // Rerender the component if data changes.
+    // Only evaluates to true if data is of Type TableDataComp as root only binds in this case.
+    // Only needed because svelte does not rerender the childcomponent as its data never changes.
+    // Even if everything else changes in the surrounding
+    $: if (root && data && comp) {
+        comp.$destroy();
+        comp = data.getFactory()(root, {
+                index,
+                crawlOnView,
+        });
+    }
 
     // Pass the crawlOnView method to the child component to provide the possibility to add custom behaviour
     const { crawlOnView } = getContext(crawlerKey);
@@ -28,7 +41,7 @@
             
             // Create the component, TableData::getFactory returns a function object,
             // on which the function can be called on directly.
-            data.getFactory()(root, {
+            comp = data.getFactory()(root, {
                 index,
                 crawlOnView,
             });
@@ -56,7 +69,7 @@
 </style>
 {#if data !== undefined && !data.isHidden()} 
     <div class=data>
-        <!-- Switch over the types. Since Typesrcipt has no dynamic binding, this is the most suiting
+        <!-- Switch over the types. Since Typescript has no dynamic binding, this is the most suiting
              solution to maintain the three-tier architecture -->
         {#if data.getType() == TableDataAdditions.HTML}
             {@html data.getData()}
