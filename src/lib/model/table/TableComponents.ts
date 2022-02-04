@@ -40,7 +40,7 @@ export interface iTableData<T> {
  */
 export abstract class TableComponent<T> {
     protected data: iTableData<T> | TableComponent<T> | TableComponent<T>[];
-    protected filterable: boolean;
+    protected filterable: boolean = true;
     protected hidden: boolean = false;
     protected sorter?: Sorter<TableComponent<T>>;
 
@@ -140,20 +140,27 @@ export class Table<T> extends TableComponent<T> {
      *      If there is a title, then the key is the value of the title, the value the matching data
      */
     public getData(): any[] {
-        let data: Object = {};
+        let data: Object[] = [];
+
+        if (!this.data) {
+            return undefined;
+        }
+
         this.data.forEach((child, index) => {
+            let object: Object = {};
             let childData = child.getData();
             if (childData !== undefined) {
                 if (this.title) {
                     // There is a title, so the key should be the index-TitleCell data
-                    data[this.title.getData()[index].toString()] = childData;
+                    childData.forEach((d, i) => object[this.title.getData()[i].toString()] = d);
                 } else {
                     // No title, therefore the key is the first column, the value all remaining columns
-                    data[childData[0].toString()] = tail(childData).toString();
+                    object[childData[0].toString()] = tail(childData).toString();
                 }
             }
+            data.push(object);
         });
-        return [data];
+        return data;
     }
 
     /**
@@ -172,6 +179,9 @@ export class Table<T> extends TableComponent<T> {
      * @returns `True` iff the row was present and could be removed.
      */
     public remove(index: number): boolean {
+        if (index < 0 || index > this.data.length) {
+            return false;
+        }
         return this.data.length > index && this.data.splice(index, 1) != undefined;
     }
 
@@ -246,6 +256,9 @@ export class TableRow<T> extends TableComponent<T> {
      * @returns The data stored in this row
      */
     public override getData(): T[] {
+        if (!this.data) {
+            return undefined;
+        }
         let data: Array<T> = [];
         this.data.forEach(child => {
             let childData = child.getData()
@@ -307,6 +320,10 @@ export class TableCell<T> extends TableComponent<T> {
      * @returns The data contained in this cell
      */
     public override getData(): T[] {
+        if (!this.data) {
+            return undefined;
+        }
+
         let data: Array<T> = [];
         this.data.forEach(child => {
             let childData = child.getData()
@@ -370,7 +387,7 @@ export class TableData<T> extends TableComponent<T> {
      * @returns An Array containing the data of this component as the only entry
      */
     public override getData(): T[] {
-        return [this.data.data];
+        return this.data ? [this.data.data] : undefined;
     }
 
     public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
@@ -421,14 +438,6 @@ export class TableDataHTML<T> extends TableData<T> {
     public override getChilds(): [Table<T>] {
         return undefined;
     }
-
-    /**
-     * Getter for the data of this component.
-     * @returns An Array containing the data of this component as the only entry or `undefined` if the data is `undefined`
-     */
-    public override getData(): T[] {
-        return this.data.data === undefined ? undefined : [this.data.data];
-    }
 }
 
 /**
@@ -463,7 +472,7 @@ export class TableDataComponent<T> extends TableData<T> {
      * @returns An Array containing the data of this component as the only entry or `undefined` if the data is `undefined`
      */
     public getData(): T[] {
-        return this.data.data === undefined ? undefined : [this.data.data];;
+        return undefined;
     }
 }
 
@@ -495,7 +504,7 @@ export class TableDataTable<T> extends TableData<T> {
      * @returns An Array containing the {@link Table table} contained in this component.
      */
     public override getChilds(): [Table<T>] {
-        return [this.data.table];
+        return this.data.table? [this.data.table] : undefined;
     }
 
     /**
@@ -503,7 +512,7 @@ export class TableDataTable<T> extends TableData<T> {
      * @returns The data of the contained table
      */
     public override getData(): T[] {
-        return this.data.table.getData();
+        return this.data.table ? this.data.table.getData() : undefined;
     }
 }
 
@@ -547,6 +556,11 @@ export class TitleCell<T> extends TableCell<T> {
     public getSorter(): Sorter<TableRow<T>> {
         return this.sorter;
     }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlTitleCell(this);
+        this.data = newData? newData.data : undefined;
+    }
 }
 
 /**
@@ -584,5 +598,10 @@ export class TitleRow<T> extends TableRow<T> {
      */
     public getChilds(): TitleCell<T>[] {
         return this.data;
+    }
+
+    public override getCrawledOn<C extends TableCrawler<T, C>>(crawler: C) {
+        let newData = crawler.crawlTitleRow(this);
+        this.data = newData? newData.data : undefined;
     }
 }
