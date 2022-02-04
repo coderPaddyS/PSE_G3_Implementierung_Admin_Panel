@@ -9,4 +9,3 @@ node_modules
 yarn-error.log
 .vscode
 /coverage
-yarn.lock
