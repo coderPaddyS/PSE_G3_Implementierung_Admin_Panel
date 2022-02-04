@@ -6,7 +6,7 @@
     "build": " npm run test && svelte-kit build",
     "package": "npm run test && svelte-kit package",
     "preview": "svelte-kit preview",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json -- --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --coverage",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "test:watch": "npm run test -- --watch"
