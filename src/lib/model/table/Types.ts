@@ -41,4 +41,9 @@ export const crawlerKey = Symbol();
  * Remove the first element of the array
  * @returns the remaining array
  */
-export const tail = ([x, ...xs]: any[]) => xs;
+export const tail = <T>(x: T[]) => {
+    if (!x) {
+        return undefined;
+    }
+    return (([x, ...xs]: T[]) => xs)(x);
+};

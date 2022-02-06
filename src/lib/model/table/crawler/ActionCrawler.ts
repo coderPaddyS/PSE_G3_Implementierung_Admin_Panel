@@ -2,7 +2,7 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import { TableComponent, Table, TableCell, TableData, TableRow, TitleCell, TitleRow, TableDataTable } from "../TableComponents";
+import { Table, TableCell, TableData, TableDataTable, TableRow } from "../TableComponents";
 import { TableCrawler } from "../TableCrawler";
 import type { CrawlerAction } from "../Types";
 
@@ -30,57 +30,83 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
      */
     public constructor(action: CrawlerAction<T, TableActionCrawler<T>>, index?: Array<number>) {
         super();
+        if (action === undefined) {
+            throw new Error("a TableActionCrawler needs to have an action, otherwise it is useless");
+        }
         this.action = action;
         this.index = index === undefined ? undefined : index.reverse();
     }
 
     public override crawlTable(table: Table<T>): Table<T> {
-        return this.advance(table, this.crawlRow);
-    }
-
-    public override crawlTitleRow(titleRow: TitleRow<T>): TitleRow<T> {
-        return this.advance(titleRow, this.crawlTitleCell);
+        if (table === undefined) {
+            return undefined;
+        } else if (this.index !== undefined && this.index.length > 0) {
+            let index = this.index.pop();
+            let length = table.getChilds().length;
+            if (length < index || index < 0) {
+                console.log(length, index);
+                throw new Error(`index ${index} is out of bounce. Maximum: ${length}, Minimum: 0`);
+            }
+            this.crawlRow(table.getChilds()[index]);
+        } else {
+            this.action(this, table);
+            table.getChilds().forEach(child => this.crawlRow(child));
+        }
+        return table;
     }
 
     public override crawlRow(row: TableRow<T>): TableRow<T> {
-        return this.advance(row, this.crawlCell);
+        if (row === undefined) {
+            return undefined;
+        } else if (this.index !== undefined && this.index.length > 0) {
+            let index = this.index.pop();
+            let length = row.getChilds().length;
+            if (length < index || index < 0) {
+                throw new Error(`index ${index} is out of bounce. Maximum: ${length}, Minimum: 0`);
+            }
+            this.crawlCell(row.getChilds()[index]);
+        } else {
+            this.action(this, row);
+            row.getChilds().forEach(child => this.crawlCell(child));
+        }
+        return row;
     }
 
     public override crawlCell(cell: TableCell<T>): TableCell<T> {
-        return this.advance(cell, this.crawlData);
-    }
-
-    public override crawlTitleCell(titleCell: TitleCell<T>): TitleCell<T> {
-        return this.advance(titleCell, this.crawlData);
+        if (cell === undefined) {
+            return undefined;
+        } else if (this.index !== undefined && this.index.length > 0) {
+            let index = this.index.pop();
+            let length = cell.getChilds().length;
+            if (length < index || index < 0) {
+                throw new Error(`index ${index} is out of bounce. Maximum: ${length}, Minimum: 0`);
+            }
+            this.crawlData(cell.getChilds()[index]);
+        } else {
+            this.action(this, cell);
+            cell.getChilds().forEach(child => this.crawlData(child));
+        }
+        return cell;
     }
 
     public override crawlData(data: TableData<T>): TableData<T> {
-        if (data instanceof TableDataTable) {
-            return this.advance(data, this.crawlTable)
-        }
-        return this.advance(data, this.crawlData);
-    }
-
-    /**
-     * Crawl onto the component and advance by using the index.
-     * @param comp The {@link TableComponent} to crawl on
-     * @param crawl The method used to crawl onto the component. Needed due to missing dynamic binding.
-     * @returns The given comp
-     * 
-     * @template C Something that extends {@link TableComponent TableComponent<T>}
-     * @template R Something that extends {@link TableComponent TableComponent<T>} and is the child of C.
-     */
-    private advance<C extends TableComponent<T>, R extends TableComponent<T>>(comp: C, crawl: (c: R) => R): C {
-        if (this.index === undefined || this.index.length == 0) {
-            // Perform the action on this element.
-            this.action(this, comp);
-        } else if (this.index.length > 1) {
-            // crawl onto the specified index of the child
-            crawl(comp.getChilds()[this.index.pop()]);
+        if (data === undefined) {
+            return undefined;
+        } else if (this. index !== undefined && this.index.length > 0 && data instanceof TableDataTable) {
+            let index = this.index.pop();
+            let length = data.getChilds().length;
+            if (length < index || index < 0) {
+                throw new Error(`index ${index} is out of bounce. Maximum: ${length}, Minimum: 0`);
+            }
+            this.crawlTable(data.getChilds()[index]);
+        } else if (this.index !== undefined && this.index.length > 0) {
+            throw new Error(`${typeof data} does not have any child components.`);
         } else {
-            // Perform the action on the next element. Saves a recursion step
-            this.action(this, comp.getChilds()[this.index.pop()])
+            this.action(this, data);
+            if (data instanceof TableDataTable) {
+                this.crawlTable(data.getChilds()[0])
+            }
         }
-        return comp;
+        return data;
     }
 }

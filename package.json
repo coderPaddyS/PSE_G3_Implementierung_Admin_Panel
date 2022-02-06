@@ -3,12 +3,13 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev",
-    "build": "svelte-kit build",
-    "package": "svelte-kit package",
+    "build": " npm run test && svelte-kit build",
+    "package": "npm run test && svelte-kit package",
     "preview": "svelte-kit preview",
-    "test": "",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --coverage",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch"
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "test:watch": "npm run test -- --watch"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "next",
@@ -19,7 +20,17 @@
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.9.4",
     "tslib": "^2.3.1",
-    "typescript": "^4.4.3"
+    "typescript": "^4.4.3",
+    "@babel/core": "^7.14.0",
+    "@babel/preset-env": "^7.14.0",
+    "jest": "^27.0.0",
+    "babel-jest": "^27.0.0",
+    "svelte-jester": "^2.0.1",
+    "@testing-library/svelte": "^3.0.0",
+    "@testing-library/jest-dom": "^5.14.0",
+    "ts-jest": "^27.0.0",
+    "@types/jest": "^27.0.0",
+    "@types/testing-library__jest-dom": "^5.14.0"
   },
   "type": "module",
   "dependencies": {
