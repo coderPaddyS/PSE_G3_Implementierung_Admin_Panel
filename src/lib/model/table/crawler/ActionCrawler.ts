@@ -50,7 +50,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
             this.crawlRow(table.getChilds()[index]);
         } else {
             this.action(this, table);
-            table.getChilds().forEach(child => this.crawlRow(child));
+            table.getChilds().forEach(child => child.getCrawledOn(this));
         }
         return table;
     }
@@ -67,7 +67,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
             this.crawlCell(row.getChilds()[index]);
         } else {
             this.action(this, row);
-            row.getChilds().forEach(child => this.crawlCell(child));
+            row.getChilds().forEach(child => child.getCrawledOn(this));
         }
         return row;
     }
@@ -84,7 +84,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
             this.crawlData(cell.getChilds()[index]);
         } else {
             this.action(this, cell);
-            cell.getChilds().forEach(child => this.crawlData(child));
+            cell.getChilds().forEach(child => child.getCrawledOn(this));
         }
         return cell;
     }

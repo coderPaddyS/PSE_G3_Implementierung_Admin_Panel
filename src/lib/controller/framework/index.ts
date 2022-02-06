@@ -1,4 +1,4 @@
-import type { Blacklist, BlacklistListener } from "$lib/model/Blacklist";
+import type { Blacklist } from "$lib/model/Blacklist";
 import { Changes } from "$lib/model/Changes";
 import type { ChangesListener } from "$lib/model/Changes";
 import type { Table } from "$lib/model/table/TableComponents"
@@ -6,7 +6,9 @@ import { Backend } from "../backend";
 import type { Action } from "$lib/model/Changes/Action";
 import { ChangeAction } from "$lib/model/Changes/ChangeAction";
 import type { Alias } from "$lib/model/Alias";
-import type { OfficialAliasesListener } from "$lib/model/OfficialAliases";
+import type { TableListener } from "$lib/model/TableManager";
+import { AuthManager } from "../authmanager";
+import type { AuthenticationListener } from "../authmanager";
 
 
 /**
@@ -21,6 +23,9 @@ export class Framework {
     private static instance: Framework = undefined;
     private backend: Backend;
     private changes: Changes;
+    private authManager: AuthManager;
+
+    private errorListener: Set<(error: string) => void>;
 
     /**
      * Construct the framework.
@@ -29,6 +34,8 @@ export class Framework {
     private constructor() {
         this.backend = new Backend();
         this.changes = new Changes();
+        this.authManager = new AuthManager(this.notifyError);
+        this.errorListener = new Set();
     }
 
     /**
@@ -63,7 +70,7 @@ export class Framework {
      * Observe changes on the backend
      * @param update {@link BlacklistListener}
      */
-    public onBlacklistUpdate(onUpdate: BlacklistListener) {
+    public onBlacklistUpdate(onUpdate: TableListener) {
         this.backend.onBlacklistUpdate(onUpdate);
     }
 
@@ -88,7 +95,7 @@ export class Framework {
      * Observe changes on the official aliases
      * @param update {@link OfficialAliassesListener}
      */
-    public onOfficialAliasesUpdate(onUpdate: OfficialAliasesListener) {
+    public onOfficialAliasesUpdate(onUpdate: TableListener) {
         this.backend.onOfficialAliasesUpdate(onUpdate);
     }
 
@@ -113,7 +120,7 @@ export class Framework {
      * Observe changes on the official aliases
      * @param update {@link OfficialAliassesListener}
      */
-    public onAliasSuggestionsUpdate(onUpdate: OfficialAliasesListener) {
+    public onAliasSuggestionsUpdate(onUpdate: TableListener) {
         this.backend.onAliasSuggestionsUpdate(onUpdate);
     }
 
@@ -168,12 +175,43 @@ export class Framework {
         return this.changes.getChangesTable();
     }
 
-
     /**
      * Observe changes on the changes
      * @param update {@link BlacklistListener}
      */
     public onChangesUpdate(onUpdate: ChangesListener) {
         this.changes.addListener(onUpdate);
+    }
+
+    public async login() {
+        await this.authManager.login();
+    }
+
+    public async logout() {
+        await this.authManager.logout();
+    }
+
+    public onAuthenticationUpdate(onUpdate: AuthenticationListener) {
+        this.authManager.onAuthenticationUpdate(onUpdate);
+    }
+
+    public isAuthenticated(): boolean {
+        return this.authManager.isAuthenticated();
+    }
+
+    public redirectAfterLogin() {
+        this.authManager.redirectAfterLogin();
+    }
+
+    public redirectAfterLogout() {
+        this.authManager.redirectAfterLogout();
+    }
+
+    private notifyError(error: string) {
+        this.errorListener.forEach(listener => listener(error));
+    }
+
+    public onError(onError: (error: string) => void) {
+        this.errorListener.add(onError);
     }
 }
