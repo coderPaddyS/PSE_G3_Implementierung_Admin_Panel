@@ -31,7 +31,7 @@
      * Create a {@link TableActionCrawler} to crawl onto the row of the given index.
      */
     function createCrawler(): TableActionCrawler<T> {
-        return new TableActionCrawler<T>(crawlerAction, index.slice(0, -2));
+        return new TableActionCrawler<T>(crawlerAction, index.slice(0, -2), false);
     }
 
 </script>
