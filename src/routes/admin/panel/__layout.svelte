@@ -5,7 +5,6 @@
     import { goto } from "$app/navigation";
 import { Framework } from "$lib/controller/framework";
 
-    import {LogoutButton} from "@dopry/svelte-oidc";
 import { onMount } from "svelte";
     
     Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
@@ -18,6 +17,7 @@ import { onMount } from "svelte";
 
     onMount(() => {
         if (!Framework.getInstance().isAuthenticated()) {
+            console.log("not logged in");
             goto('/admin', {
                 replaceState: true
             });

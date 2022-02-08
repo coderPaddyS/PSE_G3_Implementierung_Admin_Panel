@@ -1,14 +1,12 @@
-import type { Blacklist } from "$lib/model/Blacklist";
 import { Changes } from "$lib/model/Changes";
 import type { ChangesListener } from "$lib/model/Changes";
 import type { Table } from "$lib/model/table/TableComponents"
 import { Backend } from "../backend";
+import type { AuthenticationListener } from "../backend";
 import type { Action } from "$lib/model/Changes/Action";
 import { ChangeAction } from "$lib/model/Changes/ChangeAction";
 import type { Alias } from "$lib/model/Alias";
 import type { TableListener } from "$lib/model/TableManager";
-import { AuthManager } from "../authmanager";
-import type { AuthenticationListener } from "../authmanager";
 
 
 /**
@@ -23,7 +21,6 @@ export class Framework {
     private static instance: Framework = undefined;
     private backend: Backend;
     private changes: Changes;
-    private authManager: AuthManager;
 
     private errorListener: Set<(error: string) => void>;
 
@@ -32,9 +29,20 @@ export class Framework {
      * Private due to being a singleton.
      */
     private constructor() {
-        this.backend = new Backend();
+        this.backend = new Backend({
+                loginRedirectURI: new URL("http://localhost:3000/admin"),
+                logoutRedirectURI: new URL("http://localhost:3000/admin"),
+                settings: {
+                    authority: "https://oidc.scc.kit.edu/auth/realms/kit/",
+                    client_id: "pse-itermori-de",
+                    redirect_uri: "http://localhost:3000/admin/login",
+                    response_type: "code",
+                    scope: "openid profile email",
+                    automaticSilentRenew: true
+                }
+            },
+            () => "");
         this.changes = new Changes();
-        this.authManager = new AuthManager(this.notifyError);
         this.errorListener = new Set();
     }
 
@@ -59,14 +67,6 @@ export class Framework {
     }
 
     /**
-     * Remove the given entry from the blacklist.
-     * @param entry {@link string}
-     */
-    public async removeFromBlacklist(entry: string) {
-        this.backend.removeFromBlacklist(entry);
-    }
-
-    /**
      * Observe changes on the backend
      * @param update {@link BlacklistListener}
      */
@@ -83,13 +83,6 @@ export class Framework {
         return table;
     }
 
-    /**
-     * Remove the given entry from the blacklist.
-     * @param entry {@link string}
-     */
-    public async removeFromOfficialAliases(entry: Alias) {
-        this.backend.removeFromOfficialAliases(entry);
-    }
 
     /**
      * Observe changes on the official aliases
@@ -108,13 +101,6 @@ export class Framework {
         return table;
     }
 
-    /**
-     * Remove the given entry from the blacklist.
-     * @param entry {@link string}
-     */
-    public async removeFromAliasSuggestions(entry: Alias) {
-        this.backend.removeFromAliasSuggestions(entry);
-    }
 
     /**
      * Observe changes on the official aliases
@@ -149,7 +135,7 @@ export class Framework {
      * @param metadata The metadata as Key-Value-Object of this action
      * @returns {@code true} if the change could be performed.
      */
-    public performChange(time: string, category: string, description: string, metadata: Object): boolean {
+    public async performChange(time: string, category: string, description: string, metadata: Object): Promise<boolean> {
         return this.changes.perform(new Date(time), category, description, metadata);
     }
 
@@ -163,7 +149,7 @@ export class Framework {
      * @param metadata The metadata as Key-Value-Object of this action
      * @returns {@code true} if the change could be removed.
      */
-    public removeChange(time: string, category: string, description: string, metadata: Object): boolean {
+    public async removeChange(time: string, category: string, description: string, metadata: Object): Promise<boolean> {
         return this.changes.removeByData(new Date(time), category, description, metadata);
     }
 
@@ -184,27 +170,27 @@ export class Framework {
     }
 
     public async login() {
-        await this.authManager.login();
+        await this.backend.login();
     }
 
     public async logout() {
-        await this.authManager.logout();
+        await this.backend.logout();
     }
 
     public onAuthenticationUpdate(onUpdate: AuthenticationListener) {
-        this.authManager.onAuthenticationUpdate(onUpdate);
+        this.backend.addAuthenticationListener(onUpdate);
     }
 
     public isAuthenticated(): boolean {
-        return this.authManager.isAuthenticated();
+        return this.backend.isAuthenticated();
     }
 
     public redirectAfterLogin() {
-        this.authManager.redirectAfterLogin();
+        this.backend.redirectAfterLogin();
     }
 
     public redirectAfterLogout() {
-        this.authManager.redirectAfterLogout();
+        this.backend.redirectAfterLogout();
     }
 
     private notifyError(error: string) {
