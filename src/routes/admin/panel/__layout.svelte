@@ -3,15 +3,26 @@
 
 <script>
     import { goto } from "$app/navigation";
+import { Framework } from "$lib/controller/framework";
 
-    import {LogoutButton} from "@dopry/svelte-oidc";
-    import { accessToken, isAuthenticated } from "@dopry/svelte-oidc/src/components/OidcContext.svelte";
+import { onMount } from "svelte";
     
-    // $: if (!$isAuthenticated) {
-    //     goto("/admin", {
-    //         replaceState: true
-    //     })
-    // }
+    Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
+        if (!isAuthenticated) {
+            goto("/admin", {
+                replaceState: true
+            });
+        }
+    })
+
+    onMount(() => {
+        if (!Framework.getInstance().isAuthenticated()) {
+            console.log("not logged in");
+            goto('/admin', {
+                replaceState: true
+            });
+        }
+    })
 </script>
 
 <style lang="scss">
@@ -148,7 +159,7 @@
         <div class="navitem"><a href=/admin/panel/blacklist>Blacklist           </a></div>
         <div class="navitem"><a href=/admin/panel/changes>Änderungen            </a></div>
         <div class=logout>
-            <LogoutButton> Logout </LogoutButton>
+            <button on:click={() => Framework.getInstance().logout()}> Logout </button>
         </div>
     </div>
     <div class=content>

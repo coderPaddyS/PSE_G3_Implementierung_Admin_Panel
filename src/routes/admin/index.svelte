@@ -6,19 +6,25 @@
 
     import { goto } from '$app/navigation'
 
-    import { 
-        isAuthenticated,
-        accessToken,
-        userInfo
-        } from '@dopry/svelte-oidc';
-
     import KITLogin from '$lib/logins/KIT/index.svelte'
+import { Framework } from '$lib/controller/framework';
+import { onMount } from 'svelte';
 
-    $:  if ($isAuthenticated) {
-        goto("admin/panel", {
-            replaceState: false
-        })
-    }
+    Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
+        if (isAuthenticated) {
+            goto('/admin/panel', {
+                replaceState: true
+            });
+        }
+    });
+
+    onMount(() => {
+        if (Framework.getInstance().isAuthenticated()) {
+            goto('/admin/panel', {
+                replaceState: true
+            });
+        }
+    })
 </script>
 
 <style lang=scss>
@@ -39,6 +45,7 @@
         display: flex;
         justify-content: center;
         height: 100%;
+        width: 100%;
         background-color: #b8740d;
     }
 
@@ -134,13 +141,13 @@
 <main>
     <div class=wrapper>
         <div class=content>
-            {JSON.stringify($userInfo, null, 2)}
+            <!-- {JSON.stringify($userInfo, null, 2)} -->
             <slot name=content></slot>
         </div>
         <div class=login-wrapper>
             <h2>Admin?</h2>
             <div class=logins>
-                <KITLogin />
+                <KITLogin login={() => Framework.getInstance().login()} />
             </div>
         </div>
         <div class=links>
