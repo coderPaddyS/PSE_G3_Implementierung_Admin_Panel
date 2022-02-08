@@ -29,13 +29,13 @@ export const lexicographicSorter: Sorter<TableRow<string>> = (a: TableRow<string
  * @author Patrick Schneider
  * @version 1.0
  */
-export abstract class TableManager<T extends ToDisplayData> {
+export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayData> {
 
     private table: Table<string>;
-    private data: T[];
+    private data: R[];
     private title: T;
     private sorters: Map<string, Sorter<TableRow<string>>>;
-    private actions: {onClick: (entry: T) => (() => void)[], text: string}[];
+    private actions: {onClick: (entry: R) => (() => void)[], text: string}[];
     private actionTitle: string;
     private listeners: Set<TableListener> = new Set();
 
@@ -50,14 +50,13 @@ export abstract class TableManager<T extends ToDisplayData> {
      */
     public constructor(
         title: T, 
-        data?: T[],
+        data?: R[],
         sorters?: Map<string, Sorter<TableRow<string>>>,
-        actions?: {actions: {onClick: (entry: T) => (() => void)[], text: string}[], title: string}) {
+        actions?: {actions: {onClick: (entry: R) => (() => void)[], text: string}[], title: string}) {
 
         if (!this.checkMatchingColumns(data, title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
-
         this.title = title;
         this.data = data;
         this.sorters = new Map(sorters);
@@ -66,11 +65,12 @@ export abstract class TableManager<T extends ToDisplayData> {
         this.table = this.createTable();
     }
 
-    private checkMatchingColumns(data: T[], title: T): boolean {
+    private checkMatchingColumns(data: R[], title: T): boolean {
         if (!data) {
             return true;
         }
-        return data.filter((entry: T) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
+        console.log(typeof data, data);
+        return data.filter((entry: R) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
     }
 
     /**
@@ -108,7 +108,7 @@ export abstract class TableManager<T extends ToDisplayData> {
      * @param entry The entry to embed into a table row
      * @returns The table row build from entry
      */
-    private buildRow(entry: T): TableRow<string> {
+    private buildRow(entry: R): TableRow<string> {
         const data = lodash.cloneDeep(entry.toDisplayData());
 
         // Build the row containing the displayData specified by ToDisplayData::toDisplayData ...
@@ -148,7 +148,8 @@ export abstract class TableManager<T extends ToDisplayData> {
      * Notify the listeners listening on table changes
      */
     private notify() {
-        this.listeners.forEach(listener => listener(this.getTable()));
+        console.log("notified", this.table)
+        this.listeners.forEach(listener => listener(this.table));
     }
 
     /**
@@ -156,7 +157,7 @@ export abstract class TableManager<T extends ToDisplayData> {
      * The titles has to match to a column and all data entries have to match to a column.
      * @param data {@code string[]} the data to display
      */
-    public setData(data: T[]) {
+    protected setData(data: R[]) {
         if (!this.checkMatchingColumns(data, this.title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
@@ -170,11 +171,12 @@ export abstract class TableManager<T extends ToDisplayData> {
      * The titles and every entry of data have to match their length, as they define the number of columns.
      * @param data The data to be added.
      */
-    public addData(...data: T[]) {
+    protected addData(...data: R[]) {
         if (!this.checkMatchingColumns(data, this.title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
-        this.table.add(...data.map(this.buildRow));
+        this.data.push(...data);
+        this.table.add(...data.map(entry => this.buildRow(entry)));
         this.notify();
     }
 
@@ -182,7 +184,7 @@ export abstract class TableManager<T extends ToDisplayData> {
      * Remove the given entries from the table.
      * @param entry The entries: {@code string[]} to be removed
      */
-    public removeData(...data: T[]) {
+    protected removeData(...data: R[]) {
         data.forEach(entry => {
             let index = this.data.indexOf(entry);
             if (index >= 0) {
@@ -209,11 +211,19 @@ export abstract class TableManager<T extends ToDisplayData> {
         this.listeners.delete(listener);
     }
 
+    protected abstract fetchData(): Promise<R[]>;
+
     /**
      * Getter for the table representation.
      * @returns {@link Table<string>}
      */
-    public getTable(): Table<string> {
+    public async getTable(): Promise<Table<string>> {
+        console.log("fetched")
+        this.fetchData().then(data => this.setData(data));
+        return this.table;
+    }
+
+    protected getTableWithoutFetch(): Table<string> {
         return this.table;
     }
 
@@ -223,16 +233,20 @@ export abstract class TableManager<T extends ToDisplayData> {
      * 
      * @param data T[]
      */
-    public hide(...data: T[]) {
+    public hide(...data: R[]) {
         let notifyObserver: boolean = false;
         data.forEach(entry => {
-            let index = this.data.indexOf(entry);
-            console.log(index, entry);
-            console.log(this.data, this.table);
-            if (index >= 0) {
+            let indices: Array<number> = [];
+            this.data.forEach((datum, index) => {
+                if (lodash.isEqual(entry, datum)) {
+                    indices.push(index);
+                }
+            })
+            indices.forEach((index) => {
+                console.log(index)
                 this.table.getChilds()[index].hide();
                 notifyObserver = true;
-            }
+            })
         });
         if (notifyObserver) {
             this.notify();
@@ -245,7 +259,7 @@ export abstract class TableManager<T extends ToDisplayData> {
      * 
      * @param data T[]
      */
-    public show(...data: T[]) {
+    public show(...data: R[]) {
         let notifyObserver: boolean = false;
         data.forEach(entry => {
             let index = this.data.indexOf(entry);

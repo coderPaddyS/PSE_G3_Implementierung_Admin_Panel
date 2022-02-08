@@ -39,7 +39,7 @@ export interface iTableData<T> {
  * @version 1.0
  */
 export abstract class TableComponent<T> {
-    protected data: iTableData<T> | TableComponent<T> | TableComponent<T>[];
+    protected data: iTableData<T> | TableComponent<T>[];
     protected filterable: boolean = true;
     protected hidden: boolean = false;
     protected sorter?: Sorter<TableComponent<T>>;
@@ -261,7 +261,7 @@ export class TableRow<T> extends TableComponent<T> {
         }
         let data: Array<T> = [];
         this.data.forEach(child => {
-            let childData = child.getData()
+            let childData = child.getData();
             if (childData !== undefined) {
                 data.push(...childData)
             }
@@ -511,8 +511,21 @@ export class TableDataTable<T> extends TableData<T> {
      * Getter for the data of the contained table.
      * @returns The data of the contained table
      */
-    public override getData(): T[] {
-        return this.data.table ? this.data.table.getData() : undefined;
+    public override getData(): [any] {
+        if (this.data.table === undefined) {
+            return undefined;
+        }
+
+        let data: T[] = this.data.table.getData();
+
+        if (data.length == 1) {
+            return [data[0]];
+        }
+        let object: Object = new Object();
+        data.forEach((obj: Object, index) => {
+            Object.entries(obj).forEach(([key, value]) => object[key] = value)
+        });
+        return [object];
     }
 }
 

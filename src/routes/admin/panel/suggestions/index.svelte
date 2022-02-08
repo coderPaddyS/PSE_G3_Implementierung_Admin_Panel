@@ -9,11 +9,7 @@
     let framework = Framework.getInstance();
 
     let filterOptions: Map<String, String> = new Map([["Filter", "Option"], ["Filter2", "Option2"]])
-
-    function mutate() {
-        
-    }
 </script>
 
-<!-- <FilterElement {filterOptions} /> -->
+<FilterElement {filterOptions} />
 <SvelteTable supplier={async () => framework.getAliasSuggestions()} updater={(listener) => framework.onAliasSuggestionsUpdate(listener)} size=5em />

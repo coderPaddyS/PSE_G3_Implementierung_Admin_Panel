@@ -105,9 +105,12 @@ export class Changes {
      * @param metadata Key-Value-Object
      * @returns boolean `true` iff removal was successful, `false` if no matching action was found or the removal was not successful
      */
-    public removeByData(time: Date, category: string, description: string, metadata: Object): boolean {
+    public async removeByData(time: Date, category: string, description: string, metadata: Object): Promise<boolean> {
         let action = this.changes.filter(c => c.equals(time, category, description, metadata))[0];
-        return action && this.remove(action) && action.remove();
+        if (action && this.remove(action)) {
+            return action.remove()
+        }
+        return false;
     }
 
     /**
@@ -138,8 +141,11 @@ export class Changes {
      * @param metadata Key-Value-Object
      * @returns boolean `true` iff action could perform and removed successfully
      */
-    public perform(time: Date, category: string, description: string, metadata: Object): boolean {
+    public async perform(time: Date, category: string, description: string, metadata: Object): Promise<boolean> {
         let action = this.changes.filter(c => c.equals(time, category, description, metadata))[0];
+        if (action && await action.perform()) {
+            this.remove(action);
+        }
         return action && action.perform() && this.remove(action);
     }
 

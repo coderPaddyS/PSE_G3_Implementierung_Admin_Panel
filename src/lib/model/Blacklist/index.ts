@@ -16,35 +16,79 @@ import type { ToDisplayData } from "../TableManager/ToDisplayData";
  * @author Patrick Schneider
  * @version 0.5
  */
-export class Blacklist extends TableManager<BlacklistEntry> {
+export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
+
+    private fetch: <T>(body: string) => Promise<T>;
 
     /**
      * Create the blacklist and set its data accordingly.
      * Copies the data, changes will not be reflected.
      * @param data If provided sets the data of the table. 
      */
-    public constructor(data?: BlacklistEntry[]) {
+    public constructor(fetch: <T>(body: string) => Promise<T>,data?: BlacklistEntry[]) {
         let sorter: Map<string, Sorter<TableRow<string>>> = new Map();
         sorter.set("Eintrag", lexicographicSorter);
         super(
-            new BlacklistEntry("Eintrag"), data, sorter, {
+            new BlacklistEntry("Eintrag"), data? data : [], sorter, {
                 title: "Aktionen",
                 actions: [{
                     onClick: (entry: BlacklistEntry) => [
-                        () => {
-                            console.log("clicked action of ", entry);
-                            Framework.getInstance().addChange(() => {this.removeData(entry); return true;}, 
-                            () => {this.show(entry); return true;}, 
-                            "Blacklist", 
-                            "Löschen " + entry.toDisplayData()[0], 
-                            this.getTable().matchData(entry.toDisplayData()))
-                        },
+                        () => this.removeEntry(entry),
                         () => this.hide(entry)
                     ],
                     text: "Löschen",
                 }]
             }
         );
+        this.fetch = fetch;
+    }
+
+    public addEntry(entry: BlacklistEntry): boolean {
+        super.addData(entry);
+        return true;
+    }
+
+    private removeEntry(entry: BlacklistEntry) {
+        Framework.getInstance().addChange(
+            async () => {
+                let success = await this.removeFromBackend(entry);
+                if (success) {
+                    this.removeData(entry);
+                }
+                return success;
+            }, 
+            async () => {this.show(entry); return true;}, 
+            "Blacklist", 
+            "Löschen ", 
+            this.getTableWithoutFetch().matchData(entry.toDisplayData())
+        );
+    }
+
+    private removeFromBackend(entry: BlacklistEntry): Promise<boolean> {
+        return this.fetch<{data: {removeFromBlacklist: boolean}}>(JSON.stringify({
+            query: `
+                mutation removeFromBlacklist($entry: String!) {
+                    removeFromBlacklist(blacklistedToRem: $entry)
+                }
+            `,
+            variables: {
+                entry: entry.toDisplayData()[0]
+            }
+        })).then(response => response.data.removeFromBlacklist)
+        .catch(error => {
+            console.log(error);
+            return false;
+        });
+    }
+
+    protected override async fetchData(): Promise<Array<BlacklistEntry>> {
+        return this.fetch<{data: {getBlacklist: string[]}}>(JSON.stringify({
+            query: `
+                query getBlacklistEntries {
+                    getBlacklist
+                }
+            `
+        })).then(response => response.data.getBlacklist.map(entry => new BlacklistEntry(entry)));
     }
 }
 

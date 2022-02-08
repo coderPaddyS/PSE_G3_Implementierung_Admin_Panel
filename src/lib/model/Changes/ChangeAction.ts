@@ -42,7 +42,7 @@ export class ChangeAction {
      * Performs the action.
      * @returns the result of this action
      */
-    public perform(): boolean {
+    public async perform(): Promise<boolean> {
         return this.action();
     }
 
@@ -50,7 +50,7 @@ export class ChangeAction {
      * Performs the onRemoval-Action.
      * @returns the result of the removal-Action
      */
-    public remove(): boolean {
+    public async remove(): Promise<boolean> {
         return this.onRemoval();
     }
 
