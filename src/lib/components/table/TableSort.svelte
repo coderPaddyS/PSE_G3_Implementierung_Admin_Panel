@@ -68,7 +68,6 @@
         resetOthers();
         state = SortState.next(state);
         setSorting(state);
-        console.log("adad")
     }
 
     /**

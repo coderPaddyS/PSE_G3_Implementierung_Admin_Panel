@@ -16,7 +16,7 @@ describe("Test TitleRowComp.svelte", () => {
         })
         afterEach(() => cleanup());
         
-        test("Testrow correctly", () => {
+        test("test row correctly", () => {
             const { container } = render(MockContext, {
                 props: {
                     key: crawlerKey,
@@ -29,7 +29,7 @@ describe("Test TitleRowComp.svelte", () => {
             expect(container).toHaveTextContent("Data");
         });
 
-        test("hidden Testrow correctly", () => {
+        test("hidden test row correctly", () => {
             row.hide();
             const { container } = render(MockContext, {
                 props: {

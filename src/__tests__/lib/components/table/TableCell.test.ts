@@ -16,7 +16,7 @@ describe("Test TableCellComp.svelte", () => {
         })
         afterEach(() => cleanup());
         
-        test("testcell correctly", () => {
+        test("test cell correctly", () => {
             const { container } = render(MockContext, {
                 props: {
                     key: crawlerKey,
@@ -29,7 +29,7 @@ describe("Test TableCellComp.svelte", () => {
             expect(container).toHaveTextContent("Data");
         });
 
-        test("hidden Testcell correctly", () => {
+        test("hidden test cell correctly", () => {
             cell.hide();
             const { container } = render(MockContext, {
                 props: {
