@@ -9,10 +9,16 @@
     // Listeners to be executed 
     export let onClick: Array<(() => void)> = [];
 
+    function handleOnClick() {
+        if (onClick) {
+            onClick.forEach((callback) => callback())
+        }
+    }
+
 </script>
 
 <style lang="scss">
 
 </style>
 
-<button on:click={() => onClick.forEach((callback) => callback())}>{text}</button>
+<button on:click={handleOnClick}>{text? text : ""}</button>

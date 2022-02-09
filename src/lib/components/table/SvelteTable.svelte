@@ -36,12 +36,6 @@
     let data: TA;
     let tableViewData: TA = lodash.cloneDeep(data);
 
-    // Add the listener to update the table data
-    updater(newTable => {
-        data = lodash.cloneDeep(newTable);
-        updateTableView();
-    })
-
     // Keys to the special filter and sorter crawlers
     const filterCrawlerKey = Symbol();
     const sorterCrawlerKey = Symbol();
@@ -52,7 +46,13 @@
     crawlers.set(sorterCrawlerKey, new TableSortingCrawler<T>((a,b) => [a,b]))
 
     // Insert every given custom crawler
-    extraCrawlers.forEach(crawlers.set);
+    extraCrawlers.forEach((crawler, key) => crawlers.set(key, crawler));
+
+    // Add the listener to update the table data
+    updater(newTable => {
+        data = lodash.cloneDeep(newTable);
+        updateTableView();
+    })
 
     /**
      * Update the displayed data.

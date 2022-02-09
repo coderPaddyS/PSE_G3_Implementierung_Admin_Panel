@@ -4,8 +4,6 @@
 <script lang=ts context=module>
     // This special script section is shared with other components to share a given state
 
-    import type TableSort from "./TableSort.svelte";
-    
     /**
      * The possible states a sorting element can be in.
      */
@@ -33,11 +31,11 @@
     }
 
     /** The current sorting elements active in this context */
-    const sortElements: Set<any> = new Set();
+    const sortElementsReset: Set<() => void> = new Set();
 </script>
 
 <script lang=ts>
-    import { getContext, get_current_component, onMount } from "svelte/internal";
+    import { getContext, onMount } from "svelte/internal";
     import { crawlerKey, invertSort, Sorter } from "$lib/model/table/Types";
     import { TableSortingCrawler } from "$lib/model/table/crawler/SortingCrawler";
     import type { TableRow } from "$lib/model/table/TableComponents";
@@ -53,12 +51,6 @@
     // The current sorting state of this sorting element
     let state: SortState = SortState.NONE;
 
-    // A reference to itself to manage the state of the other sorting elements
-    let thisElement: TableSort<T, R> = get_current_component();
-
-    // Add this sorting element to the context for state management
-    sortElements.add(thisElement);
-
     /** The sorting algorithm which should be applied. See {@link iTableRow}*/
     export let algorithm: Sorter<R>;
     const identity: Sorter<R> = (a, b) => [a,b];
@@ -73,18 +65,18 @@
      * Does reset all other sorting elements in the current context.
      */
     function nextState() {
-        resetSortOthers();
+        resetOthers();
         state = SortState.next(state);
-        setSorting(state)
+        setSorting(state);
     }
 
     /**
      * Reset any other sorting element which is present in the current context.
      */
-    function resetSortOthers() {
-        sortElements.forEach(element => {
-            if (element !== thisElement) {
-                element.reset();
+    function resetOthers() {
+        sortElementsReset.forEach(r => {
+            if (reset !== r) {
+                r();
             }
         })
     }
@@ -110,6 +102,8 @@
 
     // If the component is loaded by the browser and therefore gets visible
     onMount(() => {
+        // Add this sorting element to the context for state management
+        sortElementsReset.add(reset);
 
         // Create the sorter and set sorting state
         identitySorter = new TableSortingCrawler(identity);
@@ -127,12 +121,12 @@
     }
 </style>
 
-<div on:click={nextState}>
+<div class=sorting-element on:click={nextState}>
     {#if state == SortState.NONE}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.29,14.29,12,18.59l-4.29-4.3a1,1,0,0,0-1.42,1.42l5,5a1,1,0,0,0,1.42,0l5-5a1,1,0,0,0-1.42-1.42ZM7.71,9.71,12,5.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42l-5-5a1,1,0,0,0-1.42,0l-5,5A1,1,0,0,0,7.71,9.71Z"/></svg>
+        <svg class=identity xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.29,14.29,12,18.59l-4.29-4.3a1,1,0,0,0-1.42,1.42l5,5a1,1,0,0,0,1.42,0l5-5a1,1,0,0,0-1.42-1.42ZM7.71,9.71,12,5.41l4.29,4.3a1,1,0,0,0,1.42,0,1,1,0,0,0,0-1.42l-5-5a1,1,0,0,0-1.42,0l-5,5A1,1,0,0,0,7.71,9.71Z"/></svg>
     {:else if state == SortState.ASCENDEND}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m 16.290001,9.7117068 -4.29,-4.2999997 -4.2900012,4.2999997 a 1.0040916,1.0040916 0 0 1 -1.42,-1.4199997 l 5.0000012,-5 a 1,1 0 0 1 1.42,0 l 5,5 a 1.0040916,1.0040916 0 0 1 -1.42,1.4199997 z"/></svg>
+        <svg class=asc xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m 16.290001,9.7117068 -4.29,-4.2999997 -4.2900012,4.2999997 a 1.0040916,1.0040916 0 0 1 -1.42,-1.4199997 l 5.0000012,-5 a 1,1 0 0 1 1.42,0 l 5,5 a 1.0040916,1.0040916 0 0 1 -1.42,1.4199997 z"/></svg>
     {:else}
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.29,14.29,12,18.59l-4.29-4.3a1,1,0,0,0-1.42,1.42l5,5a1,1,0,0,0,1.42,0l5-5a1,1,0,0,0-1.42-1.42ZM7.71"/></svg>
+        <svg class=desc xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.29,14.29,12,18.59l-4.29-4.3a1,1,0,0,0-1.42,1.42l5,5a1,1,0,0,0,1.42,0l5-5a1,1,0,0,0-1.42-1.42ZM7.71"/></svg>
     {/if}
 </div>

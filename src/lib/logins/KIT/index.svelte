@@ -2,12 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import {login, OIDC_CONTEXT_CLIENT_PROMISE, OIDC_CONTEXT_REDIRECT_URI} from '@dopry/svelte-oidc/src/components/OidcContext.svelte';
-    import type { UserManager } from 'oidc-client';
-    import { getContext } from 'svelte';
-    export let oidcPromise: Promise<typeof UserManager> = getContext(OIDC_CONTEXT_CLIENT_PROMISE);
-    export let callback_url: string = getContext(OIDC_CONTEXT_REDIRECT_URI);
-    export let preserveRoute: boolean = true;
+    export let login: () => void;
 </script>
 
 <style lang=scss>
@@ -47,7 +42,7 @@
 
 </style>
 
-<div class=wrapper on:click={() => login(oidcPromise, preserveRoute, callback_url) }>
+<div class=wrapper on:click={() => login()}>
     <img src=logins/Logo_KIT.svg alt="KIT">
     <button>Login via KIT</button>
 </div>
