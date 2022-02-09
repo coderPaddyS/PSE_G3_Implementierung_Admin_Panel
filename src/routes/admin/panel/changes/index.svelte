@@ -3,7 +3,6 @@
 
 <script lang=ts>
     import SvelteTable from "$lib/components/table/SvelteTable.svelte"
-    import FilterElement from "$lib/components/table/FilterElement.svelte";
     import { Framework } from "$lib/controller/framework";
 
     let framework = Framework.getInstance();
@@ -11,5 +10,8 @@
     let filterOptions: Map<String, String> = new Map([["Filter", "Option"], ["Filter2", "Option2"]])
 </script>
 
-<FilterElement {filterOptions} />
-<SvelteTable supplier={async () => framework.getChanges()} updater={(listener) => framework.onChangesUpdate(listener)} size=5em />
+{#await framework.getChanges()}
+    Loading...
+{:then data}
+    <SvelteTable supplier={() => data} updater={(listener) => framework.onChangesUpdate(listener)} size=5em />
+{/await}

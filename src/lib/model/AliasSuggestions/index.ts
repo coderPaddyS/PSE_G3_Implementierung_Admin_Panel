@@ -124,6 +124,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         sorters.set(AliasSuggestions.colAlias, lexicographicSorter);
         sorters.set(AliasSuggestions.colBuilding, lexicographicSorter);
         sorters.set(AliasSuggestions.colRoom, lexicographicSorter);
+        sorters.set(AliasSuggestions.colUpvotes, lexicographicSorter);
+        sorters.set(AliasSuggestions.colDownvotes, lexicographicSorter);
         super(
             AliasSuggestions.title, data? data : [], sorters, {
                 title: "Aktionen",
@@ -265,5 +267,9 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
             ));
         })); */
         return suggestions;
+    }
+
+    public override filterableData(): string[] {
+        return AliasSuggestions.title.toDisplayData();
     }
 }

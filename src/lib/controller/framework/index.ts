@@ -5,8 +5,8 @@ import { Backend } from "../backend";
 import type { AuthenticationListener } from "../backend";
 import type { Action } from "$lib/model/Changes/Action";
 import { ChangeAction } from "$lib/model/Changes/ChangeAction";
-import type { Alias } from "$lib/model/Alias";
-import type { TableListener } from "$lib/model/TableManager";
+import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
+import type { Tables } from "$lib/model/tables";
 
 
 /**
@@ -57,57 +57,8 @@ export class Framework {
         return Framework.instance;
     }
 
-    /**
-     * Retrieve the current blacklist
-     * @returns Promise of {@link Table<string>}
-     */
-    public async getBlacklist(): Promise<Table<string>> {
-        let table = this.backend.getBlacklist();
-        return table;
-    }
-
-    /**
-     * Observe changes on the backend
-     * @param update {@link BlacklistListener}
-     */
-    public onBlacklistUpdate(onUpdate: TableListener) {
-        this.backend.onBlacklistUpdate(onUpdate);
-    }
-
-    /**
-     * Retrieve the current blacklist
-     * @returns Promise of {@link Table<string>}
-     */
-    public async getOfficialAliases(): Promise<Table<string>> {
-        let table = this.backend.getOfficialAliases();
-        return table;
-    }
-
-
-    /**
-     * Observe changes on the official aliases
-     * @param update {@link OfficialAliassesListener}
-     */
-    public onOfficialAliasesUpdate(onUpdate: TableListener) {
-        this.backend.onOfficialAliasesUpdate(onUpdate);
-    }
-
-    /**
-     * Retrieve the current blacklist
-     * @returns Promise of {@link Table<string>}
-     */
-    public async getAliasSuggestions(): Promise<Table<string>> {
-        let table = this.backend.getAliasSuggestions();
-        return table;
-    }
-
-
-    /**
-     * Observe changes on the official aliases
-     * @param update {@link OfficialAliassesListener}
-     */
-    public onAliasSuggestionsUpdate(onUpdate: TableListener) {
-        this.backend.onAliasSuggestionsUpdate(onUpdate);
+    public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
+        return this.backend.getTableDisplayInformation(table);
     }
 
     /**

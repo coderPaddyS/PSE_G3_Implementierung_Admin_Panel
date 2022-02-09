@@ -69,7 +69,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (!data) {
             return true;
         }
-        console.log(typeof data, data);
         return data.filter((entry: R) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
     }
 
@@ -148,7 +147,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * Notify the listeners listening on table changes
      */
     private notify() {
-        console.log("notified", this.table)
         this.listeners.forEach(listener => listener(this.table));
     }
 
@@ -218,8 +216,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns {@link Table<string>}
      */
     public async getTable(): Promise<Table<string>> {
-        console.log("fetched")
-        this.fetchData().then(data => this.setData(data));
+        await this.fetchData().then(data => this.setData(data));
         return this.table;
     }
 
@@ -243,7 +240,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 }
             })
             indices.forEach((index) => {
-                console.log(index)
                 this.table.getChilds()[index].hide();
                 notifyObserver = true;
             })
@@ -272,4 +268,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             this.notify();
         }
     }
+
+    public abstract filterableData(): string[];
 }

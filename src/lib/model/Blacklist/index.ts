@@ -9,6 +9,27 @@ import { lexicographicSorter, TableManager } from "../TableManager";
 import type { ToDisplayData } from "../TableManager/ToDisplayData";
 
 /**
+ * This class represents the data of the Blacklist.
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
+ export class BlacklistEntry implements ToDisplayData {
+    
+    private entry: string;
+
+    public constructor(entry: string) {
+        this.entry = entry;
+    }
+
+    public toDisplayData(): string[] {
+        return [this.entry];
+    }
+}
+
+type BlacklistTitle = BlacklistEntry;
+
+/**
  * This class represents the blacklist.
  * It is a two-column table, of which the first one contains the relevant data of the blacklist.
  * The second column contains an action to remove the entries from the blacklist.
@@ -16,8 +37,9 @@ import type { ToDisplayData } from "../TableManager/ToDisplayData";
  * @author Patrick Schneider
  * @version 0.5
  */
-export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
+export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
 
+    private static title = new BlacklistEntry("Eintrag");
     private fetch: <T>(body: string) => Promise<T>;
 
     /**
@@ -90,23 +112,8 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
             `
         })).then(response => response.data.getBlacklist.map(entry => new BlacklistEntry(entry)));
     }
-}
 
-/**
- * This class represents the data of the Blacklist.
- * 
- * @author Patrick Schneider
- * @version 1.0
- */
-export class BlacklistEntry implements ToDisplayData {
-    
-    private entry: string;
-
-    public constructor(entry: string) {
-        this.entry = entry;
-    }
-
-    public toDisplayData(): string[] {
-        return [this.entry];
+    public override filterableData(): string[] {
+        return Blacklist.title.toDisplayData();
     }
 }

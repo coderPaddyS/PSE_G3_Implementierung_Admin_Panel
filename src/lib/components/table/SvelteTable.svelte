@@ -29,8 +29,9 @@
     export let extraCrawlers: Map<Symbol, any> = new Map();
 
     // A supplier and an updater to retreive table data
-    export let supplier: () => Promise<TA>;
+    export let supplier: () => TA;
     export let updater: (listener: (table: TA) => void) => void;
+    export let filterableData: () => T[];
 
     // Get the table data, but only work on a copy to preserve the original state
     let data: TA;
@@ -52,7 +53,7 @@
     updater(newTable => {
         data = lodash.cloneDeep(newTable);
         updateTableView();
-    })
+    });
 
     /**
      * Update the displayed data.
@@ -81,13 +82,14 @@
             updateTableView();
         },
         crawlOnView: (crawler: C) => {
-            data.getCrawledOn(crawler);
+            tableViewData.getCrawledOn(crawler);
         }
     })
 
     onMount(async () => {
-        data = await supplier();
+        data = supplier();
         tableViewData = lodash.cloneDeep(data);
+        console.log("data", data);
     })
 </script>
 

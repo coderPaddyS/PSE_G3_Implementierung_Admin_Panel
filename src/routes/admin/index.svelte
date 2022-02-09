@@ -9,14 +9,14 @@
 
     Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
         if (isAuthenticated) {
-            goto("admin/panel", {
+            goto("/admin/panel", {
                 replaceState: false
             })
         }
     });
 
     if (Framework.getInstance().isAuthenticated()) {
-        goto("admin/panel", {
+        goto("/admin/panel", {
             replaceState: false
         })
     }

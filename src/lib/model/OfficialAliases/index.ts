@@ -169,4 +169,8 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         }));*/
         return aliases;
     }
+
+    public override filterableData(): string[] {
+        return OfficialAliases.title.toDisplayData()
+    }
 }
