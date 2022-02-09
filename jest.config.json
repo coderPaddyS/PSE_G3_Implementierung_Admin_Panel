@@ -34,5 +34,7 @@
       "useESM": true
     }
   },
-  "testEnvironment": "jsdom"
+  "testEnvironment": "jsdom",
+  "collectCoverage": true,
+  "collectCoverageFrom": ["./src/**"]
 }

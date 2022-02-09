@@ -2,8 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import type { TableRow, TitleCell } from "$lib/model/table/TableComponents";
-    import type { Sorter } from "$lib/model/table/Types";
+    import type { TitleCell } from "$lib/model/table/TableComponents";
     import TableDataComp from "./TableDataComp.svelte";
     import TableSort from "./TableSort.svelte";
 
@@ -14,9 +13,6 @@
     export let cell: TitleCell<T>;
     export let index: Array<number>;
     export let size;
-
-    // The sorting algorithm used to sort the table
-    let sorter: Sorter<TableRow<T>> = cell.getSorter();
 </script>
 
 <style lang=scss>
@@ -43,11 +39,11 @@
     }
 </style>
 
-{#if cell !== undefined && !cell.isHidden()} 
+{#if cell && !cell.isHidden()} 
     <div class=titlecell>
-        {#if sorter}
+        {#if cell.getSorter()}
             <div class=sorter>
-                <TableSort algorithm={sorter} />
+                <TableSort algorithm={cell.getSorter()} />
             </div>
         {/if}
         {#each cell.getChilds() as data, i}

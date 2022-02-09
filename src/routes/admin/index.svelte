@@ -2,19 +2,20 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script>
-    export let currentRoute;
-
     import { goto } from '$app/navigation'
-
-    import { 
-        isAuthenticated,
-        accessToken,
-        userInfo
-        } from '@dopry/svelte-oidc';
+    import { Framework } from '$lib/controller/framework';
 
     import KITLogin from '$lib/logins/KIT/index.svelte'
 
-    $:  if ($isAuthenticated) {
+    Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
+        if (isAuthenticated) {
+            goto("admin/panel", {
+                replaceState: false
+            })
+        }
+    });
+
+    if (Framework.getInstance().isAuthenticated()) {
         goto("admin/panel", {
             replaceState: false
         })
@@ -134,13 +135,12 @@
 <main>
     <div class=wrapper>
         <div class=content>
-            {JSON.stringify($userInfo, null, 2)}
             <slot name=content></slot>
         </div>
         <div class=login-wrapper>
             <h2>Admin?</h2>
             <div class=logins>
-                <KITLogin />
+                <KITLogin login={async () => await Framework.getInstance().login()} />
             </div>
         </div>
         <div class=links>

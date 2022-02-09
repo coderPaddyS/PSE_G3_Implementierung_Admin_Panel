@@ -22,7 +22,7 @@ export class Framework {
     private backend: Backend;
     private changes: Changes;
 
-    private errorListener: Set<(error: string) => void>;
+    private errorListener: Set<(error: string | Error) => void>;
 
     /**
      * Construct the framework.
@@ -41,7 +41,7 @@ export class Framework {
                     automaticSilentRenew: true
                 }
             },
-            () => "");
+            (error) => this.notifyError(error));
         this.changes = new Changes();
         this.errorListener = new Set();
     }
@@ -193,7 +193,8 @@ export class Framework {
         this.backend.redirectAfterLogout();
     }
 
-    private notifyError(error: string) {
+    private notifyError(error: string | Error) {
+        console.log(error);
         this.errorListener.forEach(listener => listener(error));
     }
 
