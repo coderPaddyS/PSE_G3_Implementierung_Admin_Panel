@@ -226,7 +226,11 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns {@link Table<string>}
      */
     public async getTable(): Promise<Table<string>> {
-        await this.fetchData().then(data => this.setData(data));
+        await this.fetchData().then(data => {
+            if (data) {
+                this.setData(data)
+            }
+        });
         return this.table;
     }
 
@@ -283,5 +287,9 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
 
     public contains(entry: R): boolean {
         return this.data.includes(entry)
+    }
+
+    protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
+        return this.data.filter(predicate);
     }
 }
