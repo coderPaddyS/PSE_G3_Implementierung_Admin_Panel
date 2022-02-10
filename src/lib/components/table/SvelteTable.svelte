@@ -12,6 +12,8 @@
     
     import TableComp from "./TableComp.svelte";
     import lodash from "lodash"
+import FilterElement from "./FilterElement.svelte";
+import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrategy";
 
 
     // Generic Types: 
@@ -29,8 +31,9 @@
     export let extraCrawlers: Map<Symbol, any> = new Map();
 
     // A supplier and an updater to retreive table data
-    export let supplier: () => Promise<TA>;
+    export let supplier: () => TA;
     export let updater: (listener: (table: TA) => void) => void;
+    export let filterableData: () => [number, FilterStrategy<string>][];
 
     // Get the table data, but only work on a copy to preserve the original state
     let data: TA;
@@ -52,7 +55,7 @@
     updater(newTable => {
         data = lodash.cloneDeep(newTable);
         updateTableView();
-    })
+    });
 
     /**
      * Update the displayed data.
@@ -65,14 +68,20 @@
         // A clone is sadly currently needed as otherwise the changes to the
         // data are not detected and reflected.
         tableViewData = lodash.cloneDeep(data);
-        crawlers.forEach(crawler => {
-            tableViewData.getCrawledOn(crawler);
-        })
+
+        if (tableViewData) {
+            console.log("updating")
+            crawlers.forEach(crawler => {
+                if (crawler) {
+                    tableViewData.getCrawledOn(crawler);
+                }
+            })
+        }
     }
 
     // Set the context such that child components can alter the filter and sorting behaviour
     setContext(crawlerKey, {
-        filter: (crawler: TableCrawler<T,C>) => {
+        setFilter: (crawler: TableCrawler<T,C>) => {
             crawlers.set(filterCrawlerKey, crawler);
             updateTableView();
         },
@@ -81,13 +90,14 @@
             updateTableView();
         },
         crawlOnView: (crawler: C) => {
-            data.getCrawledOn(crawler);
+            tableViewData.getCrawledOn(crawler);
         }
     })
 
-    onMount(async () => {
-        data = await supplier();
+    onMount(() => {
+        data = supplier();
         tableViewData = lodash.cloneDeep(data);
+        console.log("data", data);
     })
 </script>
 
@@ -95,4 +105,5 @@
 
 </style>
 
+<FilterElement filters={filterableData()}/>
 <TableComp bind:table={tableViewData} {size}/>

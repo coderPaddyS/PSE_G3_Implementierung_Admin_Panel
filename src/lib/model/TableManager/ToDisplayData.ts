@@ -2,6 +2,8 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
+import type { DataObject } from "../table/DataObject";
+
 /**
  * A type implementing this interface declares the data, it wants to be displayed in a table by a {@link TableManager}
  * 
@@ -9,5 +11,5 @@
  * @version 1.0
  */
 export interface ToDisplayData {
-    toDisplayData: () => string[];
+    toDisplayData: () => (string | DataObject<string>)[];
 }

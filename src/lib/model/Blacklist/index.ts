@@ -7,6 +7,29 @@ import type { TableRow } from "$lib/model/table/TableComponents";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "../TableManager";
 import type { ToDisplayData } from "../TableManager/ToDisplayData";
+import { LexicographicFilter } from "../TableManager/filter/LexicographicFilter";
+import type { FilterStrategy } from "../TableManager/filter/FilterStrategy";
+
+/**
+ * This class represents the data of the Blacklist.
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
+ export class BlacklistEntry implements ToDisplayData {
+    
+    private entry: string;
+
+    public constructor(entry: string) {
+        this.entry = entry;
+    }
+
+    public toDisplayData(): string[] {
+        return [this.entry];
+    }
+}
+
+type BlacklistTitle = BlacklistEntry;
 
 /**
  * This class represents the blacklist.
@@ -16,8 +39,9 @@ import type { ToDisplayData } from "../TableManager/ToDisplayData";
  * @author Patrick Schneider
  * @version 0.5
  */
-export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
+export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
 
+    private static title = new BlacklistEntry("Eintrag");
     private fetch: <T>(body: string) => Promise<T>;
 
     /**
@@ -52,6 +76,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
         Framework.getInstance().addChange(
             async () => {
                 let success = await this.removeFromBackend(entry);
+                console.log(success)
                 if (success) {
                     this.removeData(entry);
                 }
@@ -90,23 +115,8 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistEntry> {
             `
         })).then(response => response.data.getBlacklist.map(entry => new BlacklistEntry(entry)));
     }
-}
 
-/**
- * This class represents the data of the Blacklist.
- * 
- * @author Patrick Schneider
- * @version 1.0
- */
-export class BlacklistEntry implements ToDisplayData {
-    
-    private entry: string;
-
-    public constructor(entry: string) {
-        this.entry = entry;
-    }
-
-    public toDisplayData(): string[] {
-        return [this.entry];
+    public override filterableData(): [number, FilterStrategy<string>][] {
+        return Blacklist.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
     }
 }

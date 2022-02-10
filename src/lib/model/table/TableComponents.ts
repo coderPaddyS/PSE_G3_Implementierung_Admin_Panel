@@ -6,6 +6,7 @@ import { tail } from "./Types";
 import type { Sorter } from "./Types";
 import { TableDataAdditions } from "./TableDataAdditions";
 import type { TableCrawler } from "./TableCrawler";
+import type { DataObject } from "./DataObject";
 
 /**
  * A function which given an html element root and some values renders its data as a child of root.
@@ -173,6 +174,15 @@ export class Table<T> extends TableComponent<T> {
         return this;
     }
 
+    public rowsFromObject(object: DataObject<T>): Table<T> {
+        Object.values<[T,T[]]>(object).forEach(([title, data]) => {
+            let row = new TableRow<T>().add(new TableCell<T>().add(new TableData<T>(title)));
+            row.add(...data.map(cell => new TableCell<T>().add(new TableData<T>(cell))));
+            this.data.push(row);
+        })
+        return this;
+    }
+
     /**
      * Remove the given row from the table.
      * @param index The number of the row to be removed
@@ -214,9 +224,9 @@ export class Table<T> extends TableComponent<T> {
      * @param data The data that should be matched to its title.
      * @returns An {@link Object} with the keys set to the title, the values set to the given data in order.
      */
-    public matchData(data: T[]): Object {
-        let object: Object = {};
-        data.forEach((value, index) => object[this.title.getData()[index].toString()] = value);
+    public matchData(data: T[]): DataObject<T> {
+        let object: DataObject<T> = {};
+        data.forEach((value, index) => object[index] = [this.title.getData()[index],[value]]);
         return object;
     }
 }

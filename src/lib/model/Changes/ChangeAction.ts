@@ -5,6 +5,8 @@
 import type { Action } from "./Action";
 
 import lodash from "lodash";
+import type { ToDisplayData } from "../TableManager/ToDisplayData";
+import type { DataObject } from "../table/DataObject";
 
 /**
  * A ChangeAction is a data class to contain relevant information to an action event.
@@ -12,12 +14,12 @@ import lodash from "lodash";
  * @author Patrick Schneider
  * @version 1.0
  */
-export class ChangeAction {
+export class ChangeAction implements ToDisplayData {
     private action: Action;
     private onRemoval: Action;
     private creationTime: Date;
     private category: string;
-    private metadata: Object;
+    private metadata: DataObject<string>;
     private description: string;
 
     /**
@@ -29,7 +31,7 @@ export class ChangeAction {
      * @param category The category affected by this change as string
      * @param description The description of what this action does
      */
-    public constructor(action: Action, onRemoval: Action, metadata: Object, category: string, description: string) {
+    public constructor(action: Action, onRemoval: Action, metadata: DataObject<string>, category: string, description: string) {
         this.creationTime = new Date();
         this.category = category;
         this.action = action;
@@ -96,5 +98,9 @@ export class ChangeAction {
      */
     public equals(time: Date, category: string, description: string, metadata: Object): boolean {
         return lodash.isEqual(time, this.creationTime) && this.category == category && this.description == description && lodash.isEqual(this.metadata, metadata);
+    }
+
+    public toDisplayData(): (string | DataObject<string>)[] {
+        return [this.creationTime.toISOString(), this.category, this.description, this.metadata]
     }
 }

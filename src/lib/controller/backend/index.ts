@@ -7,6 +7,8 @@ import type { TableListener } from "$lib/model/TableManager";
 import type { User, UserManagerSettings } from "oidc-client";
 import { UserManager } from "oidc-client";
 import { goto } from "$app/navigation";
+import { Tables } from "$lib/model/tables";
+import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
 
 
 export type LoginConfiguration = {
@@ -31,6 +33,8 @@ export class Backend {
     private official: OfficialAliases;
     private suggestions: AliasSuggestions;
 
+    private displayInformation: Map<Tables, TableDisplayInformation<string, Table<string>>> = new Map();
+
     private getAccessToken: () => string;
     private onError: Set<(error: string | Error) => void>;
 
@@ -47,7 +51,6 @@ export class Backend {
         this.onAuthenticationChange = new Set();
 
         this.blacklist = new Blacklist((body: string) => this.fetchBackend(body));
-        // this.blacklist.setData(["Eintrag 1", "Eintrag 42", "Eintrag 3"].map(entry => new BlacklistEntry(entry)));
         this.official = new OfficialAliases(
             (body: string) => this.fetchBackend(body),
             (entry: string) => this.blacklist.addEntry(new BlacklistEntry(entry))
@@ -57,14 +60,21 @@ export class Backend {
             (entry: string) => this.addToBlacklist(new BlacklistEntry(entry)),
             (entry: Alias) => this.addToOfficial(entry)            
         );
-    }
-
-    /**
-     * Fetches the blacklist data and returns a parsed table.
-     * @returns Promise of {@link Table<string>}
-     */
-    public async getBlacklist(): Promise<Table<string>> {
-        return this.blacklist.getTable();
+        this.displayInformation.set(Tables.BLACKLIST, {
+            supplier: () => this.blacklist.getTable(),
+            updater: (listener) => this.blacklist.addListener(listener),
+            filterableData: () => this.blacklist.filterableData()
+        });
+        this.displayInformation.set(Tables.ALIAS, {
+            supplier: () => this.official.getTable(),
+            updater: (listener) => this.official.addListener(listener),
+            filterableData: () => this.official.filterableData()
+        });
+        this.displayInformation.set(Tables.ALIAS_SUGGESTIONS, {
+            supplier: () => this.suggestions.getTable(),
+            updater: (listener) => this.suggestions.addListener(listener),
+            filterableData: () => this.suggestions.filterableData()
+        });
     }
 
     private async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
@@ -109,28 +119,8 @@ export class Backend {
         return added;
     }
 
-    /**
-     * Observe changes on the backend
-     * @param update {@link BlacklistListener}
-     */
-    public onBlacklistUpdate(update: TableListener) {
-        this.blacklist.addListener(update);
-    }
-
-    public async getOfficialAliases(): Promise<Table<string>> {
-        return this.official.getTable();
-    }
-
-    public onOfficialAliasesUpdate(update: TableListener) {
-        this.official.addListener(update);
-    }
-
-    public async getAliasSuggestions(): Promise<Table<string>> {
-        return this.suggestions.getTable();
-    }
-
-    public onAliasSuggestionsUpdate(update: TableListener) {
-        this.suggestions.addListener(update);
+    public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
+        return this.displayInformation.get(table);
     }
 
     public addAuthenticationListener(onUpdate: (authenticated: boolean) => void) {

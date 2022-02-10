@@ -3,13 +3,16 @@
 
 <script lang=ts>
     import SvelteTable from "$lib/components/table/SvelteTable.svelte"
-    import FilterElement from "$lib/components/table/FilterElement.svelte";
     import { Framework } from "$lib/controller/framework";
+import { Tables } from "$lib/model/tables";
 
     let framework = Framework.getInstance();
+    let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.BLACKLIST);
 
-    let filterOptions: Map<String, String> = new Map([["Filter", "Option"], ["Filter2", "Option2"]])
 </script>
 
-<FilterElement {filterOptions} />
-<SvelteTable supplier={async () => framework.getBlacklist()} updater={(listener) => framework.onBlacklistUpdate(listener)} size=5em />
+{#await supplier()}
+    Loading...
+{:then data}
+    <SvelteTable supplier={() => data} {updater} {filterableData} size=5em />
+{/await}

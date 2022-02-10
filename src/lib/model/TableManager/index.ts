@@ -3,10 +3,12 @@
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
 import type { Sorter } from "$lib/model/table/Types"
-import { Table, TableCell, TableData, TableDataComponent, TableRow, TitleCell, TitleRow } from "$lib/model/table/TableComponents";
+import { Table, TableCell, TableData, TableDataComponent, TableDataTable, TableRow, TitleCell, TitleRow } from "$lib/model/table/TableComponents";
 import Action from "$lib/components/table_actions/Action.svelte";
 import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
+import type { FilterStrategy } from "./filter/FilterStrategy";
+import type { DataObject } from "../table/DataObject";
 
 /**
  * A listener to get notified on table updates.
@@ -69,7 +71,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (!data) {
             return true;
         }
-        console.log(typeof data, data);
         return data.filter((entry: R) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
     }
 
@@ -83,7 +84,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         // Set the title row
         table.setTitle(new TitleRow<string>().add(
             ...this.title.toDisplayData().map(
-                title => new TitleCell<string>(this.sorters.get(title)).set(new TableData<string>(title))
+                title => new TitleCell<string>(this.sorters.get(title.toString())).set(new TableData<string>(title.toString()))
             )
         ));
 
@@ -109,14 +110,23 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns The table row build from entry
      */
     private buildRow(entry: R): TableRow<string> {
-        const data = lodash.cloneDeep(entry.toDisplayData());
+        const data: (string | DataObject<string>)[] = lodash.cloneDeep(entry.toDisplayData());
 
         // Build the row containing the displayData specified by ToDisplayData::toDisplayData ...
         const row = new TableRow<string>().add(...data.map(
-            (datum: string) => {
+            (datum) => {
+
+                let cell = new TableCell<string>();
+
+                if (typeof datum === 'string') {
+                    cell.add(new TableData<string>(datum));
+                } else {
+                    console.log("building table:", datum)
+                    cell.add(new TableDataTable<string>(new Table<string>().rowsFromObject(datum)));
+                }
                 
                 // ... in normal data cells ...
-                return new TableCell<string>().add(new TableData<string>(datum))
+                return cell;
             }
         ));
 
@@ -148,7 +158,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * Notify the listeners listening on table changes
      */
     private notify() {
-        console.log("notified", this.table)
         this.listeners.forEach(listener => listener(this.table));
     }
 
@@ -218,8 +227,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns {@link Table<string>}
      */
     public async getTable(): Promise<Table<string>> {
-        console.log("fetched")
-        this.fetchData().then(data => this.setData(data));
+        await this.fetchData().then(data => this.setData(data));
         return this.table;
     }
 
@@ -243,7 +251,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 }
             })
             indices.forEach((index) => {
-                console.log(index)
                 this.table.getChilds()[index].hide();
                 notifyObserver = true;
             })
@@ -271,5 +278,11 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (notifyObserver) {
             this.notify();
         }
+    }
+
+    public abstract filterableData(): [number, FilterStrategy<string>][];
+
+    public contains(entry: R): boolean {
+        return this.data.includes(entry)
     }
 }

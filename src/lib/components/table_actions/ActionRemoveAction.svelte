@@ -23,7 +23,6 @@
      */
     const crawlerAction: CrawlerAction<T, TableActionCrawler<T>> = (crawler: TableActionCrawler<T>, component: TableComponent<T>) => {        
         let data = component.getData();
-
         Framework.getInstance().removeChange(data[0], data[1], data[2], data[3]);
     }
 
@@ -31,7 +30,7 @@
      * Create a {@link TableActionCrawler} to crawl onto the row of the given index.
      */
     function createCrawler(): TableActionCrawler<T> {
-        return new TableActionCrawler<T>(crawlerAction, index.slice(0, -2));
+        return new TableActionCrawler<T>(crawlerAction, index.slice(0, -2), false);
     }
 
 </script>
