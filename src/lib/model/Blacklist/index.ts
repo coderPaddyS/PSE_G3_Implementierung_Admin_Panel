@@ -76,7 +76,6 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
         Framework.getInstance().addChange(
             async () => {
                 let success = await this.removeFromBackend(entry);
-                console.log(success)
                 if (success) {
                     this.removeData(entry);
                 }
@@ -100,10 +99,6 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
                 entry: entry.toDisplayData()[0]
             }
         })).then(response => response.data.removeFromBlacklist)
-        .catch(error => {
-            console.log(error);
-            return false;
-        });
     }
 
     protected override async fetchData(): Promise<Array<BlacklistEntry>> {

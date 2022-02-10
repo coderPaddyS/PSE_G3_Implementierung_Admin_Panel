@@ -1,8 +1,9 @@
 <!-- SPDX-License-Identifier: GPL-3.0-or-later -->
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
-<script>
+<script lang=ts>
     import { goto } from "$app/navigation";
+import ErrorMessage from "$lib/components/error/ErrorMessage.svelte";
 import { Framework } from "$lib/controller/framework";
 
 import { onMount } from "svelte";
@@ -15,7 +16,12 @@ import { onMount } from "svelte";
         }
     })
 
+    let errorbox: HTMLElement;
+
     onMount(() => {
+        if (errorbox) {
+            Framework.getInstance().onError((error) => errorbox.textContent = error.toString());
+        }
         if (!Framework.getInstance().isAuthenticated()) {
             console.log("not logged in");
             goto('/admin', {
@@ -151,6 +157,10 @@ import { onMount } from "svelte";
     }
 </style>
 
+<ErrorMessage 
+    remove={(error) => Framework.getInstance().removeError(error)}
+    errorSupplier={(listener) => Framework.getInstance().onError(listener)}
+/>
 <main class=wrapper>
     <div class="nav">
         <div class="navitem"><a href=/admin/panel>Dashboard                     </a></div>

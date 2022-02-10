@@ -4,8 +4,6 @@
 
 import type { Table, TableRow } from "../table/TableComponents";
 import type { ChangeAction } from "./ChangeAction";
-import ActionPerformChange from "$lib/components/table_actions/ActionPerformChange.svelte";
-import ActionRemoveAction from "$lib/components/table_actions/ActionRemoveAction.svelte";
 import lodash from "lodash";
 import { lexicographicSorter, TableManager } from "../TableManager";
 import type { ToDisplayData } from "../TableManager/ToDisplayData";
@@ -96,9 +94,7 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
      */
     public add(...actions: ChangeAction[]) {
         this.changes.push(...actions);
-        // console.log("before:", this.changes);
         super.addData(...actions);
-        // console.log("after:", this.changes);
     }
 
     /**

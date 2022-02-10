@@ -8,6 +8,7 @@ import { ChangeAction } from "$lib/model/Changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
 import { Tables } from "$lib/model/tables";
 import type { DataObject } from "$lib/model/table/DataObject";
+import { ErrorQueue } from "$lib/model/error/ErrorQueue";
 
 
 /**
@@ -22,6 +23,7 @@ export class Framework {
     private static instance: Framework = undefined;
     private backend: Backend;
     private changes: Changes;
+    private errors: ErrorQueue;
 
     private errorListener: Set<(error: string | Error) => void>;
 
@@ -30,6 +32,7 @@ export class Framework {
      * Private due to being a singleton.
      */
     private constructor() {
+        this.errors = new ErrorQueue();
         this.backend = new Backend({
                 loginRedirectURI: new URL("http://localhost:3000/admin"),
                 logoutRedirectURI: new URL("http://localhost:3000/admin"),
@@ -42,7 +45,7 @@ export class Framework {
                     automaticSilentRenew: true
                 }
             },
-            (error) => this.notifyError(error));
+            (error) => this.errors.addError(error));
         this.changes = new Changes();
         this.errorListener = new Set();
     }
@@ -152,12 +155,11 @@ export class Framework {
         this.backend.redirectAfterLogout();
     }
 
-    private notifyError(error: string | Error) {
-        console.log(error);
-        this.errorListener.forEach(listener => listener(error));
+    public onError(onError: (error: Array<Error | string>) => void) {
+        this.errors.addListener(onError);
     }
 
-    public onError(onError: (error: string) => void) {
-        this.errorListener.add(onError);
+    public removeError(error: Error | string) {
+        this.errors.removeError(error);
     }
 }

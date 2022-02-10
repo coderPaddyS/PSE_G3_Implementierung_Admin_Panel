@@ -3,6 +3,7 @@
 
 <script>
     import { goto } from '$app/navigation'
+import ErrorMessage from '$lib/components/error/ErrorMessage.svelte';
     import { Framework } from '$lib/controller/framework';
 
     import KITLogin from '$lib/logins/KIT/index.svelte'
@@ -132,6 +133,10 @@
 
 </style>
 
+<ErrorMessage 
+    remove={(error) => Framework.getInstance().removeError(error)}
+    errorSupplier={(listener) => Framework.getInstance().onError(listener)}
+/>
 <main>
     <div class=wrapper>
         <div class=content>

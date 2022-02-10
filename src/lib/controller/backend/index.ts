@@ -88,7 +88,7 @@ export class Backend {
                 entry: entry.toDisplayData()[0]
             }
         })).then(response => response.data.blacklistAlias).catch(error => {
-            console.log(error);
+            this.notifyError(error);
             return false;
         });
         if (added) {
@@ -109,7 +109,7 @@ export class Backend {
                 id: alias.getId()
             }
         })).then(response => response.data.approveAliasSuggestion).catch(error => {
-            console.log(error);
+            this.notifyError(error);
             return false;
         });
 
@@ -120,6 +120,7 @@ export class Backend {
     }
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
+        this.notifyError("TestError");
         return this.displayInformation.get(table);
     }
 
