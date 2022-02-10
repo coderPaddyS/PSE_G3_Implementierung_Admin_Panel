@@ -88,42 +88,6 @@ export class Framework {
     }
 
     /**
-     * Perform the previously by {@link addChange} added Action.
-     * Removes the action from the table.
-     * 
-     * @param time The time the change was made as {@link string}
-     * @param category The category of the action as {@link string}
-     * @param description The description of the action as {@link string}
-     * @param metadata The metadata as Key-Value-Object of this action
-     * @returns {@code true} if the change could be performed.
-     */
-    public async performChange(time: string, category: string, description: string, metadata: Object): Promise<boolean> {
-        return this.changes.perform(new Date(time), category, description, metadata);
-    }
-
-    /**
-     * Remove the previously by {@link addChange} added Action.
-     * Does not execute the action, but executes the onRemove action added by {@link addChange}.
-     * 
-     * @param time The time the change was made as {@link string}
-     * @param category The category of the action as {@link string}
-     * @param description The description of the action as {@link string}
-     * @param metadata The metadata as Key-Value-Object of this action
-     * @returns {@code true} if the change could be removed.
-     */
-    public async removeChange(time: string, category: string, description: string, metadata: Object): Promise<boolean> {
-        return this.changes.removeByData(new Date(time), category, description, metadata);
-    }
-
-    /**
-     * Retrieve the current changes
-     * @returns Promise of {@link Table<string>}
-     */
-    // public getChanges(): Table<string> {
-    //     return this.changes.getChangesTable();
-    // }
-
-    /**
      * Observe changes on the changes
      * @param update {@link BlacklistListener}
      */

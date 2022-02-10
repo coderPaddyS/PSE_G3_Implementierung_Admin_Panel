@@ -53,8 +53,6 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
         Changes.colTime, Changes.colCategory, Changes.colDescription, Changes.colMetadata
     );
 
-    private changes: Array<ChangeAction>;
-
     /**
      * Create the changes.
      * Creates an empty table with title.
@@ -85,7 +83,6 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
             }
 
         )
-        this.changes = new Array();
     }
 
     /**
@@ -93,26 +90,7 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
      * @param actions {@link ChangeAction}
      */
     public add(...actions: ChangeAction[]) {
-        this.changes.push(...actions);
         super.addData(...actions);
-    }
-
-    /**
-     * Removes a change action identified by its data.
-     * 
-     * 
-     * @param time Date
-     * @param category string
-     * @param description string
-     * @param metadata Key-Value-Object
-     * @returns boolean `true` iff removal was successful, `false` if no matching action was found or the removal was not successful
-     */
-    public async removeByData(time: Date, category: string, description: string, metadata: Object): Promise<boolean> {
-        let action = this.changes.filter(c => c.equals(time, category, description, metadata))[0];
-        if (action && this.remove(action)) {
-            return action.remove()
-        }
-        return false;
     }
 
     /**
@@ -124,66 +102,15 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
      */
     public remove(action: ChangeAction): boolean {
         if (this.contains(action)) {
-            let index = this.changes.indexOf(action);
-            this.changes.splice(index, 1);
+            super.removeData(action);
             action.remove();
             return true;
         }
         return false;
     }
 
-    /**
-     * Performs the action identified by the given data.
-     * 
-     * @param time Date
-     * @param category string
-     * @param description string
-     * @param metadata Key-Value-Object
-     * @returns boolean `true` iff action could perform and removed successfully
-     */
-    public async perform(time: Date, category: string, description: string, metadata: Object): Promise<boolean> {
-        let action = this.changes.filter(c => c.equals(time, category, description, metadata))[0];
-        if (action && await action.perform()) {
-            this.remove(action);
-        }
-        return action && action.perform() && this.remove(action);
-    }
-
-    /**
-     * Getter for all changes.
-     * @returns An {@link Iterable} of {@link ChangeAction}
-     */
-    public getChanges(): Iterable<ChangeAction> {
-        return this.changes;
-    }
-
-       /**
-     * Checks if the given ChangeActions are contained in the changes.
-     * @param actions `True` iff contained
-     */
-    public contains(...actions: ChangeAction[]): boolean {
-        for (let action of actions) {
-            if (!this.changes.includes(action)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Checks if a {@link ChangeAction} matching the given category and metadata is contained.
-     * @param category string
-     * @param metadata Key-Value-Object
-     * @returns `True` if contained
-     */
-    public containsData(category: string, metadata: Object): boolean {
-        return this.changes.filter(action => category == action.getCategory())
-            .filter(action => lodash.isEqual(metadata, action.getMetadata()))
-            .length > 0;
-    }
-
     protected async fetchData(): Promise<ChangeAction[]> {
-        return this.changes;
+        return undefined;
     }
 
     public filterableData(): [number, FilterStrategy<string>][] {
