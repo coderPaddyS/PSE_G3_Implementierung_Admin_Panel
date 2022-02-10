@@ -121,7 +121,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 if (typeof datum === 'string') {
                     cell.add(new TableData<string>(datum));
                 } else {
-                    console.log("building table:", datum)
                     cell.add(new TableDataTable<string>(new Table<string>().rowsFromObject(datum)));
                 }
                 
