@@ -4,14 +4,15 @@
 <script lang=ts>
     import SvelteTable from "$lib/components/table/SvelteTable.svelte"
     import { Framework } from "$lib/controller/framework";
+import { Tables } from "$lib/model/tables";
 
     let framework = Framework.getInstance();
-
-    let filterOptions: Map<String, String> = new Map([["Filter", "Option"], ["Filter2", "Option2"]])
+    let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.CHANGES);
+    
 </script>
 
-{#await framework.getChanges()}
+{#await supplier()}
     Loading...
 {:then data}
-    <SvelteTable supplier={() => data} updater={(listener) => framework.onChangesUpdate(listener)} size=5em />
+    <SvelteTable supplier={() => data} {updater} {filterableData} size=5em />
 {/await}

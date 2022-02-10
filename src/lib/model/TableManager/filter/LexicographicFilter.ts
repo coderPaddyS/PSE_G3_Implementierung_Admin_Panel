@@ -8,7 +8,7 @@ export class LexicographicFilter<T> extends FilterStrategy<T> {
         }
 
         let term = this.supplier();
-        console.log(term);
+        console.log(term, data);
         if (term.length == 0) {
             console.log("undefined", undefined)
             return undefined;

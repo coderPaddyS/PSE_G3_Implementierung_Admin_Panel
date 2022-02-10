@@ -18,7 +18,7 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
     filters.forEach(([index, strategy], i) => {
         predicates.push(data => {
             strategy.setFilter(() => values[i]);
-            let tested = data.map(entry => strategy.filter([entry.toString()]));
+            let tested = data.map(entry => strategy.filter([JSON.stringify(entry)]));
             if (tested.includes(true)) {
                 return true;
             }

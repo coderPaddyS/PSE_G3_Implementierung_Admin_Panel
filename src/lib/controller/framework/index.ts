@@ -6,7 +6,8 @@ import type { AuthenticationListener } from "../backend";
 import type { Action } from "$lib/model/Changes/Action";
 import { ChangeAction } from "$lib/model/Changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
-import type { Tables } from "$lib/model/tables";
+import { Tables } from "$lib/model/tables";
+import type { DataObject } from "$lib/model/table/DataObject";
 
 
 /**
@@ -58,6 +59,13 @@ export class Framework {
     }
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
+        if (table === Tables.CHANGES) {
+            return {
+                supplier: () => this.changes.getTable(),
+                updater: (listener) => this.changes.addListener(listener),
+                filterableData: () => this.changes.filterableData()
+            }
+        }
         return this.backend.getTableDisplayInformation(table);
     }
 
@@ -72,7 +80,7 @@ export class Framework {
      * @param description The resulting effect of the action as {@link string} to inform the user
      * @param metadata The by the action affected data as Key-Value-Object to inform the user.
      */
-    public addChange(action: Action, onRemove: Action, category: string, description: string, metadata: Object) {
+    public addChange(action: Action, onRemove: Action, category: string, description: string, metadata: DataObject<string>) {
         this.changes.add(new ChangeAction(action, onRemove, metadata, category, description));
     }
 
@@ -108,9 +116,9 @@ export class Framework {
      * Retrieve the current changes
      * @returns Promise of {@link Table<string>}
      */
-    public getChanges(): Table<string> {
-        return this.changes.getChangesTable();
-    }
+    // public getChanges(): Table<string> {
+    //     return this.changes.getChangesTable();
+    // }
 
     /**
      * Observe changes on the changes

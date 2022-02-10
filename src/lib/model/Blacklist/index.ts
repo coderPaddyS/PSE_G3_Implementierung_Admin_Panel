@@ -76,6 +76,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
         Framework.getInstance().addChange(
             async () => {
                 let success = await this.removeFromBackend(entry);
+                console.log(success)
                 if (success) {
                     this.removeData(entry);
                 }
