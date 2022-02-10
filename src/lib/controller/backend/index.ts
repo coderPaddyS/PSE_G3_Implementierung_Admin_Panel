@@ -35,7 +35,8 @@ export class Backend {
 
     private displayInformation: Map<Tables, TableDisplayInformation<string, Table<string>>> = new Map();
 
-    private getAccessToken: () => string;
+    // A true private variable in javascript is prepended with #
+    #getAccessToken: () => string;
     private onError: Set<(error: string | Error) => void>;
 
     private onAuthenticationChange: Set<(auth: boolean) => void>;
@@ -45,7 +46,7 @@ export class Backend {
      */
     public constructor(config: LoginConfiguration, onError: (error: string | Error) => void) {
         this.configureManager(config);
-        this.getAccessToken = undefined;
+        this.#getAccessToken = undefined;
         this.onError = new Set();
         this.onError.add(onError);
         this.onAuthenticationChange = new Set();
@@ -132,12 +133,12 @@ export class Backend {
         this.config = config;
         this.auth = new UserManager(config.settings);
         this.auth.events.addUserLoaded((user: User) => {
-            this.getAccessToken = () => user.access_token;
+            this.#getAccessToken = () => user.access_token;
 
             this.notifyAuthenticationChange();
         });
         this.auth.events.addUserUnloaded(() => {
-            this.getAccessToken = undefined;
+            this.#getAccessToken = undefined;
 
             this.notifyAuthenticationChange();
         });
@@ -191,17 +192,22 @@ export class Backend {
     }
 
     public isAuthenticated(): boolean {
-        return this.getAccessToken !== undefined;
+        return this.#getAccessToken !== undefined;
     }
 
     private async fetchBackend<T>(body: string): Promise<T> {
-        return fetch('https://pse.itermori.de/graphql', {
+        try {
+            return fetch('https://pse.itermori.de/graphql', {
                 headers: {
-                    'Authorization': `Bearer ${this.getAccessToken()}`,
+                    'Authorization': `Bearer ${this.#getAccessToken()}`,
                     'content-type': "application/json"
                 },
                 method: "POST",
                 body
-        }).then((response: Response) => response.json() as Promise<T>);
+            }).then((response: Response) => response.json() as Promise<T>)
+            .catch(error => {throw new Error(error)});
+        } catch (error){
+            this.notifyError(error);
+        }
     }
 }

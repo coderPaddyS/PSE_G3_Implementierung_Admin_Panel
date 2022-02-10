@@ -54,6 +54,7 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
     // Add the listener to update the table data
     updater(newTable => {
         data = lodash.cloneDeep(newTable);
+        console.log("fkhlhsfdljh", data);
         updateTableView();
     });
 
@@ -70,7 +71,6 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
         tableViewData = lodash.cloneDeep(data);
 
         if (tableViewData) {
-            console.log("updating")
             crawlers.forEach(crawler => {
                 if (crawler) {
                     tableViewData.getCrawledOn(crawler);

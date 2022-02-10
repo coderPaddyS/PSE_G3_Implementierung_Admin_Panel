@@ -101,6 +101,6 @@ export class ChangeAction implements ToDisplayData {
     }
 
     public toDisplayData(): (string | DataObject<string>)[] {
-        return [this.creationTime.toISOString(), this.category, this.description, this.metadata]
+        return [this.creationTime.toLocaleTimeString(), this.category, this.description, this.metadata]
     }
 }
