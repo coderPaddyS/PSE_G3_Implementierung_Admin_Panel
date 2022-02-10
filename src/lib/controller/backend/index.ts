@@ -195,7 +195,23 @@ export class Backend {
         return this.#getAccessToken !== undefined;
     }
 
-    private async fetchBackend<T>(body: string): Promise<T> {
+    public async isAdmin(): Promise<boolean> {
+        let admin: boolean = false;
+        await this.fetchBackend<{data: {isAdmin: boolean}}>(JSON.stringify({
+            query:`
+                query isAdmin {
+                    isAdmin
+                }
+            `
+        })).then(response => {
+            if (response.data) {
+                admin = response.data.isAdmin
+            }
+        });
+        return admin;
+    }
+
+    private async fetchBackend<T>(body: string, onRejection?: () => void): Promise<T> {
         try {
             return fetch('https://pse.itermori.de/graphql', {
                 headers: {
