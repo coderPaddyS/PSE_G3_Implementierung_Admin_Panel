@@ -8,7 +8,7 @@
     import { Tables } from "$lib/model/tables";
 
     let framework = Framework.getInstance();
-    let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.SUGGESTED_ALIASES);
+    let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.ALIAS_SUGGESTIONS);
 
     let filterOptions: Map<String, String> = new Map([["Filter", "Option"], ["Filter2", "Option2"]])
 </script>

@@ -7,6 +7,8 @@ import type { TableRow } from "$lib/model/table/TableComponents";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "../TableManager";
 import type { ToDisplayData } from "../TableManager/ToDisplayData";
+import { LexicographicFilter } from "../TableManager/filter/LexicographicFilter";
+import type { FilterStrategy } from "../TableManager/filter/FilterStrategy";
 
 /**
  * This class represents the data of the Blacklist.
@@ -113,7 +115,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
         })).then(response => response.data.getBlacklist.map(entry => new BlacklistEntry(entry)));
     }
 
-    public override filterableData(): string[] {
-        return Blacklist.title.toDisplayData();
+    public override filterableData(): [number, FilterStrategy<string>][] {
+        return Blacklist.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
     }
 }

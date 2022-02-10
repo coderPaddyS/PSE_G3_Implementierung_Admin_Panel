@@ -8,6 +8,9 @@ import type { Sorter } from "../table/Types";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "../TableManager";
 import type { ToDisplayData } from "../TableManager/ToDisplayData";
+import type { FilterStrategy } from "../TableManager/filter/FilterStrategy";
+import { LexicographicFilter } from "../TableManager/filter/LexicographicFilter";
+import { MinimumNumericFilter } from "../TableManager/filter/MinimumNumericFilter";
 
 
 export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
@@ -269,7 +272,13 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         return suggestions;
     }
 
-    public override filterableData(): string[] {
-        return AliasSuggestions.title.toDisplayData();
+    public override filterableData(): [number, FilterStrategy<string>][] {
+        return [
+            [0, new LexicographicFilter(AliasSuggestions.colAlias)],
+            [1, new LexicographicFilter(AliasSuggestions.colBuilding)],
+            [2, new LexicographicFilter(AliasSuggestions.colRoom)],
+            [3, new MinimumNumericFilter(AliasSuggestions.colUpvotes)],
+            [4, new MinimumNumericFilter(AliasSuggestions.colDownvotes)],
+        ];
     }
 }

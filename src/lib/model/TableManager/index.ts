@@ -7,6 +7,7 @@ import { Table, TableCell, TableData, TableDataComponent, TableRow, TitleCell, T
 import Action from "$lib/components/table_actions/Action.svelte";
 import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
+import type { FilterStrategy } from "./filter/FilterStrategy";
 
 /**
  * A listener to get notified on table updates.
@@ -269,5 +270,5 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         }
     }
 
-    public abstract filterableData(): string[];
+    public abstract filterableData(): [number, FilterStrategy<string>][];
 }

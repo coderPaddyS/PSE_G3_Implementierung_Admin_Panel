@@ -7,6 +7,8 @@ import type { TableRow } from "../table/TableComponents";
 import type { Sorter } from "../table/Types";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "../TableManager";
+import { LexicographicFilter } from "../TableManager/filter/LexicographicFilter";
+import type { FilterStrategy } from "../TableManager/filter/FilterStrategy";
 
 /**
  * This class represents a type alias to underline the meaning as a title.
@@ -170,7 +172,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         return aliases;
     }
 
-    public override filterableData(): string[] {
-        return OfficialAliases.title.toDisplayData()
+    public override filterableData(): [number, FilterStrategy<string>][] {
+        return OfficialAliases.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
     }
 }
