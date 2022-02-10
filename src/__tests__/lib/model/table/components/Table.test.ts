@@ -128,11 +128,11 @@ describe("Testing if Table ", () => {
     test("returns data from child correctly with title", () => {
         let table = new Table<string>();
         let title = new TitleRow<string>().add(new DummyTitleCell("title1"), new DummyTitleCell("title2"), new DummyTitleCell("title3"));
-        let row = new TableRow<string>().add(new DummyTableCell("data"), new DummyTableCell("data"), new DummyTableCell("data"));
+        let row = new TableRow<string>().add(new DummyTableCell("data1"), new DummyTableCell("data2"), new DummyTableCell("data3"));
         table.add(row);
         table.setTitle(title);
 
-        expect(table.getData()).toEqual([{title1: "data", title2: "data", title3: "data"}]);
+        expect(table.getData()).toEqual([{"title1": "data1", "title2": "data2", "title3": "data3"}]);
     });
 
     test("sets childs accordingly", () => {
@@ -175,10 +175,10 @@ describe("Testing if Table ", () => {
     test("matches data correctly", () => {
         let table = new Table<string>();
         let title = new TitleRow<string>().add(new DummyTitleCell("title1"), new DummyTitleCell("title2"), new DummyTitleCell("title3"));
-        let row = new TableRow<string>().add(new DummyTableCell("data"), new DummyTableCell("data"), new DummyTableCell("data"));
+        let row = new TableRow<string>().add(new DummyTableCell("data1"), new DummyTableCell("data2"), new DummyTableCell("data3"));
         table.add(row);
         table.setTitle(title);
 
-        expect(table.matchData(row.getData())).toEqual({title1: "data", title2: "data", title3: "data"});
+        expect(table.matchData(row.getData())).toEqual({"0": ["title1", ["data1"]], "1": ["title2", ["data2"]], "2": ["title3", ["data3"]]});
     })
 });

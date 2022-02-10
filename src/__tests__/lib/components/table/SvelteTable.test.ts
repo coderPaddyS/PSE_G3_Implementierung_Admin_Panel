@@ -5,6 +5,7 @@ import { TitleCell, TableData, TableRow, TitleRow, Table, TableCell} from "$lib/
 import SvelteTable from "$lib/components/table/SvelteTable.svelte";
 import { TableActionCrawler } from "$lib/model/table/crawler/ActionCrawler";
 import type { TableCrawler } from "$lib/model/table/TableCrawler";
+import { LexicographicFilter } from "$lib/model/TableManager/filter/LexicographicFilter";
 
 describe("Test SvelteTable.svelte", () => {
     describe("to render given", () => {
@@ -12,6 +13,7 @@ describe("Test SvelteTable.svelte", () => {
         let table: Table<string>;
         let supplier = () => table;
         let updater = (listener) => listener(supplier());
+        let filterableData = () => [[0, new LexicographicFilter("Title")]];
         beforeEach(() => {
             table = new Table<string>()
                 .setTitle(new TitleRow<string>().add(new TitleCell<string>().set(new TableData("Title"))))
@@ -24,7 +26,8 @@ describe("Test SvelteTable.svelte", () => {
                 props: {
                     size: "",
                     supplier,
-                    updater
+                    updater,
+                    filterableData
                 }
             });
             expect(container).toHaveTextContent("Data");
@@ -41,6 +44,7 @@ describe("Test SvelteTable.svelte", () => {
                     size: "",
                     supplier,
                     updater,
+                    filterableData,
                     extraCrawlers,
                 }
             });
@@ -57,7 +61,8 @@ describe("Test SvelteTable.svelte", () => {
             props: {
                     size: "",
                     supplier,
-                    updater
+                    updater,
+                    filterableData
                 }
             });
 
