@@ -7,24 +7,22 @@ import ErrorMessage from "$lib/components/error/ErrorMessage.svelte";
 import { Framework } from "$lib/controller/framework";
 
 import { onMount } from "svelte";
+
+    let framework = Framework.getInstance();
     
-    Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
-        if (!isAuthenticated) {
+    framework.onAuthenticationUpdate(async (isAuthenticated) => {
+        if (!isAuthenticated || !await framework.isAdmin()) {
+            framework.addError("Nur Administratoren haben Zugriff auf diesen Bereich!");
             goto("/admin", {
                 replaceState: true
             });
         }
     })
 
-    let errorbox: HTMLElement;
-
-    onMount(() => {
-        if (errorbox) {
-            Framework.getInstance().onError((error) => errorbox.textContent = error.toString());
-        }
-        if (!Framework.getInstance().isAuthenticated()) {
-            console.log("not logged in");
-            goto('/admin', {
+    onMount(async () => {
+        if (!framework.isAuthenticated() || !await framework.isAdmin()) {
+            framework.addError("Nur Administratoren haben Zugriff auf diesen Bereich!");
+            goto("/admin", {
                 replaceState: true
             });
         }
