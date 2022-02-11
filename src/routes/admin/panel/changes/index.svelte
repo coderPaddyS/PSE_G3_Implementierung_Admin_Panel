@@ -4,7 +4,8 @@
 <script lang=ts>
     import SvelteTable from "$lib/view/components/table/SvelteTable.svelte"
     import { Framework } from "$lib/controller/framework";
-import { Tables } from "$lib/model/tables/Tables";
+    import { Tables } from "$lib/model/tables/Tables";
+    import Waiting from "$lib/view/Waiting.svelte";
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.CHANGES);
@@ -12,7 +13,7 @@ import { Tables } from "$lib/model/tables/Tables";
 </script>
 
 {#await supplier()}
-    Loading...
+    <Waiting text={"Rufe Daten vom Server ab"} />
 {:then data}
     <SvelteTable supplier={() => data} {updater} {filterableData} size=5em />
 {/await}
