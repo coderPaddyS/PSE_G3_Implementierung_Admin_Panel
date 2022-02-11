@@ -12,8 +12,6 @@
     // A styling variable to alter sizes simultaneously
     export let size;
     export let table: Table<T>;
-
-    console.log(table)
 </script>
 
 <style lang=scss>

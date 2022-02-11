@@ -54,7 +54,6 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
     // Add the listener to update the table data
     updater(newTable => {
         data = lodash.cloneDeep(newTable);
-        console.log("fkhlhsfdljh", data);
         updateTableView();
     });
 
@@ -97,7 +96,6 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
     onMount(() => {
         data = supplier();
         tableViewData = lodash.cloneDeep(data);
-        console.log("data", data);
     })
 </script>
 
