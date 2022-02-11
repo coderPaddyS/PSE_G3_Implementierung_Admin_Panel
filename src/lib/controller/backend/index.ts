@@ -112,7 +112,6 @@ export class Backend {
     }
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
-        console.log(this.displayInformation, this.displayInformation.get(table).tableTitle(), table)
         return this.displayInformation.get(table);
     }
 

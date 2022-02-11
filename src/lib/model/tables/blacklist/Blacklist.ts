@@ -117,13 +117,12 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     }
 
     protected async size(): Promise<number> {
-        // this.fetch(JSON.stringify({
-        //     query:`
-        //         query size {
-        //             getNumBlacklist
-        //         }
-        //     `
-        // }))
-        return 10;
+        return this.fetch<{data: {getAmountEntriesBlacklist: string}}>(JSON.stringify({
+            query:`
+                query size {
+                    getAmountEntriesBlacklist
+                }
+            `
+        })).then(response => Number(response.data.getAmountEntriesBlacklist))
     }
 }

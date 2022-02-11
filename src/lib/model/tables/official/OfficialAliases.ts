@@ -169,13 +169,12 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     }
 
     protected async size(): Promise<number> {
-        // this.fetch(JSON.stringify({
-        //     query:`
-        //         query size {
-        //             getNumOfAliases
-        //         }
-        //     `
-        // }))
-        return 42;
+        return this.fetch<{data: {getAmountEntriesAliases: string}}>(JSON.stringify({
+            query:`
+                query size {
+                    getAmountEntriesAlias
+                }
+            `
+        })).then(response => Number(response.data.getAmountEntriesAliases))
     }
 }

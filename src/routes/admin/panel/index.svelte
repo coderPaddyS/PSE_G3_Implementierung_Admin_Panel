@@ -6,6 +6,8 @@
     import TableOverview from "$lib/view/components/table/TableOverview.svelte";
     import type { UserData } from "$lib/controller/backend";
     import Greeter from "$lib/view/dashboard/Greeter.svelte";
+import Waiting from "$lib/view/Waiting.svelte";
+import { Tables } from "$lib/model/tables/Tables";
 
     let framework = Framework.getInstance();
     let userData: UserData = framework.getUserData();
@@ -21,6 +23,9 @@
         let tables: {size: number, title: string}[] = [];
         let availableTables = framework.getTables();
         for (let i = 0; i < availableTables.length; ++i) {
+            if (availableTables[i] == Tables.CHANGES) {
+                continue;
+            }
             let { size, tableTitle } = framework.getTableDisplayInformation(availableTables[i]);
             let table = {
                 size: await size(),
@@ -43,7 +48,7 @@
 <Greeter {username} {name} />
 
 {#await getTables()}
-    Loading...
+    <Waiting text={"Rufe Daten vom Server ab"} />
 {:then tables}
     <div class=stats>
         {#each tables as {size, title}}

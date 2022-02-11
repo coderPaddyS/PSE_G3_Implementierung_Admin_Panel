@@ -274,13 +274,12 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     }
 
     protected async size(): Promise<number> {
-        // this.fetch(JSON.stringify({
-        //     query:`
-        //         query size {
-        //             getNumAliasSuggestions
-        //         }
-        //     `
-        // }))
-        return 187;
+        return this.fetch<{data: {getAmountEntriesAliasSuggestion: string}}>(JSON.stringify({
+            query:`
+                query size {
+                    getAmountEntriesAliasSuggestion
+                }
+            `
+        })).then(response => Number(response.data.getAmountEntriesAliasSuggestion))
     }
 }
