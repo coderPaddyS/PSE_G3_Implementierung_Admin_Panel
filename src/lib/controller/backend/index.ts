@@ -1,14 +1,14 @@
-import type { Table } from "$lib/model/table/TableComponents";
-import { Blacklist, BlacklistEntry } from "$lib/model/Blacklist";
-import { OfficialAliases } from "$lib/model/OfficialAliases";
+import type { Table } from "$lib/model/recursive_table/TableComponents";
+import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
+import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import type { Alias } from "$lib/model/Alias";
-import { AliasSuggestions } from "$lib/model/AliasSuggestions";
-import type { TableListener } from "$lib/model/TableManager";
+import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
+import type { TableListener } from "$lib/model/tables/manager/TableManager";
 import type { User, UserManagerSettings } from "oidc-client";
 import { UserManager } from "oidc-client";
 import { goto } from "$app/navigation";
-import { Tables } from "$lib/model/tables";
-import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
+import { Tables } from "$lib/model/tables/Tables";
+import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
 
 
 export type LoginConfiguration = {

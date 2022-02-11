@@ -3,10 +3,10 @@
 
 <script>
     import { goto } from '$app/navigation'
-import ErrorMessage from '$lib/components/error/ErrorMessage.svelte';
+import ErrorMessage from '$lib/view/components/error/ErrorMessage.svelte';
     import { Framework } from '$lib/controller/framework';
 
-    import KITLogin from '$lib/logins/KIT/index.svelte'
+    import KITLogin from '$lib/view/logins/KIT/index.svelte'
 </script>
 
 <style lang=scss>
