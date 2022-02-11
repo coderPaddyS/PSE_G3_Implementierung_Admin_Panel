@@ -34,12 +34,12 @@ export class Framework {
     private constructor() {
         this.errors = new ErrorQueue();
         this.backend = new Backend({
-                loginRedirectURI: new URL("http://localhost:3000/admin"),
-                logoutRedirectURI: new URL("http://localhost:3000/admin"),
+                loginRedirectURI: new URL(`${window.location.origin}/admin`),
+                logoutRedirectURI: new URL(`${window.location.origin}/admin`),
                 settings: {
                     authority: "https://oidc.scc.kit.edu/auth/realms/kit/",
                     client_id: "pse-itermori-de",
-                    redirect_uri: "http://localhost:3000/admin/login",
+                    redirect_uri: `${window.location.origin}/admin/login`,
                     response_type: "code",
                     scope: "openid profile email",
                     automaticSilentRenew: true
