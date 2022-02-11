@@ -3,7 +3,7 @@
 
 <script lang=ts>
     import { goto } from "$app/navigation";
-import ErrorMessage from "$lib/components/error/ErrorMessage.svelte";
+import ErrorMessage from "$lib/view/components/error/ErrorMessage.svelte";
 import { Framework } from "$lib/controller/framework";
 
 import { onMount } from "svelte";

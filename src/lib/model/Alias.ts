@@ -2,7 +2,7 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { ToDisplayData } from "./TableManager/ToDisplayData";
+import type { ToDisplayData } from "./tables/manager/ToDisplayData";
 
 export class Alias implements ToDisplayData {
     private name: string;

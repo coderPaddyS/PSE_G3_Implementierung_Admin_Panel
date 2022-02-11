@@ -1,13 +1,13 @@
-import { Changes } from "$lib/model/Changes";
-import type { ChangesListener } from "$lib/model/Changes";
-import type { Table } from "$lib/model/table/TableComponents"
-import { Backend } from "../backend";
-import type { AuthenticationListener } from "../backend";
-import type { Action } from "$lib/model/Changes/Action";
-import { ChangeAction } from "$lib/model/Changes/ChangeAction";
-import type { TableDisplayInformation } from "$lib/model/TableManager/TableDisplayInformation";
-import { Tables } from "$lib/model/tables";
-import type { DataObject } from "$lib/model/table/DataObject";
+import { Changes } from "$lib/model/tables/changes/Changes";
+import type { ChangesListener } from "$lib/model/tables/changes/Changes";
+import type { Table } from "$lib/model/recursive_table/TableComponents"
+import { Backend } from "$lib/controller/backend";
+import type { AuthenticationListener } from "$lib/controller/backend";
+import type { Action } from "$lib/model/tables/changes/Action";
+import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
+import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
+import { Tables } from "$lib/model/tables/Tables";
+import type { DataObject } from "$lib/model/recursive_table/DataObject";
 import { ErrorQueue } from "$lib/model/error/ErrorQueue";
 
 

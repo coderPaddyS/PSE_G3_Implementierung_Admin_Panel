@@ -2,10 +2,9 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import SvelteTable from "$lib/components/table/SvelteTable.svelte"
-    import FilterElement from "$lib/components/table/FilterElement.svelte";
+    import SvelteTable from "$lib/view/components/table/SvelteTable.svelte"
     import { Framework } from "$lib/controller/framework";
-    import { Tables } from "$lib/model/tables";
+    import { Tables } from "$lib/model/tables/Tables";
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.ALIAS);
