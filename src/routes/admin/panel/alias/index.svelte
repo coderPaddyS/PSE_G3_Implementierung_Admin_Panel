@@ -3,7 +3,6 @@
 
 <script lang=ts>
     import SvelteTable from "$lib/view/components/table/SvelteTable.svelte"
-    import FilterElement from "$lib/view/components/table/FilterElement.svelte";
     import { Framework } from "$lib/controller/framework";
     import { Tables } from "$lib/model/tables/Tables";
 

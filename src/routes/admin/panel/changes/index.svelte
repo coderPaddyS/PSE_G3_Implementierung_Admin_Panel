@@ -2,7 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import SvelteTable from "$lib/components/table/SvelteTable.svelte"
+    import SvelteTable from "$lib/view/components/table/SvelteTable.svelte"
     import { Framework } from "$lib/controller/framework";
 import { Tables } from "$lib/model/tables/Tables";
 
