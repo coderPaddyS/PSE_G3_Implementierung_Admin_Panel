@@ -4,12 +4,13 @@ import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import type { Alias } from "$lib/model/Alias";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
 import type { TableListener } from "$lib/model/tables/manager/TableManager";
-import type { User, UserManagerSettings } from "oidc-client";
+import type { User, UserManagerSettings, Profile } from "oidc-client";
 import { UserManager } from "oidc-client";
 import { goto } from "$app/navigation";
 import { Tables } from "$lib/model/tables/Tables";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
 
+export type UserData = Profile;
 
 export type LoginConfiguration = {
     settings: UserManagerSettings,
@@ -37,6 +38,8 @@ export class Backend {
 
     // A true private variable in javascript is prepended with #
     #getAccessToken: () => string;
+    private userData: UserData;
+
     private onError: Set<(error: string | Error) => void>;
 
     private onAuthenticationChange: Set<(auth: boolean) => void>;
@@ -61,21 +64,9 @@ export class Backend {
             (entry: string) => this.addToBlacklist(new BlacklistEntry(entry)),
             (entry: Alias) => this.addToOfficial(entry)            
         );
-        this.displayInformation.set(Tables.BLACKLIST, {
-            supplier: () => this.blacklist.getTable(),
-            updater: (listener) => this.blacklist.addListener(listener),
-            filterableData: () => this.blacklist.filterableData()
-        });
-        this.displayInformation.set(Tables.ALIAS, {
-            supplier: () => this.official.getTable(),
-            updater: (listener) => this.official.addListener(listener),
-            filterableData: () => this.official.filterableData()
-        });
-        this.displayInformation.set(Tables.ALIAS_SUGGESTIONS, {
-            supplier: () => this.suggestions.getTable(),
-            updater: (listener) => this.suggestions.addListener(listener),
-            filterableData: () => this.suggestions.filterableData()
-        });
+        this.displayInformation.set(Tables.BLACKLIST, this.blacklist.getTableDisplayInformation());
+        this.displayInformation.set(Tables.ALIAS, this.official.getTableDisplayInformation());
+        this.displayInformation.set(Tables.ALIAS_SUGGESTIONS, this.suggestions.getTableDisplayInformation());
     }
 
     private async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
@@ -121,7 +112,7 @@ export class Backend {
     }
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
-        this.notifyError("TestError");
+        console.log(this.displayInformation, this.displayInformation.get(table).tableTitle(), table)
         return this.displayInformation.get(table);
     }
 
@@ -134,17 +125,23 @@ export class Backend {
         this.auth = new UserManager(config.settings);
         this.auth.events.addUserLoaded((user: User) => {
             this.#getAccessToken = () => user.access_token;
+            this.userData = user.profile;
 
             this.notifyAuthenticationChange();
         });
         this.auth.events.addUserUnloaded(() => {
             this.#getAccessToken = undefined;
+            this.userData = undefined;
 
             this.notifyAuthenticationChange();
         });
         this.auth.events.addSilentRenewError((error: string | Error) => {
             this.notifyError(error);
         });
+    }
+
+    public getUserData(): Profile {
+        return this.userData;
     }
 
     private notifyError(error: string | Error) {

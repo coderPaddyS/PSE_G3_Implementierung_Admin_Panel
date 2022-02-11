@@ -55,6 +55,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         sorters.set(OfficialAliases.colBuilding, lexicographicSorter);
         sorters.set(OfficialAliases.colRoom, lexicographicSorter);
         super(
+            "Offizielle Aliase",
             OfficialAliases.title, data? data : [], sorters, {
                 title: "Aktionen",
                 actions: [
@@ -165,5 +166,16 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
 
     public override filterableData(): [number, FilterStrategy<string>][] {
         return OfficialAliases.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
+    }
+
+    protected async size(): Promise<number> {
+        // this.fetch(JSON.stringify({
+        //     query:`
+        //         query size {
+        //             getNumOfAliases
+        //         }
+        //     `
+        // }))
+        return 42;
     }
 }

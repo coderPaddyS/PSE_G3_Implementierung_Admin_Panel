@@ -129,6 +129,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         sorters.set(AliasSuggestions.colUpvotes, lexicographicSorter);
         sorters.set(AliasSuggestions.colDownvotes, lexicographicSorter);
         super(
+            "Alias-Vorschläge",
             AliasSuggestions.title, data? data : [], sorters, {
                 title: "Aktionen",
                 actions: [
@@ -270,5 +271,16 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
             [3, new MinimumNumericFilter(AliasSuggestions.colUpvotes)],
             [4, new MinimumNumericFilter(AliasSuggestions.colDownvotes)],
         ];
+    }
+
+    protected async size(): Promise<number> {
+        // this.fetch(JSON.stringify({
+        //     query:`
+        //         query size {
+        //             getNumAliasSuggestions
+        //         }
+        //     `
+        // }))
+        return 187;
     }
 }

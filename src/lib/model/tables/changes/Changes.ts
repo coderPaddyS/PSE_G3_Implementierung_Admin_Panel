@@ -65,6 +65,7 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
         sorters.set(Changes.colMetadata, lexicographicSorter);
 
         super(
+            "Änderungen",
             Changes.title, [], sorters, {
                 title: "Aktionen",
                 actions: [
@@ -120,5 +121,9 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
             [2, new LexicographicFilter<string>(Changes.colDescription)],
             [3, new LexicographicFilter<string>(Changes.colMetadata)],
         ]
+    }
+
+    protected async size(): Promise<number> {
+        return undefined;
     }
 }

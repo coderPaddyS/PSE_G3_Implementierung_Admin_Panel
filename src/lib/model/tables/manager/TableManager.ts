@@ -9,6 +9,7 @@ import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
 import type { FilterStrategy } from "./filter/FilterStrategy";
 import type { DataObject } from "$lib/model/recursive_table/DataObject";
+import type { TableDisplayInformation } from "./TableDisplayInformation";
 
 /**
  * A listener to get notified on table updates.
@@ -33,6 +34,7 @@ export const lexicographicSorter: Sorter<TableRow<string>> = (a: TableRow<string
  */
 export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayData> {
 
+    private name: string;
     private table: Table<string>;
     private data: R[];
     private title: T;
@@ -51,6 +53,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      *                  containing an array of onClick-functions and a text to display the action.
      */
     public constructor(
+        name: string,
         title: T, 
         data?: R[],
         sorters?: Map<string, Sorter<TableRow<string>>>,
@@ -65,6 +68,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         this.actions = actions.actions;
         this.actionTitle = actions.title;
         this.table = this.createTable();
+        this.name = name;
     }
 
     private checkMatchingColumns(data: R[], title: T): boolean {
@@ -291,5 +295,17 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
 
     protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
         return this.data.filter(predicate);
+    }
+
+    protected abstract size(): Promise<number>;
+
+    public getTableDisplayInformation(): TableDisplayInformation<string, Table<string>> {
+        return {
+            supplier: () => this.getTable(),
+            updater: (listener) => this.addListener(listener),
+            filterableData: () => this.filterableData(),
+            size: async () => this.size().then(size => size? size: this.data.length),
+            tableTitle: () => this.name
+        }
     }
 }

@@ -2,6 +2,7 @@ import { Changes } from "$lib/model/tables/changes/Changes";
 import type { ChangesListener } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
+import type { UserData } from "$lib/controller/backend";
 import type { AuthenticationListener } from "$lib/controller/backend";
 import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
@@ -63,13 +64,15 @@ export class Framework {
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
         if (table === Tables.CHANGES) {
-            return {
-                supplier: () => this.changes.getTable(),
-                updater: (listener) => this.changes.addListener(listener),
-                filterableData: () => this.changes.filterableData()
-            }
+            return this.changes.getTableDisplayInformation();
         }
         return this.backend.getTableDisplayInformation(table);
+    }
+
+    public getTables(): Tables[] {
+        return Object.keys(Tables)
+            .filter(item => Number.isNaN(Number(item)))
+            .map(key => Tables[key]);
     }
 
     /**
@@ -133,5 +136,9 @@ export class Framework {
 
     public async isAdmin(): Promise<boolean> {
         return this.backend.isAdmin();
+    }
+
+    public getUserData(): UserData {
+        return this.backend.getUserData()
     }
 }
