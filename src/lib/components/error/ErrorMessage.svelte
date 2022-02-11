@@ -9,15 +9,61 @@
 </script>
 
 <style lang=scss>
+
+    @use "sass:color";
+
     .errorbox {
         position: absolute;
+        display: block;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        width: 25%;
+        background-color: #ff183f;
+        border-radius: 1em;
+
+        .error {
+
+            display: flex;
+            flex-direction: row-reverse;
+            border-radius: inherit;
+            padding: 1em;
+
+            &:hover {
+                background-color: rgb(238, 40, 40)            
+            }
+
+            button {
+                display: flex;
+                border-color: transparent;
+                background-color: inherit;
+                border-radius: 0.5em;
+                justify-content: center;
+                align-items: center;
+
+                &:hover {
+                    background-color: #ff2a2a;
+                }
+            }
+
+            .text {
+                width: fit-content;
+                flex-grow: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+        }
     }
 </style>
 
 <div class=errorbox>
     {#each errors as error,i}
         <div class=error>
-            <button on:click={() => remove(error)}></button>
+            <button on:click={() => remove(error)}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"><g fill="none" fill-rule="evenodd" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1 1)"><path d="M12 0L0 12M0 0l12 12"/></g></svg>
+            </button>
             <div class=text>
                 {error}
             </div>
