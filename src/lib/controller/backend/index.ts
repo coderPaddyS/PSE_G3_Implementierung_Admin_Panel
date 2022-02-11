@@ -3,7 +3,7 @@ import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist
 import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import type { Alias } from "$lib/model/Alias";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
-import type { TableListener } from "$lib/model/tables/manager/TableManager";
+import type { ActionComponentFactory, TableListener } from "$lib/model/tables/manager/TableManager";
 import type { User, UserManagerSettings, Profile } from "oidc-client";
 import { UserManager } from "oidc-client";
 import { goto } from "$app/navigation";
@@ -113,6 +113,16 @@ export class Backend {
 
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
         return this.displayInformation.get(table);
+    }
+
+    public setActionComponentFactory(table: Tables, factory: ActionComponentFactory<string>) {
+        switch(table) {
+            case Tables.ALIAS: this.official.setActionComponentFactory(factory); break;
+            case Tables.ALIAS_SUGGESTIONS: this.suggestions.setActionComponentFactory(factory); break;
+            case Tables.BLACKLIST: this.blacklist.setActionComponentFactory(factory); break;
+            default:
+                throw Error(`No matching table was provided. Provided: ${table}`)
+        }
     }
 
     public addAuthenticationListener(onUpdate: (authenticated: boolean) => void) {

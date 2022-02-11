@@ -6,10 +6,23 @@
     import { Framework } from "$lib/controller/framework";
     import { Tables } from "$lib/model/tables/Tables";
     import Waiting from "$lib/view/Waiting.svelte";
+    import Action from "$lib/view/components/table_actions/Action.svelte";
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.CHANGES);
-    
+    framework.setActionComponentFactory(
+        Tables.CHANGES, 
+        (onClick, text) => ((root, props) => {
+            return new Action({
+                target: root,
+                props: {
+                    onClick,
+                    text,
+                    ...props
+                }
+            })
+        })
+    )
 </script>
 
 {#await supplier()}

@@ -133,14 +133,14 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         //     new Alias("Alias 69", "Gebäude 69", "Raum 69", 69),
         // ];
 
-        return this.fetch<{data: {getAllAlias: {
+        return this.fetch<{data: {getAllAliases: {
             name: string,
             mapID: number,
             mapObject: string
         }[]}}>(JSON.stringify({
             query: `
                 query getAllAlias {
-                    getAllAlias {
+                    getAllAliases {
                         name: String
                         mapID: Int
                         mapObject: String
@@ -149,7 +149,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
             `
         })).then(response => {
             if (response.data) {
-                return response.data.getAllAlias.map(entry => {
+                return response.data.getAllAliases.map(entry => {
                     let [building, room,] = entry.mapObject.split(",");
                     return new Alias(
                         entry.name,

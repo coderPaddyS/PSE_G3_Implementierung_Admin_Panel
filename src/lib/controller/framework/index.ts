@@ -10,6 +10,7 @@ import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDis
 import { Tables } from "$lib/model/tables/Tables";
 import type { DataObject } from "$lib/model/recursive_table/DataObject";
 import { ErrorQueue } from "$lib/model/error/ErrorQueue";
+import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
 
 
 /**
@@ -67,6 +68,13 @@ export class Framework {
             return this.changes.getTableDisplayInformation();
         }
         return this.backend.getTableDisplayInformation(table);
+    }
+
+    public setActionComponentFactory(table: Tables, factory: ActionComponentFactory<string>) {
+        if (table === Tables.CHANGES) {
+            return this.changes.setActionComponentFactory(factory);
+        }
+        return this.backend.setActionComponentFactory(table, factory);
     }
 
     public getTables(): Tables[] {
