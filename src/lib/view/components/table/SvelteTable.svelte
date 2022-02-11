@@ -3,6 +3,7 @@
 
 <script lang=ts>
     import { onMount, setContext } from "svelte";
+    import { fly } from "svelte/transition";
     import { crawlerKey } from "$lib/model/recursive_table/Types";
 
     import type { Table } from "$lib/model/recursive_table/TableComponents";
@@ -12,8 +13,8 @@
     
     import TableComp from "./TableComp.svelte";
     import lodash from "lodash"
-import FilterElement from "./FilterElement.svelte";
-import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
+    import FilterElement from "./FilterElement.svelte";
+    import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
 
 
     // Generic Types: 
@@ -103,5 +104,7 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
 
 </style>
 
-<FilterElement filters={filterableData()}/>
-<TableComp bind:table={tableViewData} {size}/>
+<div class=svelte-table-wrapper in:fly>
+    <FilterElement filters={filterableData()} />
+    <TableComp bind:table={tableViewData} {size}/>
+</div>
