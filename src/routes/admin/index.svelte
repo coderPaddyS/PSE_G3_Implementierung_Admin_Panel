@@ -7,20 +7,6 @@ import ErrorMessage from '$lib/components/error/ErrorMessage.svelte';
     import { Framework } from '$lib/controller/framework';
 
     import KITLogin from '$lib/logins/KIT/index.svelte'
-
-    Framework.getInstance().onAuthenticationUpdate((isAuthenticated) => {
-        if (isAuthenticated) {
-            goto("/admin/panel", {
-                replaceState: false
-            })
-        }
-    });
-
-    if (Framework.getInstance().isAuthenticated()) {
-        goto("/admin/panel", {
-            replaceState: false
-        })
-    }
 </script>
 
 <style lang=scss>

@@ -210,42 +210,24 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         )
     }
 
-    /* Hopefully not needed in next version, see below*/
-    private async fetchMapData(mapID: number): Promise<[string, string]> {
-        return this.fetch<{data: {getMapObject: String}}>(JSON.stringify({
-            query: `
-                query getMapObject($mapID: Int!) {
-                    getMapObject(mapID: $mapID)
-                }
-            `,
-            variables: {
-                mapID
-            }
-        })).then(response => response.data.getMapObject).then(mapObject => {
-            let splitted = mapObject.split(',');
-            return [splitted[0], splitted[1]];
-        })
-    }
-
     protected async fetchData(): Promise<Array<AliasSuggestionsEntry>> {
-        let suggestions: Array<AliasSuggestionsEntry> = [
-            new AliasSuggestionsEntry("Nutte", "Infobau", "-109", 79128763, 10, 5, "test"),
-            new AliasSuggestionsEntry("Alias 0", "Gebäude 0", "Raum 0", 0, 10, 5, "test"),
-            new AliasSuggestionsEntry("Alias 3", "Gebäude 3", "Raum 3", 3, 10, 5, "test"),
-            new AliasSuggestionsEntry("Alias 49", "Gebäude 49", "Raum 49", 49, 10, 5, "test"),
-            new AliasSuggestionsEntry("Alias 42", "Gebäude 42", "Raum 42", 42, 10, 5, "test"),
-            new AliasSuggestionsEntry("Alias 420", "Gebäude 420", "Raum 420", 420, 10, 5, "test"),
-        ];
-
-        /* Does not work currently as the backend does not have all necessary queries */
-        /*
-        this.fetch<{data: {
+        // let suggestions: Array<AliasSuggestionsEntry> = [
+        //     new AliasSuggestionsEntry("Nutte", "Infobau", "-109", 79128763, 10, 5, "test"),
+        //     new AliasSuggestionsEntry("Alias 0", "Gebäude 0", "Raum 0", 0, 10, 5, "test"),
+        //     new AliasSuggestionsEntry("Alias 3", "Gebäude 3", "Raum 3", 3, 10, 5, "test"),
+        //     new AliasSuggestionsEntry("Alias 49", "Gebäude 49", "Raum 49", 49, 10, 5, "test"),
+        //     new AliasSuggestionsEntry("Alias 42", "Gebäude 42", "Raum 42", 42, 10, 5, "test"),
+        //     new AliasSuggestionsEntry("Alias 420", "Gebäude 420", "Raum 420", 420, 10, 5, "test"),
+        // ];
+        
+        return this.fetch<{data: {
             getAliasSuggestions: {
-                suggester: string,
-                name: string,
-                mapID: number,
-                upvotes: number,
-                downvotes: number
+                suggester: string
+                name: string
+                posVotes: number
+                negVotes: number
+                mapID: number
+                mapObject: string
             }[],
         }}>(JSON.stringify({
             query: `
@@ -253,23 +235,32 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                     getAliasSuggestions(minValToShowPos: $minPositive, minValToShowNeg: $minNegative) {
                         suggester
                         name
+                        posVotes
+                        negVotes
                         mapID
+                        mapObject
                     }
                 }
-            `
-        })).then(response => response.data.getAliasSuggestions.forEach(async entry => {
-            let [building, room] = await this.fetchMapData(entry.mapID);
-            suggestions.push(new AliasSuggestionsEntry(
-                entry.name,
-                building,
-                room,
-                entry.mapID,
-                entry.upvotes,
-                entry.downvotes,
-                entry.suggester
-            ));
-        })); */
-        return suggestions;
+            `,
+            variables: {
+                minPositive: 0,
+                minNegative: 0
+            }
+        })).then(response => {
+            if (response.data) {
+                return response.data.getAliasSuggestions.map(entry => {
+                    let [building, room,] = entry.mapObject.split(",");
+                    return new AliasSuggestionsEntry(
+                        entry.name,
+                        building,
+                        room,
+                        entry.mapID,
+                        entry.posVotes,
+                        entry.negVotes,
+                        entry.suggester
+                    );
+            }
+        )}});
     }
 
     public override filterableData(): [number, FilterStrategy<string>][] {

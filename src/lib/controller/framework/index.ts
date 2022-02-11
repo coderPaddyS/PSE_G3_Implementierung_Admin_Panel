@@ -119,11 +119,19 @@ export class Framework {
         this.backend.redirectAfterLogout();
     }
 
+    public addError(error: Error | string) {
+        this.errors.addError(error);
+    }
+
     public onError(onError: (error: Array<Error | string>) => void) {
         this.errors.addListener(onError);
     }
 
     public removeError(error: Error | string) {
         this.errors.removeError(error);
+    }
+
+    public async isAdmin(): Promise<boolean> {
+        return this.backend.isAdmin();
     }
 }

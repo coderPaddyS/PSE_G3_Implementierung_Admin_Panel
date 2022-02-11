@@ -70,7 +70,6 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
         tableViewData = lodash.cloneDeep(data);
 
         if (tableViewData) {
-            console.log("updating")
             crawlers.forEach(crawler => {
                 if (crawler) {
                     tableViewData.getCrawledOn(crawler);
@@ -97,7 +96,6 @@ import type { FilterStrategy } from "$lib/model/TableManager/filter/FilterStrate
     onMount(() => {
         data = supplier();
         tableViewData = lodash.cloneDeep(data);
-        console.log("data", data);
     })
 </script>
 
