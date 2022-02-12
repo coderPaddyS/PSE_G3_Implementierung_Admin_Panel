@@ -27,6 +27,7 @@ import ErrorMessage from '$lib/view/components/error/ErrorMessage.svelte';
         display: flex;
         justify-content: center;
         height: 100%;
+        width: 100%;
         background-color: #b8740d;
     }
 
@@ -131,7 +132,7 @@ import ErrorMessage from '$lib/view/components/error/ErrorMessage.svelte';
         <div class=login-wrapper>
             <h2>Admin?</h2>
             <div class=logins>
-                <KITLogin login={async () => await Framework.getInstance().login()} />
+                <KITLogin login={async () => await Framework.getInstance().login()} configure={(config) => Framework.getInstance().configureLogin(config)}/>
             </div>
         </div>
         <div class=links>

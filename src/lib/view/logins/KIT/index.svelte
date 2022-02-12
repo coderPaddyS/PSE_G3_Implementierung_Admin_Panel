@@ -2,7 +2,27 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
+    import type { LoginConfiguration } from "$lib/controller/backend";
+
+    export let configure: (config: LoginConfiguration) => void;
     export let login: () => void;
+
+    function handleOnClick() {
+        configure({
+                loginRedirectURI: new URL(`${window.location.origin}/admin`),
+                logoutRedirectURI: new URL(`${window.location.origin}/admin`),
+                settings: {
+                    authority: "https://oidc.scc.kit.edu/auth/realms/kit/",
+                    client_id: "pse-itermori-de",
+                    redirect_uri: `${window.location.origin}/admin/login`,
+                    response_type: "code",
+                    scope: "openid profile email",
+                    automaticSilentRenew: true
+                }
+        });
+        
+        login()
+    }
 </script>
 
 <style lang=scss>
@@ -42,7 +62,7 @@
 
 </style>
 
-<div class=wrapper on:click={() => login()}>
+<div class=wrapper on:click={handleOnClick}>
     <img src=logins/Logo_KIT.svg alt="KIT">
     <button>Login via KIT</button>
 </div>
