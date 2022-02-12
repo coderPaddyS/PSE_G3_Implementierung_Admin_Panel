@@ -5,4 +5,6 @@ export interface TableDisplayInformation<T, TA extends Table<T>> {
     supplier: () => Promise<TA>;
     updater: (listener: (table: TA) => void) => void;
     filterableData: () => [number, FilterStrategy<string>][];
+    size: () => Promise<number>;
+    tableTitle: () => string;
 }

@@ -53,6 +53,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
         let sorter: Map<string, Sorter<TableRow<string>>> = new Map();
         sorter.set("Eintrag", lexicographicSorter);
         super(
+            "Blacklist",
             new BlacklistEntry("Eintrag"), data? data : [], sorter, {
                 title: "Aktionen",
                 actions: [{
@@ -113,5 +114,15 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
 
     public override filterableData(): [number, FilterStrategy<string>][] {
         return Blacklist.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
+    }
+
+    protected async size(): Promise<number> {
+        return this.fetch<{data: {getAmountEntriesBlacklist: string}}>(JSON.stringify({
+            query:`
+                query size {
+                    getAmountEntriesBlacklist
+                }
+            `
+        })).then(response => Number(response.data.getAmountEntriesBlacklist))
     }
 }

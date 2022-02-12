@@ -4,11 +4,14 @@
 
 import type { Sorter } from "$lib/model/recursive_table/Types"
 import { Table, TableCell, TableData, TableDataComponent, TableDataTable, TableRow, TitleCell, TitleRow } from "$lib/model/recursive_table/TableComponents";
-import Action from "$lib/view/components/table_actions/Action.svelte";
+import type { ComponentFactory } from "$lib/model/recursive_table/TableComponents";
 import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
 import type { FilterStrategy } from "./filter/FilterStrategy";
 import type { DataObject } from "$lib/model/recursive_table/DataObject";
+import type { TableDisplayInformation } from "./TableDisplayInformation";
+
+export type ActionComponentFactory<T> = (onClick: (() => void)[], text: string) => ComponentFactory;
 
 /**
  * A listener to get notified on table updates.
@@ -33,10 +36,13 @@ export const lexicographicSorter: Sorter<TableRow<string>> = (a: TableRow<string
  */
 export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayData> {
 
+    private name: string;
     private table: Table<string>;
     private data: R[];
+    private dataToBeAdded: R[];
     private title: T;
     private sorters: Map<string, Sorter<TableRow<string>>>;
+    private actionFactory: ActionComponentFactory<R> = undefined;
     private actions: {onClick: (entry: R) => (() => void)[], text: string}[];
     private actionTitle: string;
     private listeners: Set<TableListener> = new Set();
@@ -51,6 +57,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      *                  containing an array of onClick-functions and a text to display the action.
      */
     public constructor(
+        name: string,
         title: T, 
         data?: R[],
         sorters?: Map<string, Sorter<TableRow<string>>>,
@@ -60,11 +67,13 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
         this.title = title;
-        this.data = data;
+        this.data = [];
+        this.dataToBeAdded = data;
         this.sorters = new Map(sorters);
         this.actions = actions.actions;
         this.actionTitle = actions.title;
         this.table = this.createTable();
+        this.name = name;
     }
 
     private checkMatchingColumns(data: R[], title: T): boolean {
@@ -135,18 +144,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             // ... append those actions in an Action component inside the table data ...
             row.add(new TableCell<string>().add(
                 ...this.actions.map(action => {
-                    return new TableDataComponent<string>((root, props: {index, crawlOnView}) => {
-                        return new Action({
-                                    
-                            // ... and giving the respective parameters.
-                            target: root,
-                            props: {
-                                onClick: action.onClick(entry),
-                                text: action.text,
-                                ...props
-                            }
-                        })
-                    })
+                    return new TableDataComponent<string>(this.actionFactory(action.onClick(entry), action.text));
                 })
             ))
         }
@@ -183,8 +181,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (!this.checkMatchingColumns(data, this.title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
-        this.data.push(...data);
-        this.table.add(...data.map(entry => this.buildRow(entry)));
+        this.dataToBeAdded.push(...data);
         this.notify();
     }
 
@@ -231,6 +228,10 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 this.setData(data)
             }
         });
+        this.data.push(...this.dataToBeAdded)
+        this.table.add(...this.dataToBeAdded.map(entry => this.buildRow(entry)));
+        this.dataToBeAdded = [];
+
         return this.table;
     }
 
@@ -291,5 +292,21 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
 
     protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
         return this.data.filter(predicate);
+    }
+
+    public setActionComponentFactory(factory: ActionComponentFactory<R>) {
+        this.actionFactory = factory;
+    }
+
+    protected abstract size(): Promise<number>;
+
+    public getTableDisplayInformation(): TableDisplayInformation<string, Table<string>> {
+        return {
+            supplier: () => this.getTable(),
+            updater: (listener) => this.addListener(listener),
+            filterableData: () => this.filterableData(),
+            size: async () => this.size().then(size => size? size: this.data.length),
+            tableTitle: () => this.name
+        }
     }
 }

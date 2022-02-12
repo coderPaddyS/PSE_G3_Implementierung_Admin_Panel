@@ -55,6 +55,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         sorters.set(OfficialAliases.colBuilding, lexicographicSorter);
         sorters.set(OfficialAliases.colRoom, lexicographicSorter);
         super(
+            "Offizielle Aliase",
             OfficialAliases.title, data? data : [], sorters, {
                 title: "Aktionen",
                 actions: [
@@ -132,14 +133,14 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         //     new Alias("Alias 69", "Gebäude 69", "Raum 69", 69),
         // ];
 
-        return this.fetch<{data: {getAllAlias: {
+        return this.fetch<{data: {getAllAliases: {
             name: string,
             mapID: number,
             mapObject: string
         }[]}}>(JSON.stringify({
             query: `
                 query getAllAlias {
-                    getAllAlias {
+                    getAllAliases {
                         name: String
                         mapID: Int
                         mapObject: String
@@ -148,7 +149,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
             `
         })).then(response => {
             if (response.data) {
-                return response.data.getAllAlias.map(entry => {
+                return response.data.getAllAliases.map(entry => {
                     let [building, room,] = entry.mapObject.split(",");
                     return new Alias(
                         entry.name,
@@ -165,5 +166,15 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
 
     public override filterableData(): [number, FilterStrategy<string>][] {
         return OfficialAliases.title.toDisplayData().map((entry, index) => [index, new LexicographicFilter(entry)]);
+    }
+
+    protected async size(): Promise<number> {
+        return this.fetch<{data: {getAmountEntriesAliases: string}}>(JSON.stringify({
+            query:`
+                query size {
+                    getAmountEntriesAlias
+                }
+            `
+        })).then(response => Number(response.data.getAmountEntriesAliases))
     }
 }
