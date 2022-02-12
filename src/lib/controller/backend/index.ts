@@ -1,3 +1,7 @@
+/// SPDX-License-Identifier: GPL-3.0-or-later
+/// 
+/// 2022, Patrick Schneider <patrick@itermori.de>
+
 import type { Table } from "$lib/model/recursive_table/TableComponents";
 import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
 import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
@@ -22,30 +26,34 @@ export type AuthenticationListener = (isAuthenticated: boolean) => void;
 
 /**
  * This class manages the communication with the remote backend on the server.
+ * For security reasons, it also handles the management of the authentication process to prevent XSS-attacks.
  * 
  * @author Patrick Schneider
- * @version 0.1
+ * @version 1.0
  */
 export class Backend {
 
+    private static readonly backendURL: string = "https://pse.itermori.de/graphql";
+
     private auth: UserManager;
     private config: LoginConfiguration;
+    private static readonly configStoreKey: string = "authconfig";
+    private onAuthenticationChange: Set<(auth: boolean) => void>;
+    private userData: UserData;
+
     private blacklist: Blacklist;
     private official: OfficialAliases;
     private suggestions: AliasSuggestions;
-
     private displayInformation: Map<Tables, TableDisplayInformation<string, Table<string>>> = new Map();
 
     // A true private variable in javascript is prepended with #
     #getAccessToken: () => string;
-    private userData: UserData;
 
     private onError: Set<(error: string | Error) => void>;
 
-    private onAuthenticationChange: Set<(auth: boolean) => void>;
-
     /**
      * Construct a new instance of the Backend
+     * @param onError A Consumer which accepts an error in form of `string | Error`
      */
     public constructor(onError: (error: string | Error) => void) {
         this.#getAccessToken = undefined;
@@ -56,7 +64,7 @@ export class Backend {
         this.blacklist = new Blacklist((body: string) => this.fetchBackend(body));
         this.official = new OfficialAliases(
             (body: string) => this.fetchBackend(body),
-            (entry: string) => this.blacklist.addEntry(new BlacklistEntry(entry))
+            (entry: string) => {this.blacklist.addEntry(new BlacklistEntry(entry)); return true;}
         );
         this.suggestions = new AliasSuggestions(
             (body: string) => this.fetchBackend(body),
@@ -68,6 +76,11 @@ export class Backend {
         this.displayInformation.set(Tables.ALIAS_SUGGESTIONS, this.suggestions.getTableDisplayInformation());
     }
 
+    /**
+     * Adds a given entry to the remote blacklist. 
+     * @param entry The {@link BlacklistEntry} to be added.
+     * @returns true if the element wasn't on the blacklist
+     */
     private async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
         let added = await this.fetchBackend<{data: {blacklistAlias: boolean}}>(JSON.stringify({
             query: `
@@ -88,6 +101,11 @@ export class Backend {
         return added;
     }
 
+    /**
+     * Adds a given alias to the remote official aliases list. 
+     * @param alias The {@link Alias} to be added.
+     * @returns true if the element wasn't already an official alias.
+     */
     private async addToOfficial(alias: Alias): Promise<boolean> {
         let added = await this.fetchBackend<{data: {approveAliasSuggestion: boolean}}>(JSON.stringify({
             query: `
@@ -110,11 +128,24 @@ export class Backend {
         return added;
     }
 
+    /**
+     * Getter for the display information of the specified table.
+     * @param table {@link Tables.BLACKLIST}, {@link Tables.ALIAS}, {@link Tables.ALIAS_SUGGESTIONS}
+     * @returns {@link TableDisplayInformation} of the selected Table
+     */
     public getTableDisplayInformation(table: Tables): TableDisplayInformation<string, Table<string>> {
         return this.displayInformation.get(table);
     }
 
-    public setActionComponentFactory(table: Tables, factory: ActionComponentFactory<string>) {
+    /**
+     * Setter for the display style of the actions of the specified table.
+     * Must be called before displaying the table.
+     * 
+     * @param table {@link Tables.BLACKLIST}, {@link Tables.ALIAS}, {@link Tables.ALIAS_SUGGESTIONS}
+     * @param factory An {@link ActionComponentFactory} which produces a factory to render the component.
+     * @returns {@link TableDisplayInformation} of the selected Table
+     */
+    public setActionComponentFactory(table: Tables, factory: ActionComponentFactory) {
         switch(table) {
             case Tables.ALIAS: this.official.setActionComponentFactory(factory); break;
             case Tables.ALIAS_SUGGESTIONS: this.suggestions.setActionComponentFactory(factory); break;
@@ -124,14 +155,22 @@ export class Backend {
         }
     }
 
+    /**
+     * Get notified on updates of the authentication state.
+     * @param onUpdate A boolean-Consumer as listener
+     */
     public addAuthenticationListener(onUpdate: (authenticated: boolean) => void) {
         this.onAuthenticationChange.add(onUpdate);
     }
 
+    /**
+     * The configuration used to configure the login process
+     * @param config {@link LoginConfiguration}
+     */
     private configureManager(config: LoginConfiguration) {
         this.config = config;
+        window.sessionStorage.setItem(Backend.configStoreKey, JSON.stringify(config));
         this.auth = new UserManager(config.settings);
-        console.log("auth", this.auth)
         this.auth.events.addUserLoaded((user: User) => {
             this.#getAccessToken = () => user.access_token;
             this.userData = user.profile;
@@ -149,23 +188,40 @@ export class Backend {
         });
     }
 
-    public getUserData(): Profile {
+    /**
+     * Getter for the user data.
+     * @returns The {@link UserData} containing the required information
+     */
+    public getUserData(): UserData {
         return this.userData;
     }
 
+    /**
+     * Broadcast the provided error to the listeners
+     * @param error {@code string | Error}
+     */
     private notifyError(error: string | Error) {
         this.onError.forEach(listener => listener(error));
     }
 
+    /**
+     * Broadcast the current authentication state to the listeners
+     */
     private notifyAuthenticationChange() {
         this.onAuthenticationChange.forEach(listener => listener(this.isAuthenticated()));
     }
 
+    /**
+     * Configure the login process to use the provided settings.
+     * @param config The {@link LoginConfiguration} with the required settings.
+     */
     public configureLogin(config: LoginConfiguration) {
-        window.sessionStorage.setItem("authconfig", JSON.stringify(config));
         this.configureManager(config);
     }
 
+    /**
+     * Login using the previously via {@link configureLogin} configured settings.
+     */
     public async login() {
         await this.auth.signinRedirect().catch((error) => this.notifyError(error));
     }
@@ -175,16 +231,20 @@ export class Backend {
      * Finishes the login procedure.
      */
     public redirectAfterLogin() {
-        this.configureManager(JSON.parse(window.sessionStorage.getItem("authconfig")));
+        this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));
         this.auth.signinCallback()
-            .then(value => 
+            .then(() => 
                 goto(this.config.loginRedirectURI.toString(), {replaceState: true})
             )
             .catch((error) => this.notifyError(error));
     }
 
+    /**
+     * Logout using the previously via {@link configureLogin} configured settings.
+     */
     public async logout() {
-        await this.auth.signoutRedirect().catch((error) => this.notifyError(error));
+        this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));
+        this.auth.signoutRedirect().catch((error) => this.notifyError(error));
     }
 
     /**
@@ -199,10 +259,18 @@ export class Backend {
             .catch((error) => this.notifyError(error));
     }
 
+    /**
+     * Getter for the authentication state of the user.
+     * @returns true if the user is authenticated
+     */
     public isAuthenticated(): boolean {
         return this.#getAccessToken !== undefined;
     }
 
+    /**
+     * Getter wether the current user is an admin or not
+     * @returns true if the user is an admin
+     */
     public async isAdmin(): Promise<boolean> {
         let admin: boolean = false;
         await this.fetchBackend<{data: {isAdmin: boolean}}>(JSON.stringify({
@@ -212,6 +280,7 @@ export class Backend {
                 }
             `
         })).then(response => {
+            console.log(response);
             if (response.data) {
                 admin = response.data.isAdmin
             }
@@ -219,9 +288,18 @@ export class Backend {
         return admin;
     }
 
-    private async fetchBackend<T>(body: string, onRejection?: () => void): Promise<T> {
+    /**
+     * Fetch the backend via a POST method.
+     * Attaches the authorization credentials to the provided body.
+     * 
+     * @type T - The expected type of the server response
+     * 
+     * @param body The fetch body 
+     * @returns The specified type
+     */
+    private async fetchBackend<T>(body: string): Promise<T> {
         try {
-            return fetch('https://pse.itermori.de/graphql', {
+            return fetch(Backend.backendURL, {
                 headers: {
                     'Authorization': `Bearer ${this.#getAccessToken()}`,
                     'content-type': "application/json"
@@ -232,6 +310,7 @@ export class Backend {
             .catch(error => {throw new Error(error)});
         } catch (error){
             this.notifyError(error);
+            console.log(error);
         }
     }
 }

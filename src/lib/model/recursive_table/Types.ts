@@ -45,5 +45,11 @@ export const tail = <T>(x: T[]) => {
     if (!x) {
         return undefined;
     }
-    return (([x, ...xs]: T[]) => xs)(x);
+    return (([, ...xs]: T[]) => xs)(x);
 };
+
+
+/**
+ * A representation of a table as a tuple mapping a title to its values.
+ */
+ export type DataObject<T> = {[s: string]: [T,T[]]}

@@ -1,3 +1,7 @@
+/// SPDX-License-Identifier: GPL-3.0-or-later
+/// 
+/// 2022, Patrick Schneider <patrick@itermori.de>
+
 import { TableSortingCrawler } from "$lib/model/recursive_table/crawler/SortingCrawler";
 import { Table, TableCell, TableData, TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { Sorter } from "$lib/model/recursive_table/Types";

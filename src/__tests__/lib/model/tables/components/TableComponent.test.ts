@@ -50,6 +50,6 @@ describe("Testing if TableComponent ", () => {
     });
 
     test("has no children after creation", () => {
-        expect(dummy.getChilds()).toBe(undefined);
+        expect(dummy.getChildren()).toBe(undefined);
     })
 })

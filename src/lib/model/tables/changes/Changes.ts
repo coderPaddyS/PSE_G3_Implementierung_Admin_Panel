@@ -4,21 +4,34 @@
 
 import type { Table, TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { ChangeAction } from "./ChangeAction";
-import lodash from "lodash";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData";
 import type { Sorter } from "$lib/model/recursive_table/Types";
 import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
 
+/**A Listener to get notified on updates on the changes table */
 export type ChangesListener = (table: Table<string>) => void;
 
+/**
+ * This class represents the title of the changes table.
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
 class ChangeTitle implements ToDisplayData {
     private time: string;
     private category: string;
     private description: string;
     private metadata: string;
 
+    /**
+     * Construct a new Title with the given strings as title for their columns.
+     * @param time string
+     * @param category string
+     * @param description string
+     * @param metadata string
+     */
     public constructor(
         time: string,
         category: string,
@@ -41,17 +54,23 @@ class ChangeTitle implements ToDisplayData {
  * Rather than immediately performing changes, changes are saved and performed later.
  * 
  * @author Patrick Schneider
- * @version 0.5
+ * @version 1.0
  */
 export class Changes extends TableManager<ChangeAction, ChangeTitle>{
+
+    private static readonly tableName: string = "Änderungen";
 
     private static readonly colTime: string = "Zeit";
     private static readonly colCategory: string = "Kategorie";
     private static readonly colDescription: string = "Beschreibung";
     private static readonly colMetadata: string = "Änderungen";
+    private static readonly colActions: string = "Aktionen";
     private static readonly title: ChangeTitle = new ChangeTitle(
         Changes.colTime, Changes.colCategory, Changes.colDescription, Changes.colMetadata
     );
+
+    private static readonly butDelete: string = "Ablehnen";
+    private static readonly butAccept: string = "Akzeptieren";
 
     /**
      * Create the changes.
@@ -59,26 +78,26 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
      */
     public constructor() {
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
-        sorters.set(Changes.colTime, lexicographicSorter);
-        sorters.set(Changes.colCategory, lexicographicSorter);
-        sorters.set(Changes.colDescription, lexicographicSorter);
-        sorters.set(Changes.colMetadata, lexicographicSorter);
+        sorters.set(Changes.colTime, lexicographicSorter(0));
+        sorters.set(Changes.colCategory, lexicographicSorter(1));
+        sorters.set(Changes.colDescription, lexicographicSorter(2));
+        sorters.set(Changes.colMetadata, lexicographicSorter(3));
 
         super(
-            "Änderungen",
+            Changes.tableName,
             Changes.title, [], sorters, {
-                title: "Aktionen",
+                title: Changes.colActions,
                 actions: [
                     {
                         onClick: (entry: ChangeAction) => [
                             () => entry.perform() && this.remove(entry)
                         ],
-                        text: "Akzeptieren",
+                        text: Changes.butAccept,
                     }, {
                         onClick: (entry: ChangeAction) => [
                             () => this.remove(entry) && entry.remove()
                         ],
-                        text: "Ablehnen",
+                        text: Changes.butDelete,
                     }, 
                 ]
             }

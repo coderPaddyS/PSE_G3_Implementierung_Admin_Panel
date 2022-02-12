@@ -30,10 +30,17 @@ export class TableColumnFilterCrawler<T> extends TableCrawler<T, TableColumnFilt
         this.filters = filters;
     }
 
+    /**
+     * Crawl onto the given row to filter it by the given predicates.
+     * 
+     * @param row The row to crawl on
+     * @param match A method to be called if there was a match
+     * @returns The crawled on row
+     */
     public override crawlRow(row: TableRow<T>, match?: () => void): TableRow<T> {
         let matches = 0;
         let validFilters = 0;
-        row.getChilds().forEach((cell, index) => {
+        row.getChildren().forEach((cell, index) => {
             if (index < this.filters.length) {
                 switch (this.filters[index](cell.getData())) {
                     case true: matches++; validFilters++; break;
@@ -47,8 +54,8 @@ export class TableColumnFilterCrawler<T> extends TableCrawler<T, TableColumnFilt
         return row;
     }
 
-    public crawlTable(table: Table<T>, match?: () => void): Table<T> {
-        table.getChilds().forEach(row => {
+    public crawlTable(table: Table<T>): Table<T> {
+        table.getChildren().forEach(row => {
             let matches: boolean = false;
             this.crawlRow(row, () => matches = true);
             if (!matches) {

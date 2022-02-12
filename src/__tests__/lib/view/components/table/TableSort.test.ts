@@ -42,7 +42,7 @@ describe("Test TableSort.svelte", () => {
         afterEach(() => cleanup());
         
         describe("a sorter correctly:", () =>{
-            let algorithm = lexicographicSorter;
+            let algorithm = lexicographicSorter(0);
             
             beforeEach(() => {
                 sorter.mockClear();

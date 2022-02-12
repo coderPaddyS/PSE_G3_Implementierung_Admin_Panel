@@ -31,9 +31,9 @@
     }
 </style>
 
-{#if row && !row.isHidden() && row.getChilds()} 
+{#if row && !row.isHidden() && row.getChildren()} 
     <div class=row use:cssVars={styleVars}>
-        {#each row.getChilds() as cell, i}
+        {#each row.getChildren() as cell, i}
             <TableCellComp bind:cell={cell} index={[...index, i]} {size}/>
         {/each}
     </div>

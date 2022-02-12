@@ -3,10 +3,10 @@
 
 <script lang=ts>
     import { goto } from "$app/navigation";
-import ErrorMessage from "$lib/view/components/error/ErrorMessage.svelte";
-import { Framework } from "$lib/controller/framework";
+    import ErrorMessage from "$lib/view/components/error/ErrorMessage.svelte";
+    import { Framework } from "$lib/controller/framework";
 
-import { onMount } from "svelte";
+    import { onMount } from "svelte";
 
     let framework = Framework.getInstance();
     

@@ -10,6 +10,8 @@
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.ALIAS_SUGGESTIONS);
+    
+    // Set the table to use the Action Component to display the actions
     framework.setActionComponentFactory(
         Tables.ALIAS_SUGGESTIONS, 
         (onClick, text) => ((root, props) => {

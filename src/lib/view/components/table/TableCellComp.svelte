@@ -30,7 +30,7 @@
 
 {#if cell !== undefined && !cell.isHidden()} 
     <div class=cell>
-        {#each cell.getChilds() as data, i}
+        {#each cell.getChildren() as data, i}
             <TableDataComp bind:data={data} index={[...index, i]} {size} />
         {/each}
     </div>

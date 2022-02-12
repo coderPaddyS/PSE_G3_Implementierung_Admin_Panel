@@ -10,6 +10,8 @@
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.BLACKLIST);
+    
+    // Set the table to use the Action Component to display the actions
     framework.setActionComponentFactory(
         Tables.BLACKLIST, 
         (onClick, text) => ((root, props) => {

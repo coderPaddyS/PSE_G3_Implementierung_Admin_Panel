@@ -11,11 +11,14 @@
 
     type T = $$Generic;
     export let filters: [number, FilterStrategy<string>][];
+
+    // Start with an empty string for every filter
     let values: string[] = [...Array.from(Array(filters.length)).map(v => "")];
     
     let predicates: Predicate<T[]>[] = new Array();
 
-    filters.forEach(([index, strategy], i) => {
+    // create an predicate for each filter using its strategy to filter
+    filters.forEach(([, strategy], i) => {
         predicates.push(data => {
             strategy.setFilter(() => values[i]);
             let tested = data.map(entry => strategy.filter([JSON.stringify(entry)]));

@@ -6,7 +6,7 @@ import type { Action } from "./Action";
 
 import lodash from "lodash";
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData";
-import type { DataObject } from "$lib/model/recursive_table/DataObject";
+import type { DataObject } from "$lib/model/recursive_table/Types";
 
 /**
  * A ChangeAction is a data class to contain relevant information to an action event.

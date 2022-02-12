@@ -28,7 +28,7 @@ describe("Testing if TableDataComponent ", () => {
     });
 
     test("has no children", () => {
-        expect(data.getChilds()).toBe(undefined);
+        expect(data.getChildren()).toBe(undefined);
     });
 
     test("is of type TableDataAdditions.COMPONENT", () => {

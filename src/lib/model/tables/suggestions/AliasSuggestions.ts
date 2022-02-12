@@ -91,11 +91,18 @@ export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
  */
 export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasSuggestionsTitle> {
 
+    private static readonly tableName: string = "Alias-Vorschläge";
+
     private static readonly colAlias: string = "Alias";
     private static readonly colBuilding: string = "Gebäude";
     private static readonly colRoom: string = "Raum";
     private static readonly colUpvotes: string = "Positiv";
     private static readonly colDownvotes: string = "Negativ";
+    private static readonly colActions: string = "Aktionen";
+
+    private static readonly butDelete: string = "Löschen";
+    private static readonly butBlacklist: string = "Blacklist";
+    private static readonly butAccept: string = "Akzeptieren";
 
     private static readonly title: AliasSuggestionsTitle = new AliasSuggestionsTitle(
         AliasSuggestions.colAlias, 
@@ -114,43 +121,46 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
 
     /**
      * Create the alias suggestions and set the data accordingly.
-     * @param data If provided sets the data of the table. 
+     * @param fetch The function used to fetch data from the backend.
+     * @param addToBlacklist A consumer used to blacklist entries.
+     * @param acceptAlias A consumer used to accept aliases.
+     * @param data If provided, sets the initial table data.
      */
-     public constructor(
+    public constructor(
         fetch: <T>(body: string) => Promise<T>,
         addToBlacklist: (entry: string) => Promise<boolean>,
         acceptAlias: (alias: Alias) => Promise<boolean>,
         data?: AliasSuggestionsEntry[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
-        sorters.set(AliasSuggestions.colAlias, lexicographicSorter);
-        sorters.set(AliasSuggestions.colBuilding, lexicographicSorter);
-        sorters.set(AliasSuggestions.colRoom, lexicographicSorter);
-        sorters.set(AliasSuggestions.colUpvotes, lexicographicSorter);
-        sorters.set(AliasSuggestions.colDownvotes, lexicographicSorter);
+        sorters.set(AliasSuggestions.colAlias, lexicographicSorter(0));
+        sorters.set(AliasSuggestions.colBuilding, lexicographicSorter(1));
+        sorters.set(AliasSuggestions.colRoom, lexicographicSorter(2));
+        sorters.set(AliasSuggestions.colUpvotes, lexicographicSorter(3));
+        sorters.set(AliasSuggestions.colDownvotes, lexicographicSorter(4));
         super(
-            "Alias-Vorschläge",
+            AliasSuggestions.tableName,
             AliasSuggestions.title, data? data : [], sorters, {
-                title: "Aktionen",
+                title: AliasSuggestions.colActions,
                 actions: [
                     {
                         onClick: (entry: AliasSuggestionsEntry) => [
                             () => this.removeEntry(entry),
                             () => this.hide(entry)
                         ],
-                        text: "Löschen",
+                        text: AliasSuggestions.butDelete,
                     }, {
                         onClick: (entry: AliasSuggestionsEntry) => [
                             () => this.blacklist(entry),
                             () => this.hide(entry)
                         ],
-                        text: "Blacklisten"
+                        text: AliasSuggestions.butBlacklist
                     }, {
                         onClick: (entry: AliasSuggestionsEntry) => [
                             () => this.accept(entry),
                             () => this.hide(entry)
                         ],
-                        text: "Akzeptieren"
+                        text: AliasSuggestions.butAccept
                     }
                 ]
             }
@@ -158,6 +168,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         this.fetch = fetch;
         this.addToBlacklist = addToBlacklist;
         this.acceptAlias = acceptAlias;
+        this.minDownvotes = 0;
+        this.minUpvotes = 0;
     }
 
     private removeFromRemote(entry: Alias): Promise<boolean> {
@@ -184,8 +196,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                 return false;
             }, 
             async () => {this.show(entry); return true;}, 
-            "Aliasvorschläge", 
-            "Löschen", 
+            AliasSuggestions.tableName, 
+            AliasSuggestions.butDelete, 
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         );
     }
@@ -194,8 +206,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         Framework.getInstance().addChange(
             async () => this.addToBlacklist(entry.getName()),
             async () => {this.show(entry); return true;},
-            "Aliasvorschläge",
-            "Blacklisten",
+            AliasSuggestions.tableName,
+            AliasSuggestions.butBlacklist,
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         );
     }
@@ -204,21 +216,13 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         Framework.getInstance().addChange(
             async () => this.acceptAlias(entry),
             async () => {this.show(entry); return true;},
-            "Aliasvorschläge",
-            "Akzeptieren",
+            AliasSuggestions.tableName,
+            AliasSuggestions.butAccept,
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         )
     }
 
     protected async fetchData(): Promise<Array<AliasSuggestionsEntry>> {
-        // let suggestions: Array<AliasSuggestionsEntry> = [
-        //     new AliasSuggestionsEntry("Nutte", "Infobau", "-109", 79128763, 10, 5, "test"),
-        //     new AliasSuggestionsEntry("Alias 0", "Gebäude 0", "Raum 0", 0, 10, 5, "test"),
-        //     new AliasSuggestionsEntry("Alias 3", "Gebäude 3", "Raum 3", 3, 10, 5, "test"),
-        //     new AliasSuggestionsEntry("Alias 49", "Gebäude 49", "Raum 49", 49, 10, 5, "test"),
-        //     new AliasSuggestionsEntry("Alias 42", "Gebäude 42", "Raum 42", 42, 10, 5, "test"),
-        //     new AliasSuggestionsEntry("Alias 420", "Gebäude 420", "Raum 420", 420, 10, 5, "test"),
-        // ];
         
         return this.fetch<{data: {
             getAliasSuggestions: {
@@ -243,8 +247,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                 }
             `,
             variables: {
-                minPositive: 0,
-                minNegative: 0
+                minPositive: this.minUpvotes,
+                minNegative: this.minDownvotes
             }
         })).then(response => {
             if (response.data) {

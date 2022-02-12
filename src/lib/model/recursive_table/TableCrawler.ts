@@ -18,7 +18,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
     
     /**
      * Crawl on a given table element
-     * @param table {@code iTable<iTableRow} The table to crawl on
+     * @param table {@link Table} The table to crawl on
      * @returns The crawled-on table with perhaps changed data
      */
     public crawlTable(table: Table<T>): Table<T> {
@@ -27,7 +27,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
 
     /**
      * Crawl on a given row element
-     * @param row {@code iTableRow} The row to crawl on
+     * @param row {@link TableRow} The row to crawl on
      * @returns The crawled-on row with perhaps changed data
      */
     public crawlRow(row: TableRow<T>): TableRow<T> {
@@ -36,7 +36,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
 
     /**
      * Crawl on a given cell element
-     * @param cell {@code iTableCell} The cell to crawl on
+     * @param cell {@link TableCell} The cell to crawl on
      * @returns The crawled-on cell with perhaps changed data
      */
     public crawlCell(cell: TableCell<T>): TableCell<T> {
@@ -45,7 +45,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
 
     /**
      * Crawl on a given data element
-     * @param data {@code iTableData} The data to crawl on
+     * @param data {@link TableData} The data to crawl on
      * @returns The crawled-on data with perhaps changed data
      */
     public crawlData(data: TableData<T>): TableData<T> {
@@ -54,7 +54,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
 
     /**
      * Crawl on a given title row element
-     * @param row {@code iTableRow} The title row to crawl on
+     * @param row {@link TitleRow} The title row to crawl on
      * @returns The crawled-on title row with perhaps changed data
      */
     public crawlTitleRow(titleRow: TitleRow<T>): TitleRow<T> {
@@ -63,7 +63,7 @@ export abstract class TableCrawler<T, E extends TableCrawler<T, E>> {
 
     /**
      * Crawl on a given title cell element
-     * @param titlecell {@code iTableCell} The title cell to crawl on
+     * @param titleCell {@link TitleCell} The title cell to crawl on
      * @returns The crawled-on title cell with perhaps changed data
      */
     public crawlTitleCell(titleCell: TitleCell<T>): TitleCell<T> {

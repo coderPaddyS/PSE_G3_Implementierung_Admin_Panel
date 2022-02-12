@@ -29,8 +29,8 @@
         {#if table.getTitle()}
             <TitleRowComp row={table.getTitle()} index={[0]} {size}/>
         {/if}
-        {#if table.getChilds()}
-            {#each table.getChilds() as row,i}
+        {#if table.getChildren()}
+            {#each table.getChildren() as row,i}
                 <TableRowComp bind:row={row} index={[i]} {size} />
             {/each}
         {/if}

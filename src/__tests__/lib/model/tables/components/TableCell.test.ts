@@ -43,8 +43,8 @@ describe("Testing if TableCell ", () => {
     test("has no children after initialization, but not undefined", () => {
         let cell = new TableCell<string>();
 
-        expect(cell.getChilds()).not.toBe(undefined);
-        expect(cell.getChilds()).toEqual([]);
+        expect(cell.getChildren()).not.toBe(undefined);
+        expect(cell.getChildren()).toEqual([]);
     });
 
     test("gets correctly being crawled on", () => {
@@ -67,7 +67,7 @@ describe("Testing if TableCell ", () => {
         let data = new DummyTableData();
         cell.add(data);
 
-        expect(cell.getChilds()).toEqual([data]);
+        expect(cell.getChildren()).toEqual([data]);
     });
 
     test("adds children correctly", () => {
@@ -75,7 +75,7 @@ describe("Testing if TableCell ", () => {
         let data = [new DummyTableData(), new DummyTableData(), new DummyTableData()];
         cell.add(...data);
 
-        expect(cell.getChilds()).toEqual(data);
+        expect(cell.getChildren()).toEqual(data);
     });
 
     test("returns data from children correctly", () => {

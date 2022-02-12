@@ -28,13 +28,19 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
  * The last column contains actions to react to events.
  * 
  * @author Patrick Schneider
- * @version 0.5
+ * @version 1.0
  */
 export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
+
+    private static readonly tableName: string = "Offizielle Aliase";
 
     private static readonly colAlias: string = "Alias";
     private static readonly colBuilding: string = "Gebäude";
     private static readonly colRoom: string = "Raum";
+    private static readonly colActions: string = "Aktionen";
+
+    private static readonly butDelete: string = "Löschen";
+    private static readonly butBlacklist: string = "Blacklisten";
 
     private static readonly title: OfficialAliasesTitle
         = new OfficialAliasesTitle(OfficialAliases.colAlias, OfficialAliases.colBuilding, OfficialAliases.colRoom);
@@ -44,33 +50,36 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
 
     /**
      * Create the official aliases and set the data accordingly.
-     * @param data If provided sets the data of the table. 
+     * @param fetch The function used to fetch data from the backend.
+     * @param addToBlacklist A consumer used to blacklist entries.
+     * @param data If provided, sets the initial table data.
      */
      public constructor(
         fetch: <T>(body: string) => Promise<T>,
-        addToBlacklist: (entry: string) => boolean, data?: Alias[]) {
+        addToBlacklist: (entry: string) => boolean, 
+        data?: Alias[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
-        sorters.set(OfficialAliases.colAlias, lexicographicSorter);
-        sorters.set(OfficialAliases.colBuilding, lexicographicSorter);
-        sorters.set(OfficialAliases.colRoom, lexicographicSorter);
+        sorters.set(OfficialAliases.colAlias, lexicographicSorter(0));
+        sorters.set(OfficialAliases.colBuilding, lexicographicSorter(1));
+        sorters.set(OfficialAliases.colRoom, lexicographicSorter(2));
         super(
-            "Offizielle Aliase",
+            OfficialAliases.tableName,
             OfficialAliases.title, data? data : [], sorters, {
-                title: "Aktionen",
+                title: OfficialAliases.tableName,
                 actions: [
                     {
                         onClick: (entry: Alias) => [
                             () => this.removeEntry(entry),
                             () => this.hide(entry)
                         ],
-                        text: "Löschen",
+                        text: OfficialAliases.butDelete,
                     }, {
                         onClick: (entry: Alias) => [
                             () => this.blacklist(entry),
                             () => this.hide(entry),
                         ],
-                        text: "Blacklisten"
+                        text: OfficialAliases.butBlacklist
                     }
                 ]
             }
@@ -79,9 +88,12 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         this.fetch = fetch;
     }
 
-    public addEntry(entry: Alias): boolean {
+    /**
+     * Add an alias to the official aliases.
+     * @param entry {@link Alias}
+     */
+    public addEntry(entry: Alias) {
         this.addData(entry);
-        return true;
     }
 
     private removeFromRemote(entry: Alias): Promise<boolean> {
@@ -108,8 +120,8 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
                 return false;
             }, 
             async () => {this.show(entry); return true;}, 
-            "Offizielle Aliase", 
-            "Löschen", 
+            OfficialAliases.tableName, 
+            OfficialAliases.butDelete, 
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         );
     }
@@ -118,20 +130,13 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         Framework.getInstance().addChange(
             async () => this.addToBlacklist(entry.getName()),
             async () => {this.show(entry); return true;},
-            "Offizielle Aliase",
-            "Blacklisten",
+            OfficialAliases.tableName,
+            OfficialAliases.butBlacklist,
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         );
     }
 
     protected async fetchData(): Promise<Alias[]> {
-        // let aliases: Array<Alias> = [
-        //     new Alias("Alias 1", "Gebäude 1", "Raum 1", 1),
-        //     new Alias("Alias 2", "Gebäude 2", "Raum 2", 2),
-        //     new Alias("Alias 45", "Gebäude 45", "Raum 45", 45),
-        //     new Alias("Alias 8", "Gebäude 8", "Raum 8", 8),
-        //     new Alias("Alias 69", "Gebäude 69", "Raum 69", 69),
-        // ];
 
         return this.fetch<{data: {getAllAliases: {
             name: string,

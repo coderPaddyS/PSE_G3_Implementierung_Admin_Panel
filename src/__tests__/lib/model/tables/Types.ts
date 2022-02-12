@@ -1,3 +1,7 @@
+/// SPDX-License-Identifier: GPL-3.0-or-later
+/// 
+/// 2022, Patrick Schneider <patrick@itermori.de>
+
 import { invertSort, Sorter, tail } from "$lib/model/recursive_table/Types";
 
 

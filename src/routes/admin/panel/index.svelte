@@ -6,8 +6,8 @@
     import TableOverview from "$lib/view/components/table/TableOverview.svelte";
     import type { UserData } from "$lib/controller/backend";
     import Greeter from "$lib/view/dashboard/Greeter.svelte";
-import Waiting from "$lib/view/Waiting.svelte";
-import { Tables } from "$lib/model/tables/Tables";
+    import Waiting from "$lib/view/Waiting.svelte";
+    import { Tables } from "$lib/model/tables/Tables";
 
     let framework = Framework.getInstance();
     let userData: UserData = framework.getUserData();
@@ -19,6 +19,9 @@ import { Tables } from "$lib/model/tables/Tables";
         name = userData.name;
     }
 
+    /**
+     * Retreive all tables with size and title, but skip Tables.CHANGES as we are not interested in showing it.
+     */
     async function getTables(): Promise<{size: number, title: string}[]> {
         let tables: {size: number, title: string}[] = [];
         let availableTables = framework.getTables();
