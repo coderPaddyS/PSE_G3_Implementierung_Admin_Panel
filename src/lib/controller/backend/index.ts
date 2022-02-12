@@ -47,8 +47,7 @@ export class Backend {
     /**
      * Construct a new instance of the Backend
      */
-    public constructor(config: LoginConfiguration, onError: (error: string | Error) => void) {
-        this.configureManager(config);
+    public constructor(onError: (error: string | Error) => void) {
         this.#getAccessToken = undefined;
         this.onError = new Set();
         this.onError.add(onError);
@@ -132,6 +131,7 @@ export class Backend {
     private configureManager(config: LoginConfiguration) {
         this.config = config;
         this.auth = new UserManager(config.settings);
+        console.log("auth", this.auth)
         this.auth.events.addUserLoaded((user: User) => {
             this.#getAccessToken = () => user.access_token;
             this.userData = user.profile;
@@ -162,6 +162,7 @@ export class Backend {
     }
 
     public configureLogin(config: LoginConfiguration) {
+        window.sessionStorage.setItem("authconfig", JSON.stringify(config));
         this.configureManager(config);
     }
 
@@ -174,6 +175,7 @@ export class Backend {
      * Finishes the login procedure.
      */
     public redirectAfterLogin() {
+        this.configureManager(JSON.parse(window.sessionStorage.getItem("authconfig")));
         this.auth.signinCallback()
             .then(value => 
                 goto(this.config.loginRedirectURI.toString(), {replaceState: true})

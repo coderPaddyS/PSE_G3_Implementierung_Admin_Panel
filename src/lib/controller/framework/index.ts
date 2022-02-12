@@ -2,7 +2,7 @@ import { Changes } from "$lib/model/tables/changes/Changes";
 import type { ChangesListener } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
-import type { UserData } from "$lib/controller/backend";
+import type { UserData, LoginConfiguration } from "$lib/controller/backend";
 import type { AuthenticationListener } from "$lib/controller/backend";
 import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
@@ -35,19 +35,7 @@ export class Framework {
      */
     private constructor() {
         this.errors = new ErrorQueue();
-        this.backend = new Backend({
-                loginRedirectURI: new URL(`${window.location.origin}/admin`),
-                logoutRedirectURI: new URL(`${window.location.origin}/admin`),
-                settings: {
-                    authority: "https://oidc.scc.kit.edu/auth/realms/kit/",
-                    client_id: "pse-itermori-de",
-                    redirect_uri: `${window.location.origin}/admin/login`,
-                    response_type: "code",
-                    scope: "openid profile email",
-                    automaticSilentRenew: true
-                }
-            },
-            (error) => this.errors.addError(error));
+        this.backend = new Backend((error) => this.errors.addError(error));
         this.changes = new Changes();
         this.errorListener = new Set();
     }
@@ -147,6 +135,10 @@ export class Framework {
     }
 
     public getUserData(): UserData {
-        return this.backend.getUserData()
+        return this.backend.getUserData();
+    }
+
+    public configureLogin(config: LoginConfiguration) {
+        this.backend.configureLogin(config);
     }
 }
