@@ -1,0 +1,20 @@
+@use 'sass:color';
+$anim_speed: 0.25s;
+
+/*************** Colors *********************/
+
+// navigation
+$nav_bg_color: #b8740d;
+$nav_bg_color_highlighted: lighten($color: $nav_bg_color, $amount: 10);
+// content
+$con_bg_color: rgba($color: #AAA, $alpha: 0.8);
+
+/**************** Constants ********************/
+
+// navigation
+$nav_width: 20rem;
+$nav_width_closed: 2rem;
+$nav_height: 20rem;
+$nav_height_closed: 2rem;
+$nav_padding: 1rem;
+$nav_margin: 1rem;

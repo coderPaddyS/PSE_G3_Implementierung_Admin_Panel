@@ -28,10 +28,15 @@
 <style lang=scss>
     .greeter {
         display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
         font-size: 2em;
         padding: 2em;
+
+        span {
+            text-align: center;
+        }
     }
 </style>
 
