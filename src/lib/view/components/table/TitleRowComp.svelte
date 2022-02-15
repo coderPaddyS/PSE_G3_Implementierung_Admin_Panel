@@ -12,21 +12,23 @@
     // Data provided externally to provide the possiblity to add custom behaviour
     export let row: TitleRow<T>;
     export let index: Array<number>;
-    export let size;
+    export let styling;
 
     // apply changes to size to css
     $: styleVars = {
-        size
+        size: styling
     }
 </script>
 
 <style lang=scss>
+
+    @import '../../../../global.scss';
     .titlerow {
         width: auto;
         display: grid;
-        padding: 1em;
-        grid-template-columns: repeat(auto-fit, minmax(var(--size), 1fr));
-
+        gap: $table_gap;
+        @include rowColumnTemplate();
+        padding: $table_padding;
         border-radius: 1em;
         background-color: #55c2dd;
     }
@@ -35,7 +37,7 @@
 {#if row && !row.isHidden() && row.getChildren()} 
     <div class=titlerow use:cssVars={styleVars}>
         {#each row.getChildren() as cell, i}
-            <TitleCellComp {cell} index={[...index, i]} {size}/>
+            <TitleCellComp {cell} index={[...index, i]} {styling}/>
         {/each}
     </div>
 {/if}

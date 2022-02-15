@@ -18,7 +18,10 @@
 </script>
 
 <style lang="scss">
-
+    button {
+        padding: 0;
+        font-size: 0.75rem;
+    }
 </style>
 
 <button on:click={handleOnClick}>{text? text : ""}</button>

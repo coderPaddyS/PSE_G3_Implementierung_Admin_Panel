@@ -31,21 +31,10 @@
 
 <style lang="scss">
 
-    @mixin mobile () {
-        @media only screen and (max-width: 600px) {
-            @content;
-        }
-    }
-
-    @mixin desktop () {
-        @media only screen and (min-width: 600px) {
-            @content;
-        }
-    }
+    @import '../../../global.scss';
 
     .wrapper {
         display: flex;
-        overflow: hidden;
         width: 100%;
         height: 100%;
 
@@ -63,33 +52,129 @@
         display: flex;
         flex-direction: column;
         flex-grow: 1;
-        height: 100vh;
-        background-color: rgba($color: #AAA, $alpha: 0.8);
-        overflow: scroll;
-
-        & :global(.title) {
-            display: flex;
-            width: 100%;
-
-            justify-content: center;
-            margin-top: 5em;
-        }
+        background-color: $con_bg_color;
+        overflow: auto;
     }
 
-    .nav {
+    .navigation {
         display: flex;
         flex-direction: column;
-        padding: 1em;
+        padding: $nav_padding;
         margin: 0;
-        background-color: #b8740d;
-        transition: all 0.25s;
+        background-color: $nav_bg_color;
         overflow: hidden;
+
+        &, & * {
+            transition: all $anim_speed;
+        }
+
+        .navitems {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+
+            .navitem {
+                display: flex;
+                border-radius: 1em;
+            }
+            .navitem {
+                .item {
+                    display: flex;
+                    text-decoration: none;
+                    color: black;
+                    margin: 0;
+                    padding: $nav_padding;
+                    width: 100%;
+                    border-radius: inherit;
+
+                    &:hover {
+                        background-color: $nav_bg_color_highlighted;
+                    }
+
+                }
+            }
+
+            .logout {
+                margin-top: auto;
+
+                .item {
+                    border-color: transparent;
+                    text-align: left;
+                    background-color: $nav_bg_color;
+                }
+            }
+        }
+
+        @include desktop() {
+
+            &, & * {
+                max-width: 0;
+            }
+
+            & * {
+                opacity: 0;
+            }
+
+            &:hover, &:hover * {
+                max-width: $nav_width;
+                opacity: 1;
+            }
+
+            &:not(:hover) {
+                width: fit-content;
+                max-width: fit-content;
+                padding: $nav_padding;
+                margin: 0;
+
+                .logo:not(:hover) {
+                    max-width: $nav_width_closed;
+                    opacity: 1;
+                    h1:not(:hover) {
+                        max-width: $nav_width_closed;
+                        width: $nav_width_closed;
+                        padding: 0;
+                        margin: 0;
+                        opacity: 1;
+                        writing-mode: vertical-lr;
+                    }
+                }
+            }
+
+            .navitems {
+                width: 100%;
+            }
+        }
 
         @include mobile() {
             max-height: 0;
             bottom: 0;
-            padding-top: 4em;
-            overflow: scroll;
+
+            &:not(:hover) {
+                height: fit-content;
+                max-height: fit-content;
+                padding: $nav_padding;
+                margin: 0;
+                overflow: hidden;
+                text-align: center;
+
+                & * {
+                    display: none;
+                    max-height: 0;
+                }
+
+                .logo:not(:hover) {
+                    display: block;
+                    max-height: $nav_height_closed;
+                    opacity: 1;
+                    h1:not(:hover) {
+                        display: block;
+                        max-height: $nav_height_closed;
+                        height: $nav_height_closed;
+                        opacity: 1;
+                        margin: auto;
+                    }
+                }
+            }
 
             & * {
                 max-height: 0;
@@ -97,6 +182,12 @@
             }
 
             &:hover {
+                overflow: scroll;
+
+                .logo {
+                    text-align: center;
+                }
+                
                 &, & * {
                     padding-top: 1em;
                     max-height: 20em;
@@ -104,54 +195,15 @@
                 }
             }
         }
+    }
+
+    .nav {
+
+
+        @include mobile() {
+
+        }
         
-        @include desktop() {
-            max-width: 0;
-            & * {
-                max-width: 0;
-                transition: all 0.25s;
-            }
-
-            &:hover {
-                &, & * {
-                    max-width: 20em;
-                    transition: max-width 0.25s;
-                }
-            }
-        }
-
-        .navitem, .logout {
-
-            &:hover {
-                background-color: lighten($color: #b8740d, $amount: 10);
-
-                :global(a) {
-                    color: red;
-                }
-            }
-            padding: 1em;
-            border-radius: 1em;
-            
-            :global(a) {
-
-                display: block;
-                text-decoration: none;
-                color: black;
-                margin: 0;
-                transition: color 0.25s;
-            }
-        }
-
-        .logout {
-            margin: auto auto 0 auto;
-            display: flex;
-            
-            :global(button) {
-                display: flex;
-                flex-grow: 1;
-                border-radius: 1em;
-            }
-        }
     }
 </style>
 
@@ -160,14 +212,19 @@
     errorSupplier={(listener) => Framework.getInstance().onError(listener)}
 />
 <main class=wrapper>
-    <div class="nav">
-        <div class="navitem"><a href=/admin/panel>Dashboard                     </a></div>
-        <div class="navitem"><a href=/admin/panel/suggestions>Alias-Vorschläge  </a></div>
-        <div class="navitem"><a href=/admin/panel/alias>Offizielle Aliasse      </a></div>
-        <div class="navitem"><a href=/admin/panel/blacklist>Blacklist           </a></div>
-        <div class="navitem"><a href=/admin/panel/changes>Änderungen            </a></div>
-        <div class=logout>
-            <button on:click={() => Framework.getInstance().logout()}> Logout </button>
+    <div class=navigation>
+        <div class=logo>
+            <h1>KIT-Roomfinder</h1>
+        </div>
+        <div class="navitems">
+            <div class="navitem"><a class=item href=/admin/panel>Dashboard                     </a></div>
+            <div class="navitem"><a class=item href=/admin/panel/suggestions>Alias-Vorschläge  </a></div>
+            <div class="navitem"><a class=item href=/admin/panel/alias>Offizielle Aliasse      </a></div>
+            <div class="navitem"><a class=item href=/admin/panel/blacklist>Blacklist           </a></div>
+            <div class="navitem"><a class=item href=/admin/panel/changes>Änderungen            </a></div>
+            <div class="logout navitem">
+                <button class=item on:click={() => Framework.getInstance().logout()}> Logout </button>
+            </div>
         </div>
     </div>
     <div class=content>

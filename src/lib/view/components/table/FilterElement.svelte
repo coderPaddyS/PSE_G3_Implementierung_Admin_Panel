@@ -6,6 +6,7 @@
     import { crawlerKey, Predicate } from "$lib/model/recursive_table/Types";
     import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
     import { getContext } from "svelte";
+    import { slide } from 'svelte/transition';
 
     const { setFilter } = getContext(crawlerKey);
 
@@ -47,15 +48,24 @@
 </script>
 
 <style lang=scss>
+
+    @import '../../../../global.scss';
     .filters {
         display: flex;
         flex-direction: column;
         justify-content: center;
         padding: 0.5em;
         border-radius: 1em;
-        width: fit-content;
-        max-width: 75%;
         background-color: #ABABAB;
+
+        @include desktop() {
+            width: fit-content;
+            max-width: 75%;
+        }
+
+        @include mobile() {
+            width: 100%;
+        }
 
         .drop {
             height: 2em;
@@ -87,6 +97,10 @@
                 display: flex;
                 flex-direction: row;
 
+                @include mobile() {
+                    margin-right: $table_margin;
+                }
+
                 .name {
                     display: flex;
                     align-items: center;
@@ -113,7 +127,7 @@
         <p>Filtereinstellungen</p>
     </div>
     {#if show}
-        <div class=wrapper>
+        <div class=wrapper transition:slide>
             {#each [...filters] as options, i}
                 <div class=filter>
                     <div class=name>{options[1].toDisplayData()[0]}</div>

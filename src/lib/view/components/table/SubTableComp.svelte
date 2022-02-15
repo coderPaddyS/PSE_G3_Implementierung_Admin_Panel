@@ -3,7 +3,7 @@
 
 <script lang=ts>
     import type { Table } from "$lib/model/recursive_table/TableComponents";
-    import TableRowComp from "./TableRowComp.svelte";
+    import SubTableRowComp from "./SubTableRowComp.svelte";
     import TitleRowComp from "./TitleRowComp.svelte";
 
     // Generic Type T 
@@ -18,14 +18,9 @@
     @import '../../../../global.scss';
 
     .table {
-        width: auto;
+        width: 100%;
         justify-content: center;
         align-items: center;        
-        margin: $table_margin;
-        @include desktop() {
-            background-color: $table_bg_color;
-            border-radius: $table_border_radius;
-        }
     }
 </style>
 
@@ -36,7 +31,7 @@
         {/if}
         {#if table.getChildren()}
             {#each table.getChildren() as row,i}
-                <TableRowComp bind:row={row} index={[i]} {styling} />
+                <SubTableRowComp bind:row={row} index={[i]} {styling} />
             {/each}
         {/if}
     </div>
