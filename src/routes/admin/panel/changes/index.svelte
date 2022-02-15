@@ -30,5 +30,5 @@
 {#await supplier()}
     <Waiting text={"Rufe Daten vom Server ab"} />
 {:then data}
-    <SvelteTable supplier={() => data} {updater} {filterableData} size=5em />
+    <SvelteTable supplier={() => data} {updater} {filterableData} styling={"10em"} />
 {/await}

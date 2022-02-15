@@ -7,7 +7,7 @@
     import { TableDataAdditions } from "$lib/model/recursive_table/TableDataAdditions";
 
     import type { TableData } from "$lib/model/recursive_table/TableComponents";
-    import TableComp from "./TableComp.svelte";
+    import SubTableComp from "./SubTableComp.svelte";
 
     // Generic Type T
     type T = $$Generic;
@@ -15,7 +15,7 @@
     // Data provided externally to provide the possiblity to add custom behaviour
     export let data: TableData<T>;
     export let index: Array<number>;
-    export let size;
+    export let styling;
 
     // Render Components as a child to this element
     let root: HTMLElement;
@@ -76,7 +76,7 @@
         {:else if data.getType() == TableDataAdditions.COMPONENT}
             <div class=component bind:this={root} />
         {:else if data.getType() == TableDataAdditions.TABLE && data.getChildren()}
-            <TableComp table={data.getChildren()[0]} {size} />
+            <SubTableComp table={data.getChildren()[0]} styling=5em />
         {:else}
             {data.getData()? data.getData() : ""}
         {/if}

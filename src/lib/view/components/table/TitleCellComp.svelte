@@ -12,7 +12,7 @@
     // Data provided externally to provide the possiblity to add custom behaviour
     export let cell: TitleCell<T>;
     export let index: Array<number>;
-    export let size;
+    export let styling;
 </script>
 
 <style lang=scss>
@@ -48,7 +48,7 @@
         {/if}
         {#each cell.getChildren() as data, i}
             <div class=data>
-                <TableDataComp {data} index={[...index, i]} {size} />
+                <TableDataComp {data} index={[...index, i]} {styling} />
             </div>
         {/each}
     </div>

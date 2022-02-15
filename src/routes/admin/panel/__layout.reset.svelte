@@ -132,6 +132,8 @@
                     h1:not(:hover) {
                         max-width: $nav_width_closed;
                         width: $nav_width_closed;
+                        padding: 0;
+                        margin: 0;
                         opacity: 1;
                         writing-mode: vertical-lr;
                     }

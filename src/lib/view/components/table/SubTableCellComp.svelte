@@ -26,7 +26,7 @@
         text-align: center;
         margin-top: calc(0.25 * $table_margin);
         margin-bottom: calc(0.25 * $table_margin);
-        padding: calc(0.5 * $table_padding);
+        padding: 0;
         background-color: $table_cell_bg_color;
         border-radius: $table_border_radius;
     }

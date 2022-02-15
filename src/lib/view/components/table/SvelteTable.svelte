@@ -14,7 +14,6 @@
     import FilterElement from "./FilterElement.svelte";
     import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
 
-
     // Generic Types: 
     //      TA extends Table<T>
     //      C extends TableCrawler<T, C>
@@ -23,7 +22,7 @@
     type C = $$Generic<TableCrawler<T, C>>;
 
     // Table and styling related customizables, which are given to this component
-    export let size;
+    export let styling;
 
     // Some extra crawlers which are applied
     // Can add and alter behaviour
@@ -104,5 +103,5 @@
 
 <div class=svelte-table-wrapper in:fly>
     <FilterElement filters={filterableData()} />
-    <TableComp bind:table={tableViewData} {size}/>
+    <TableComp bind:table={tableViewData} {styling}/>
 </div>

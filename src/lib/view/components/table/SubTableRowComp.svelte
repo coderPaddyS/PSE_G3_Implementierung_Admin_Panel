@@ -3,7 +3,7 @@
 
 <script lang=ts>
     import type { TableRow } from "$lib/model/recursive_table/TableComponents";
-    import TableCellComp from "./TableCellComp.svelte";
+    import SubTableCellComp from "./SubTableCellComp.svelte";
     import cssVars from "svelte-css-vars"
 
     // Generic Types: 
@@ -31,11 +31,9 @@
         gap: $table_gap;
         @include rowColumnTemplate();
         @include mobile() {
-            background-color: $table_bg_color;
+            background-color: inherit;
             border-radius: 1em;
-            padding: $table_padding;
-            margin-top: calc(0.5 * $table_margin);
-            margin-bottom: calc(0.5 * $table_margin);
+            padding: calc(0.5 * $table_padding);
         }
     }
 </style>
@@ -43,7 +41,7 @@
 {#if row && !row.isHidden() && row.getChildren()} 
     <div class=row use:cssVars={styleVars}>
         {#each row.getChildren() as cell, i}
-            <TableCellComp bind:cell={cell} index={[...index, i]} {styling}/>
+            <SubTableCellComp bind:cell={cell} index={[...index, i]} {styling}/>
         {/each}
     </div>
 {/if}
