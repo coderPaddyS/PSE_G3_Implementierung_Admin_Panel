@@ -1,8 +1,15 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- 2022, Patrick Schneider <patrick@itermori.de> -->
+
 <script lang=ts>
+
+    // Functions to retreive the errors and to delete them
     export let errorSupplier: (listener: (errors: Array<Error | string>) => void) => void;
     export let remove: (error: Error | string) => void;
 
     let errors: Array<Error | string> = [];
+
+    // Register the listener
     errorSupplier((e) => {
         errors = e;
     })

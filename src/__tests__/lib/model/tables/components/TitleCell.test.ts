@@ -40,8 +40,8 @@ describe("Testing if TitleCell ", () => {
     test("has no children after initialization, but not undefined", () => {
         let cell = new TitleCell<string>();
 
-        expect(cell.getChilds()).not.toBe(undefined);
-        expect(cell.getChilds()).toEqual([]);
+        expect(cell.getChildren()).not.toBe(undefined);
+        expect(cell.getChildren()).toEqual([]);
     });
 
     test("has no sorter after initialization without specifying", () => {
@@ -63,10 +63,10 @@ describe("Testing if TitleCell ", () => {
         let cell = new TitleCell<string>();
 
         cell.set(data);
-        expect(cell.getChilds()).toEqual([data]);
+        expect(cell.getChildren()).toEqual([data]);
 
         cell.set(replace);
-        expect(cell.getChilds()[0] != data).toBe(true);
+        expect(cell.getChildren()[0] != data).toBe(true);
     });
 
     test("gets correctly being crawled on", () => {
@@ -89,7 +89,7 @@ describe("Testing if TitleCell ", () => {
         let data = new DummyTableData();
         cell.add(data);
 
-        expect(cell.getChilds()).toEqual([data]);
+        expect(cell.getChildren()).toEqual([data]);
     });
 
     test("adds children correctly", () => {
@@ -97,7 +97,7 @@ describe("Testing if TitleCell ", () => {
         let data = [new DummyTableData(), new DummyTableData(), new DummyTableData()];
         cell.add(...data);
 
-        expect(cell.getChilds()).toEqual(data);
+        expect(cell.getChildren()).toEqual(data);
     });
 
     test("returns data from children correctly", () => {

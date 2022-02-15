@@ -8,6 +8,7 @@ import type { CrawlerAction } from "../Types";
 
 /**
  * A {@link TableCrawler} to perform an action onto a table component specified by the index.
+ * If the index is omitted, the action is performed on the first element.
  * 
  * @template T The type used in this table
  * 
@@ -28,6 +29,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
      * Construct a new instance.
      * @param action {@link CrawlerAction}
      * @param index An Array specifying the index of the component which should be crawled on.
+     * @param crawlChildren whether to perform the provided action on any child of the component specified the given index.
      */
     public constructor(action: CrawlerAction<T, TableActionCrawler<T>>, index?: Array<number>, crawlChildren?: boolean) {
         super();
@@ -55,12 +57,22 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
         return this.crawl(data);
     }
 
+    /**
+     * Crawl on the given component and return it.
+     * If the index is empty, the action is performed on this component.
+     * Afterwards, if wanted and therefore specified in the constructor, the children will be crawled on to perform the action on them.
+     * 
+     * @template C A class extending {@link TableComponent TableComponent<T>}
+     * 
+     * @param component The component to advance on.
+     * @returns The crawled on component
+     */
     private crawl<C extends TableComponent<T>>(component: C): C {
         if (component === undefined) {
             return undefined;
         } else if (this.index !== undefined && this.index.length > 0) {
             let index = this.index.pop();
-            let children = component.getChilds();
+            let children = component.getChildren();
             if (Array.isArray(children)) {
                 if (children.length < index || index < 0) {
                     throw new Error(`index ${index} is out of bounce. Maximum: ${children.length}, Minimum: 0`);
@@ -72,7 +84,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
         } else {
             this.action(this, component);
             if (this.crawlChildren) {
-                let children = component.getChilds();
+                let children = component.getChildren();
                 if (Array.isArray(children)) {
                     children.forEach(child => child.getCrawledOn(this));
                 }

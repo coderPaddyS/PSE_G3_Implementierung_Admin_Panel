@@ -1,3 +1,7 @@
+/// SPDX-License-Identifier: GPL-3.0-or-later
+/// 
+/// 2022, Patrick Schneider <patrick@itermori.de>
+
 import { Table, TableCell, TableData, TableRow, TitleCell, TitleRow } from "$lib/model/recursive_table/TableComponents";
 import { TableCrawler } from "$lib/model/recursive_table/TableCrawler";
 

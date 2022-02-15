@@ -46,7 +46,7 @@
                 <TableSort algorithm={cell.getSorter()} />
             </div>
         {/if}
-        {#each cell.getChilds() as data, i}
+        {#each cell.getChildren() as data, i}
             <div class=data>
                 <TableDataComp {data} index={[...index, i]} {size} />
             </div>

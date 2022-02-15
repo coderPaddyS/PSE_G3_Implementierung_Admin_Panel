@@ -65,8 +65,8 @@ describe("Testing if Table ", () => {
     test("has no children after initialization, but not undefined", () => {
         let table = new Table<string>();
 
-        expect(table.getChilds()).not.toBe(undefined);
-        expect(table.getChilds()).toEqual([]);
+        expect(table.getChildren()).not.toBe(undefined);
+        expect(table.getChildren()).toEqual([]);
     });
 
     test("has no title after initialization", () => {
@@ -95,7 +95,7 @@ describe("Testing if Table ", () => {
         let row = new TableRow<string>();
         table.add(row);
 
-        expect(table.getChilds()).toEqual([row]);
+        expect(table.getChildren()).toEqual([row]);
     });
 
     test("adds children correctly", () => {
@@ -103,7 +103,7 @@ describe("Testing if Table ", () => {
         let rows = [new DummyTableRow(), new DummyTableRow(), new DummyTableRow()];
         table.add(...rows);
 
-        expect(table.getChilds()).toEqual(rows);
+        expect(table.getChildren()).toEqual(rows);
     });
 
     test("sets title correctly", () => {
@@ -135,16 +135,16 @@ describe("Testing if Table ", () => {
         expect(table.getData()).toEqual([{"title1": "data1", "title2": "data2", "title3": "data3"}]);
     });
 
-    test("sets childs accordingly", () => {
+    test("sets children accordingly", () => {
         let table = new Table<string>();
         let rows = [
             new TableRow<string>().add(...[new DummyTableCell("row1"), new DummyTableCell("cell2"), new DummyTableCell("cell3")]),
             new TableRow<string>().add(...[new DummyTableCell("row2"), new DummyTableCell("cell2"), new DummyTableCell("cell3")]),
         ];
         table.add(rows[0]);
-        expect(table.getChilds()).toEqual([rows[0]]);
-        table.setChilds(rows);
-        expect(table.getChilds()).toBe(rows);
+        expect(table.getChildren()).toEqual([rows[0]]);
+        table.setChildren(rows);
+        expect(table.getChildren()).toBe(rows);
     });
 
     test("removes row by index correctly", () => {
@@ -153,12 +153,12 @@ describe("Testing if Table ", () => {
             new TableRow<string>().add(...[new DummyTableCell("row1"), new DummyTableCell("cell2"), new DummyTableCell("cell3")]),
             new TableRow<string>().add(...[new DummyTableCell("row2"), new DummyTableCell("cell2"), new DummyTableCell("cell3")]),
         ];
-        table.setChilds(lodash.cloneDeep(rows));
-        expect(table.getChilds()).toEqual(rows);
+        table.setChildren(lodash.cloneDeep(rows));
+        expect(table.getChildren()).toEqual(rows);
 
         // valid index
         expect(table.remove(0)).toBe(true);
-        expect(table.getChilds()).toEqual([rows[1]]);
+        expect(table.getChildren()).toEqual([rows[1]]);
 
         // invalid indices
         expect(table.remove(1)).toBe(false);
@@ -166,7 +166,7 @@ describe("Testing if Table ", () => {
 
         // valid index
         expect(table.remove(0)).toBe(true);
-        expect(table.getChilds()).toEqual([]);
+        expect(table.getChildren()).toEqual([]);
 
         // invalid index on empty
         expect(table.remove(0)).toBe(false);

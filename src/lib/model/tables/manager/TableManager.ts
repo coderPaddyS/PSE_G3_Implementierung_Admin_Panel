@@ -2,30 +2,39 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { Sorter } from "$lib/model/recursive_table/Types"
+import type { Sorter, DataObject } from "$lib/model/recursive_table/Types"
 import { Table, TableCell, TableData, TableDataComponent, TableDataTable, TableRow, TitleCell, TitleRow } from "$lib/model/recursive_table/TableComponents";
 import type { ComponentFactory } from "$lib/model/recursive_table/TableComponents";
 import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
 import type { FilterStrategy } from "./filter/FilterStrategy";
-import type { DataObject } from "$lib/model/recursive_table/DataObject";
 import type { TableDisplayInformation } from "./TableDisplayInformation";
 
-export type ActionComponentFactory<T> = (onClick: (() => void)[], text: string) => ComponentFactory;
+/**
+ * A function to produce a component which can perform actions.
+ */
+export type ActionComponentFactory = (onClick: (() => void)[], text: string) => ComponentFactory;
 
 /**
  * A listener to get notified on table updates.
  */
 export type TableListener = (table: Table<string>) => void;
 
-// A rudimentary implementation to sort the table lexicographically
-export const lexicographicSorter: Sorter<TableRow<string>> = (a: TableRow<string>, b: TableRow<string>) => {
-    if (a.getData()[0] > b.getData()[0]) {
-        return [b,a]
-    } else {
-        return [a, b]
+/**
+ * Producer for a lexicographical sorter given an index.
+ * @param index The index of the column to sort by
+ * @returns Sorter<TableRow<string>> which sorts lexicographically
+ */
+export const lexicographicSorter: (index: number) => Sorter<TableRow<string>> = 
+    index => {
+        return (a: TableRow<string>, b: TableRow<string>) => {
+            if (a.getData()[index] > b.getData()[index]) {
+                return [b,a]
+            } else {
+                return [a, b]
+            }
+        };
     }
-};
 
 /**
  * This class represents a base class to manage a {@link Table Table<string>} with the possibility to update and change values.
@@ -42,7 +51,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
     private dataToBeAdded: R[];
     private title: T;
     private sorters: Map<string, Sorter<TableRow<string>>>;
-    private actionFactory: ActionComponentFactory<R> = undefined;
+    private actionFactory: ActionComponentFactory = undefined;
     private actions: {onClick: (entry: R) => (() => void)[], text: string}[];
     private actionTitle: string;
     private listeners: Set<TableListener> = new Set();
@@ -216,11 +225,9 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         this.listeners.delete(listener);
     }
 
-    protected abstract fetchData(): Promise<R[]>;
-
     /**
      * Getter for the table representation.
-     * @returns {@link Table<string>}
+     * @returns A {@link Table<string>}
      */
     public async getTable(): Promise<Table<string>> {
         await this.fetchData().then(data => {
@@ -235,6 +242,10 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         return this.table;
     }
 
+    /**
+     * Getter for the table without updating the data by fetching it.
+     * @returns Table<string>
+     */
     protected getTableWithoutFetch(): Table<string> {
         return this.table;
     }
@@ -243,7 +254,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * Hide the given entries to be not displayed.
      * Does not delete the entries.
      * 
-     * @param data T[]
+     * @param data R[]
      */
     public hide(...data: R[]) {
         let notifyObserver: boolean = false;
@@ -255,7 +266,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 }
             })
             indices.forEach((index) => {
-                this.table.getChilds()[index].hide();
+                this.table.getChildren()[index].hide();
                 notifyObserver = true;
             })
         });
@@ -268,14 +279,14 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * Show the given entries if they were hidden.
      * Does not add entries.
      * 
-     * @param data T[]
+     * @param data R[]
      */
     public show(...data: R[]) {
         let notifyObserver: boolean = false;
         data.forEach(entry => {
             let index = this.data.indexOf(entry);
             if (index > 0) {
-                this.table.getChilds()[index].show();
+                this.table.getChildren()[index].show();
                 notifyObserver = true;
             }
         });
@@ -284,22 +295,36 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         }
     }
 
-    public abstract filterableData(): [number, FilterStrategy<string>][];
-
+    /**
+     * A method to check if the given entry is contained in this manager.
+     * @param entry R
+     * @returns true if contained
+     */
     public contains(entry: R): boolean {
         return this.data.includes(entry)
     }
 
+    /**
+     * Filter the data in this manager by the given predicate.
+     * @param predicate A predicate which accepts the entry, its index and the whole array as parameters.
+     * @returns All entries for which {@code predicate} evaluates as true
+     */
     protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
         return this.data.filter(predicate);
     }
 
-    public setActionComponentFactory(factory: ActionComponentFactory<R>) {
+    /**
+     * Set the factory to produce the action components.
+     * @param factory {@link ActionComponentFactory}
+     */
+    public setActionComponentFactory(factory: ActionComponentFactory) {
         this.actionFactory = factory;
     }
 
-    protected abstract size(): Promise<number>;
-
+    /**
+     * Getter for the {@link TableDisplayInformation}.
+     * @returns The {@link TableDisplayInformation} of this table
+     */
     public getTableDisplayInformation(): TableDisplayInformation<string, Table<string>> {
         return {
             supplier: () => this.getTable(),
@@ -309,4 +334,10 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             tableTitle: () => this.name
         }
     }
+
+    protected abstract fetchData(): Promise<R[]>;
+
+    protected abstract size(): Promise<number>;
+
+    public abstract filterableData(): [number, FilterStrategy<string>][];
 }

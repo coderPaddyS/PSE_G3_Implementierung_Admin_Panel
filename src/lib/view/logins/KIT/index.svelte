@@ -4,6 +4,7 @@
 <script lang=ts>
     import type { LoginConfiguration } from "$lib/controller/backend";
 
+    // Retreive methods to configure the login and logout
     export let configure: (config: LoginConfiguration) => void;
     export let login: () => void;
 
@@ -21,7 +22,7 @@
                 }
         });
         
-        login()
+        login();
     }
 </script>
 

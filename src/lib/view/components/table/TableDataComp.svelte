@@ -75,8 +75,8 @@
             {@html data.getData()}
         {:else if data.getType() == TableDataAdditions.COMPONENT}
             <div class=component bind:this={root} />
-        {:else if data.getType() == TableDataAdditions.TABLE && data.getChilds()}
-            <TableComp table={data.getChilds()[0]} {size} />
+        {:else if data.getType() == TableDataAdditions.TABLE && data.getChildren()}
+            <TableComp table={data.getChildren()[0]} {size} />
         {:else}
             {data.getData()? data.getData() : ""}
         {/if}

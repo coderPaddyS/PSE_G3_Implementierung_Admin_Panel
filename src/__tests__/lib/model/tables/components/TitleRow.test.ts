@@ -35,8 +35,8 @@ describe("Testing if TitleRow ", () => {
     test("has no children after initialization, but not undefined", () => {
         let row = new TitleRow<string>();
 
-        expect(row.getChilds()).not.toBe(undefined);
-        expect(row.getChilds()).toEqual([]);
+        expect(row.getChildren()).not.toBe(undefined);
+        expect(row.getChildren()).toEqual([]);
     });
 
     test("gets correctly being crawled on", () => {
@@ -59,7 +59,7 @@ describe("Testing if TitleRow ", () => {
         let cell = new DummyTitleCell();
         row.add(cell);
 
-        expect(row.getChilds()).toEqual([cell]);
+        expect(row.getChildren()).toEqual([cell]);
     });
 
     test("adds children correctly", () => {
@@ -67,7 +67,7 @@ describe("Testing if TitleRow ", () => {
         let cells = [new DummyTitleCell(), new DummyTitleCell(), new DummyTitleCell()];
         row.add(...cells);
 
-        expect(row.getChilds()).toEqual(cells);
+        expect(row.getChildren()).toEqual(cells);
     });
 
     test("returns data from children correctly", () => {

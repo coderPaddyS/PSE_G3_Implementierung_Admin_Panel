@@ -1,5 +1,17 @@
+/// SPDX-License-Identifier: GPL-3.0-or-later
+/// 
+/// 2022, Patrick Schneider <patrick@itermori.de>
+
 import { FilterStrategy } from "./FilterStrategy";
 
+/**
+ * A lexicographic filter to filter the given data as text.
+ * 
+ * @template T The type to filter
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
 export class LexicographicFilter<T> extends FilterStrategy<T> {
 
     public filter(data: T[]): boolean {
@@ -16,7 +28,7 @@ export class LexicographicFilter<T> extends FilterStrategy<T> {
             if (!t) {
                 return false;
             }
-            return t.toString().includes(term);
+            return t.toString().toLowerCase().includes(term.toLowerCase());
         }).length > 0;
     }
 }

@@ -8,8 +8,6 @@
 
     import type { Table } from "$lib/model/recursive_table/TableComponents";
     import type { TableCrawler } from "$lib/model/recursive_table/TableCrawler";
-    import { TableFilterCrawler } from "$lib/model/recursive_table/crawler/FilterCrawler";
-    import { TableSortingCrawler } from "$lib/model/recursive_table/crawler/SortingCrawler";
     
     import TableComp from "./TableComp.svelte";
     import lodash from "lodash"
@@ -46,8 +44,8 @@
     const crawlers: Map<Symbol, any> = new Map();
 
     // Insert filter and sorter crawler first, such that they are applied first
-    crawlers.set(filterCrawlerKey, new TableFilterCrawler<T>((t) => true));
-    crawlers.set(sorterCrawlerKey, new TableSortingCrawler<T>((a,b) => [a,b]))
+    crawlers.set(filterCrawlerKey, undefined);
+    crawlers.set(sorterCrawlerKey, undefined)
 
     // Insert every given custom crawler
     extraCrawlers.forEach((crawler, key) => crawlers.set(key, crawler));

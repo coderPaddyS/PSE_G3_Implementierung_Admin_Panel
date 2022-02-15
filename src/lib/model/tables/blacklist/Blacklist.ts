@@ -20,6 +20,10 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
     
     private entry: string;
 
+    /**
+     * Construct a new BlacklistEntry with given string
+     * @param entry string
+     */
     public constructor(entry: string) {
         this.entry = entry;
     }
@@ -29,7 +33,13 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
     }
 }
 
-type BlacklistTitle = BlacklistEntry;
+/** 
+ * A type alias to underline the usage
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
+class BlacklistTitle extends BlacklistEntry {}
 
 /**
  * This class represents the blacklist.
@@ -37,40 +47,50 @@ type BlacklistTitle = BlacklistEntry;
  * The second column contains an action to remove the entries from the blacklist.
  * 
  * @author Patrick Schneider
- * @version 0.5
+ * @version 1.0
  */
 export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
 
-    private static title = new BlacklistEntry("Eintrag");
+    private static readonly tableName: string = "Blacklist";
+    private static readonly colEntry: string = "Eintrag";
+    private static readonly colAction: string = "Aktionen";
+    private static readonly butDelete: string = "Löschen";
+
+    private static readonly title: BlacklistTitle = new BlacklistTitle(this.colEntry);
     private fetch: <T>(body: string) => Promise<T>;
 
     /**
      * Create the blacklist and set its data accordingly.
-     * Copies the data, changes will not be reflected.
+     * @param fetch The function used to fetch data from the backend.
      * @param data If provided sets the data of the table. 
      */
     public constructor(fetch: <T>(body: string) => Promise<T>,data?: BlacklistEntry[]) {
         let sorter: Map<string, Sorter<TableRow<string>>> = new Map();
-        sorter.set("Eintrag", lexicographicSorter);
+        sorter.set(Blacklist.colEntry, lexicographicSorter(0));
         super(
-            "Blacklist",
-            new BlacklistEntry("Eintrag"), data? data : [], sorter, {
-                title: "Aktionen",
+            Blacklist.tableName,
+            Blacklist.title, 
+            data? data : [], 
+            sorter, {
+                title: Blacklist.colAction,
                 actions: [{
                     onClick: (entry: BlacklistEntry) => [
                         () => this.removeEntry(entry),
                         () => this.hide(entry)
                     ],
-                    text: "Löschen",
+                    text: Blacklist.butDelete,
                 }]
             }
         );
         this.fetch = fetch;
     }
 
-    public addEntry(entry: BlacklistEntry): boolean {
+    /**
+     * Add an entry to the blacklist
+     * @param entry {@link BlacklistEntry}
+     */
+    public addEntry(entry: BlacklistEntry) {
         super.addData(entry);
-        return true;
     }
 
     private removeEntry(entry: BlacklistEntry) {
@@ -83,8 +103,8 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
                 return success;
             }, 
             async () => {this.show(entry); return true;}, 
-            "Blacklist", 
-            "Löschen ", 
+            Blacklist.tableName, 
+            Blacklist.butDelete, 
             this.getTableWithoutFetch().matchData(entry.toDisplayData())
         );
     }

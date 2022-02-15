@@ -1,14 +1,17 @@
+<!-- SPDX-License-Identifier: GPL-3.0-or-later -->
+<!-- 2022, Patrick Schneider <patrick@itermori.de> -->
+
 <script lang=ts>
-import { cubicOut } from "svelte/easing";
+    import { cubicOut } from "svelte/easing";
+    import { tweened } from "svelte/motion";
+    import { fly } from "svelte/transition";
 
-import { tweened } from "svelte/motion";
-import { fly } from "svelte/transition";
-
-
-
+    // Receive the size and the title
     export let size: number;
     export let title: string;
 
+    // Create a Tweened Element which counts in a second from 0 to size.
+    // Loses speed according to the inverse-cube
     let value = tweened(0, {
         duration: 1000,
         easing: cubicOut

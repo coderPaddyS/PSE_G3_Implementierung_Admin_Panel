@@ -32,9 +32,9 @@
     }
 </style>
 
-{#if row && !row.isHidden() && row.getChilds()} 
+{#if row && !row.isHidden() && row.getChildren()} 
     <div class=titlerow use:cssVars={styleVars}>
-        {#each row.getChilds() as cell, i}
+        {#each row.getChildren() as cell, i}
             <TitleCellComp {cell} index={[...index, i]} {size}/>
         {/each}
     </div>

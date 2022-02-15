@@ -3,11 +3,9 @@
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
 import { tail } from "./Types";
-import type { Sorter } from "./Types";
+import type { Sorter, DataObject } from "./Types";
 import { TableDataAdditions } from "./TableDataAdditions";
 import type { TableCrawler } from "./TableCrawler";
-import type { DataObject } from "./DataObject";
-
 /**
  * A function which given an html element root and some values renders its data as a child of root.
  * @param root {@link HTMLElement} the data should be rendered to as a child.
@@ -49,7 +47,7 @@ export abstract class TableComponent<T> {
      * Getter for the child components.
      * @returns the child components
      */
-    public getChilds(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
+    public getChildren(): TableComponent<T> | iTableData<T> | TableComponent<T>[] {
         return this.data;
     }
 
@@ -98,7 +96,7 @@ export abstract class TableComponent<T> {
 }
 
 /**
- * A basic Table which contains a titlerow and datarows.
+ * A basic Table which contains a title row and data rows.
  * 
  * @template T the type of data stored by the table components
  * 
@@ -119,18 +117,18 @@ export class Table<T> extends TableComponent<T> {
     }
 
     /**
-     * Getter for the datarows of the table.
+     * Getter for the data rows of the table.
      * @returns The {@link TableRow TableRow<T>}s of the table
      */
-    public getChilds(): TableRow<T>[] {
+    public getChildren(): TableRow<T>[] {
         return this.data;
     }
 
     /**
-     * Setter for the datarows of the table.
+     * Setter for the data rows of the table.
      * @param rows The {@link TableRow TableRow<T>}s of the table
      */
-    public setChilds(rows: TableRow<T>[]) {
+    public setChildren(rows: TableRow<T>[]) {
         this.data = rows;
     }
 
@@ -174,6 +172,11 @@ export class Table<T> extends TableComponent<T> {
         return this;
     }
 
+    /**
+     * Add the rows according to the given data Object.
+     * @param object A {@link DataObject}
+     * @returns this
+     */
     public rowsFromObject(object: DataObject<T>): Table<T> {
         Object.values<[T,T[]]>(object).forEach(([title, data]) => {
             let row = new TableRow<T>().add(new TableCell<T>().add(new TableData<T>(title)));
@@ -197,11 +200,11 @@ export class Table<T> extends TableComponent<T> {
 
     /**
      * Set the title of this table
-     * @param titlerow A {@link TitleRow TitleRow<T>} to be set as title
+     * @param titleRow A {@link TitleRow TitleRow<T>} to be set as title
      * @returns This {@link Table<T>}
      */
-    public setTitle(titlerow: TitleRow<T>): Table<T> {
-        this.title = titlerow;
+    public setTitle(titleRow: TitleRow<T>): Table<T> {
+        this.title = titleRow;
         return this;
     }
 
@@ -257,7 +260,7 @@ export class TableRow<T> extends TableComponent<T> {
      * Getter for the cells in this row.
      * @returns The {@link TableCell TableCell<T>}s of this row
      */
-    public override getChilds(): TableCell<T>[] {
+    public override getChildren(): TableCell<T>[] {
         return this.data;
     }
 
@@ -321,7 +324,7 @@ export class TableCell<T> extends TableComponent<T> {
      * Getter for the table data components in this cell.
      * @returns The {@link TableData TableData<T>} of this cell
      */
-    public override getChilds(): TableData<T>[] {
+    public override getChildren(): TableData<T>[] {
         return this.data;
     }
 
@@ -385,10 +388,10 @@ export class TableData<T> extends TableComponent<T> {
     }
 
     /**
-     * A normal data component has no childs.
+     * A normal data component has no children.
      * @returns undefined
      */
-    public override getChilds(): [Table<T>] {
+    public override getChildren(): [Table<T>] {
         return undefined;
     }
 
@@ -445,7 +448,7 @@ export class TableDataHTML<T> extends TableData<T> {
         };
     }
 
-    public override getChilds(): [Table<T>] {
+    public override getChildren(): [Table<T>] {
         return undefined;
     }
 }
@@ -473,7 +476,7 @@ export class TableDataComponent<T> extends TableData<T> {
         };
     }
 
-    public override getChilds(): [Table<T>] {
+    public override getChildren(): [Table<T>] {
         return undefined;
     }
 
@@ -513,7 +516,7 @@ export class TableDataTable<T> extends TableData<T> {
      * Getter for the table in this component.
      * @returns An Array containing the {@link Table table} contained in this component.
      */
-    public override getChilds(): [Table<T>] {
+    public override getChildren(): [Table<T>] {
         return this.data.table? [this.data.table] : undefined;
     }
 
@@ -619,7 +622,7 @@ export class TitleRow<T> extends TableRow<T> {
      * Getter for the title cells in this title row.
      * @returns The {@link TitleCell TitleCell<T>}s of this row
      */
-    public getChilds(): TitleCell<T>[] {
+    public getChildren(): TitleCell<T>[] {
         return this.data;
     }
 

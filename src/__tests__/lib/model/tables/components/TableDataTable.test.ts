@@ -38,8 +38,8 @@ describe("Testing if TableDataTable ", () => {
     });
 
     test("has the table as only child", () => {
-        expect(data.getChilds()).toEqual([table]);
-        expect(noData.getChilds()).toEqual(undefined);
+        expect(data.getChildren()).toEqual([table]);
+        expect(noData.getChildren()).toEqual(undefined);
     });
 
     test("is of type TableDataAdditions.TABLE", () => {
