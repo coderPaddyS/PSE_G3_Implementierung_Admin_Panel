@@ -18,10 +18,10 @@ export class Alias implements ToDisplayData {
 
     /**
      * Construct a new Alias.
-     * @param name string
-     * @param building string
-     * @param room string
-     * @param id number
+     * @param name the name as string
+     * @param building the corresponding building as string
+     * @param room the corresponding room as string
+     * @param id the map id of the alias as number
      */
     public constructor(name: string, building: string, room: string, id: number) {
         this.name = name;
@@ -32,7 +32,7 @@ export class Alias implements ToDisplayData {
     
     /**
      * Getter for the name
-     * @returns string
+     * @returns the name as string
      */
     public getName(): string {
         return this.name;
@@ -40,7 +40,7 @@ export class Alias implements ToDisplayData {
 
     /**
      * Getter for the building
-     * @returns string
+     * @returns the corresponding building as string
      */
     public getBuilding(): string {
         return this.building;
@@ -48,7 +48,7 @@ export class Alias implements ToDisplayData {
 
     /**
      * Getter for the room
-     * @returns string
+     * @returns the corresponding room as string
      */
     public getRoom(): string {
         return this.room;
@@ -56,7 +56,7 @@ export class Alias implements ToDisplayData {
 
     /**
      * Getter for the id
-     * @returns number
+     * @returns the map id of the alias as number
      */
     public getId(): number {
         return this.id;

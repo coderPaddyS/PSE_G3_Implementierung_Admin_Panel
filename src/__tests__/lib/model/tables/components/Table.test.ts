@@ -135,7 +135,7 @@ describe("Testing if Table ", () => {
         expect(table.getData()).toEqual([{"title1": "data1", "title2": "data2", "title3": "data3"}]);
     });
 
-    test("sets childs accordingly", () => {
+    test("sets children accordingly", () => {
         let table = new Table<string>();
         let rows = [
             new TableRow<string>().add(...[new DummyTableCell("row1"), new DummyTableCell("cell2"), new DummyTableCell("cell3")]),

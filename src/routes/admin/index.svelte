@@ -15,6 +15,6 @@
         Eine Android-App zur Unterstützung der Navigation auf dem KIT-Campus.
     </p>
     <p>
-        Diese App ist im Zuge eines PSEs entstanden.
+        Diese App ist im Zuge eines PSE-Projektes entstanden.
     </p>
 </div>

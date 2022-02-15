@@ -11,7 +11,7 @@
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.CHANGES);
     
-    // Set the table to use the Action Component to display the actions
+    // Set the table to use the Action component to display the actions
     framework.setActionComponentFactory(
         Tables.CHANGES, 
         (onClick, text) => ((root, props) => {

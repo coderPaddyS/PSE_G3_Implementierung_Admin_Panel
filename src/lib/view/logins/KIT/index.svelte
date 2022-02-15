@@ -4,7 +4,7 @@
 <script lang=ts>
     import type { LoginConfiguration } from "$lib/controller/backend";
 
-    // retreive methods to configure the login and login
+    // Retreive methods to configure the login and logout
     export let configure: (config: LoginConfiguration) => void;
     export let login: () => void;
 

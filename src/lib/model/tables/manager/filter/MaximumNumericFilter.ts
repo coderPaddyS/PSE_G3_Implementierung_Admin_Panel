@@ -5,7 +5,7 @@
 import { FilterStrategy } from "./FilterStrategy";
 
 /**
- * A filter to treat the given data as Number and filter them given a maximum.
+ * A filter to treat the given data as a Number and filter them given a maximum.
  * 
  * @template T The data to be filtered
  * 

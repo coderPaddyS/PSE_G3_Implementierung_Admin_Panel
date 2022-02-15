@@ -28,7 +28,6 @@
         } else if (framework.isAuthenticated()) {
             framework.addError("Nur Administratoren haben Zugriff auf diesen Bereich!");
         }
-        console.log("isfo")
     })
 </script>
 
@@ -153,7 +152,7 @@
         <div class=login-wrapper>
             <h2>Admin?</h2>
             <div class=logins>
-                <KITLogin login={async () => await Framework.getInstance().login()} configure={(config) => Framework.getInstance().configureLogin(config)}/>
+                <KITLogin login={async () => await Framework.getInstance().login()} configure={(config) => Framework.getInstance().configureAuthentication(config)}/>
             </div>
         </div>
         <div class=links>

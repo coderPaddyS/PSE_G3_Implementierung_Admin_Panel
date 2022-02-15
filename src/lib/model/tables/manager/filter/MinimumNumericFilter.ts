@@ -5,7 +5,7 @@
 import { FilterStrategy } from "./FilterStrategy";
 
 /**
- * A filter to treat the given data as Number and filter them given a minimum.
+ * A filter to treat the given data as a Number and filter them given a minimum.
  * 
  * @template T The data to be filtered
  * 

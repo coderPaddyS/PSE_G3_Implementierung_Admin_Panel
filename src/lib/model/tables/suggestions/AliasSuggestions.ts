@@ -101,7 +101,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     private static readonly colActions: string = "Aktionen";
 
     private static readonly butDelete: string = "Löschen";
-    private static readonly butBlacklist: string = "Blacklist";
+    private static readonly butBlacklist: string = "Blacklisten";
     private static readonly butAccept: string = "Akzeptieren";
 
     private static readonly title: AliasSuggestionsTitle = new AliasSuggestionsTitle(

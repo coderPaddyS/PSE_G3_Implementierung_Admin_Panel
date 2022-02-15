@@ -6,7 +6,7 @@
     import { tweened } from "svelte/motion";
     import { fly } from "svelte/transition";
 
-    // receive the size and the title
+    // Receive the size and the title
     export let size: number;
     export let title: string;
 

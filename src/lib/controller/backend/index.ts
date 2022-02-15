@@ -215,12 +215,12 @@ export class Backend {
      * Configure the login process to use the provided settings.
      * @param config The {@link LoginConfiguration} with the required settings.
      */
-    public configureLogin(config: LoginConfiguration) {
+    public configureAuthentication(config: LoginConfiguration) {
         this.configureManager(config);
     }
 
     /**
-     * Login using the previously via {@link configureLogin} configured settings.
+     * Login using the previously via {@link configureAuthentication} configured settings.
      */
     public async login() {
         await this.auth.signinRedirect().catch((error) => this.notifyError(error));
@@ -240,7 +240,7 @@ export class Backend {
     }
 
     /**
-     * Logout using the previously via {@link configureLogin} configured settings.
+     * Logout using the previously via {@link configureAuthentication} configured settings.
      */
     public async logout() {
         this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));

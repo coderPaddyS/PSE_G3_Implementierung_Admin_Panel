@@ -66,7 +66,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         super(
             OfficialAliases.tableName,
             OfficialAliases.title, data? data : [], sorters, {
-                title: OfficialAliases.tableName,
+                title: OfficialAliases.colActions,
                 actions: [
                     {
                         onClick: (entry: Alias) => [

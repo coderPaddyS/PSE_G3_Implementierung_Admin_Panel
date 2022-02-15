@@ -9,7 +9,7 @@
 
     let errors: Array<Error | string> = [];
 
-    // register the listener
+    // Register the listener
     errorSupplier((e) => {
         errors = e;
     })

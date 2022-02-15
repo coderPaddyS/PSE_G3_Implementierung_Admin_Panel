@@ -3,7 +3,7 @@
 
 <script lang=ts>
 
-    // retreive the name und username
+    // Retreive the name und username
     export let name: string = undefined;
     export let username: string;
 

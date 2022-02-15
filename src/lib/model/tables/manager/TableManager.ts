@@ -21,7 +21,7 @@ export type ActionComponentFactory = (onClick: (() => void)[], text: string) => 
 export type TableListener = (table: Table<string>) => void;
 
 /**
- * Producer for a lexicograpical sorter given an index.
+ * Producer for a lexicographical sorter given an index.
  * @param index The index of the column to sort by
  * @returns Sorter<TableRow<string>> which sorts lexicographically
  */

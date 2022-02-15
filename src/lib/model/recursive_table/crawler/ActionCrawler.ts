@@ -29,7 +29,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
      * Construct a new instance.
      * @param action {@link CrawlerAction}
      * @param index An Array specifying the index of the component which should be crawled on.
-     * @param crawlChildren wether to perform the provided action on any child of the component specified the given index.
+     * @param crawlChildren whether to perform the provided action on any child of the component specified the given index.
      */
     public constructor(action: CrawlerAction<T, TableActionCrawler<T>>, index?: Array<number>, crawlChildren?: boolean) {
         super();
@@ -60,7 +60,7 @@ export class TableActionCrawler<T> extends TableCrawler<T,TableActionCrawler<T>>
     /**
      * Crawl on the given component and return it.
      * If the index is empty, the action is performed on this component.
-     * Afterwards, if wanted, the childs will be crawled on to perform the action on them.
+     * Afterwards, if wanted and therefore specified in the constructor, the children will be crawled on to perform the action on them.
      * 
      * @template C A class extending {@link TableComponent TableComponent<T>}
      * 

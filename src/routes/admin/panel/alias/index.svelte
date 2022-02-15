@@ -11,7 +11,7 @@ import Action from "$lib/view/components/table_actions/Action.svelte";
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.ALIAS);
     
-    // Set the table to use the Action Component to display the actions
+    // Set the table to use the Action component to display the actions
     framework.setActionComponentFactory(
         Tables.ALIAS, 
         (onClick, text) => ((root, props) => {

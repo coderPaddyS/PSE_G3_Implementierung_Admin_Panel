@@ -17,7 +17,7 @@
     
     let predicates: Predicate<T[]>[] = new Array();
 
-    // create an predicate for each filter using its strategy to filter
+    // Create a predicate for each filter using its strategy to filter
     filters.forEach(([, strategy], i) => {
         predicates.push(data => {
             strategy.setFilter(() => values[i]);

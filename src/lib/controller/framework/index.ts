@@ -115,7 +115,7 @@ export class Framework {
 
     /**
      * Login the user.
-     * {@link configureLogin} must be called first once to configure the login process.
+     * {@link configureAuthentication} must be called first once to configure the login process.
      */
     public async login() {
         await this.backend.login();
@@ -123,7 +123,7 @@ export class Framework {
 
     /**
      * Logout the user.
-     * {@link configureLogin} must be called first once.
+     * {@link configureAuthentication} must be called first once.
      */
     public async logout() {
         await this.backend.logout();
@@ -203,7 +203,7 @@ export class Framework {
      * Configure the login process to use the provided settings.
      * @param config The {@link LoginConfiguration} with the required settings.
      */
-    public configureLogin(config: LoginConfiguration) {
-        this.backend.configureLogin(config);
+    public configureAuthentication(config: LoginConfiguration) {
+        this.backend.configureAuthentication(config);
     }
 }
