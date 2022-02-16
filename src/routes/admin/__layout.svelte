@@ -59,19 +59,21 @@
             'Content Content Login'
             'Content Content Login'
             'Links Links Links';
+            max-width: 50vw;
+            margin: auto;
         }
 
         @include mobile() {
             grid-template: 'Content' 'Login' 'Links';
+            max-width: fit-content;
+            margin: auto 2em;
         }
         gap: 1em;
         background-color: rgba($color: #AAA, $alpha: 0.8);
         border-radius: 2em;
         padding: 1em;
-        max-width: 50vw;
         min-height: 50vh;
         max-height: 80vh;
-        margin: auto;
 
         .content {
             grid-area: Content;
@@ -100,7 +102,9 @@
 
             .logins {
                 padding: 1em;
-                display: grid;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
         }
 

@@ -233,9 +233,10 @@ export class Backend {
     public redirectAfterLogin() {
         this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));
         this.auth.signinCallback()
-            .then(() => 
-                goto(this.config.loginRedirectURI.toString(), {replaceState: true})
-            )
+            .then(() => {
+                let redirect = window.location.href.match("itermori.de/admin/panel")? window.location.href : this.config.loginRedirectURI.toString();
+                goto(redirect, {replaceState: true});
+            })
             .catch((error) => this.notifyError(error));
     }
 
