@@ -8,9 +8,10 @@
 
     // Generic Type T
     type T = $$Generic;
+    type R = $$Generic<TitleRow<T>>
 
     // Data provided externally to provide the possiblity to add custom behaviour
-    export let row: TitleRow<T>;
+    export let row: R;
     export let index: Array<number>;
     export let styling;
 

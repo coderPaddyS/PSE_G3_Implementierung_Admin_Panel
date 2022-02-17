@@ -8,9 +8,10 @@
 
     // Generic Type T
     type T = $$Generic;
+    type C = $$Generic<TitleCell<T>>;
 
     // Data provided externally to provide the possiblity to add custom behaviour
-    export let cell: TitleCell<T>;
+    export let cell: C;
     export let index: Array<number>;
     export let styling;
 </script>

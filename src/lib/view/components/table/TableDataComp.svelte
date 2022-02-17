@@ -76,7 +76,7 @@
         {:else if data.getType() == TableDataAdditions.COMPONENT}
             <div class=component bind:this={root} />
         {:else if data.getType() == TableDataAdditions.TABLE && data.getChildren()}
-            <SubTableComp table={data.getChildren()[0]} styling=5em />
+            <SubTableComp table={data.getChildren()[0]} styling=5em index={[...index, 0]}/>
         {:else}
             {data.getData()? data.getData() : ""}
         {/if}
