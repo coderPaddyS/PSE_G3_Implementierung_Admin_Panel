@@ -77,19 +77,27 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         }
         this.title = title;
         this.data = [];
-        this.dataToBeAdded = data;
+        this.dataToBeAdded = data ? data : [];
         this.sorters = new Map(sorters);
-        this.actions = actions.actions;
-        this.actionTitle = actions.title;
+        this.actions = actions? actions.actions : undefined;
+        this.actionTitle = actions? actions.title : undefined;
         this.table = this.createTable();
         this.name = name;
     }
 
     private checkMatchingColumns(data: R[], title: T): boolean {
-        if (!data) {
+        if (!data || data.length == 0) {
             return true;
         }
-        return data.filter((entry: R) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
+        let matches = true;
+        data.forEach((entry: R) => {
+            if (entry) {
+                matches = matches && entry.toDisplayData().length == title.toDisplayData().length
+            } else {
+                matches = undefined;
+            }
+        });
+        return matches;
     }
 
     /**
@@ -199,6 +207,10 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param entry The entries: {@code string[]} to be removed
      */
     protected removeData(...data: R[]) {
+        if (!data) {
+            return;
+        }
+        this.updateTable();
         data.forEach(entry => {
             let index = this.data.indexOf(entry);
             if (index >= 0) {
@@ -235,11 +247,15 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 this.setData(data)
             }
         });
+        this.updateTable();
+
+        return this.table;
+    }
+
+    private updateTable() {
         this.data.push(...this.dataToBeAdded)
         this.table.add(...this.dataToBeAdded.map(entry => this.buildRow(entry)));
         this.dataToBeAdded = [];
-
-        return this.table;
     }
 
     /**
@@ -257,6 +273,10 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param data R[]
      */
     public hide(...data: R[]) {
+        if (!data) {
+            return;
+        }
+        this.updateTable();
         let notifyObserver: boolean = false;
         data.forEach(entry => {
             let indices: Array<number> = [];
@@ -282,13 +302,22 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param data R[]
      */
     public show(...data: R[]) {
+        if (!data) {
+            return;
+        }
+        this.updateTable();
         let notifyObserver: boolean = false;
         data.forEach(entry => {
-            let index = this.data.indexOf(entry);
-            if (index > 0) {
+            let indices: Array<number> = [];
+            this.data.forEach((datum, index) => {
+                if (lodash.isEqual(entry, datum)) {
+                    indices.push(index);
+                }
+            })
+            indices.forEach((index) => {
                 this.table.getChildren()[index].show();
                 notifyObserver = true;
-            }
+            })
         });
         if (notifyObserver) {
             this.notify();
@@ -301,7 +330,8 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns true if contained
      */
     public contains(entry: R): boolean {
-        return this.data.includes(entry)
+        return this.data.filter(e => lodash.isEqual(entry, e)).length > 0 
+            || this.dataToBeAdded.filter(e => lodash.isEqual(entry, e)).length > 0;
     }
 
     /**
@@ -310,7 +340,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns All entries for which {@code predicate} evaluates as true
      */
     protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
-        return this.data.filter(predicate);
+        return this.data.filter(predicate) || this.dataToBeAdded.filter(predicate);
     }
 
     /**

@@ -15,12 +15,12 @@ import { FilterStrategy } from "./FilterStrategy";
 export class LexicographicFilter<T> extends FilterStrategy<T> {
 
     public filter(data: T[]): boolean {
-        if (!this.supplier || !this.supplier()) {
+        if (!this.supplier || !this.supplier() || !data) {
             return undefined;
         }
 
         let term = this.supplier();
-        if (term.length == 0) {
+        if (term.toString().length == 0) {
             return undefined;
         } 
         
@@ -28,7 +28,7 @@ export class LexicographicFilter<T> extends FilterStrategy<T> {
             if (!t) {
                 return false;
             }
-            return t.toString().toLowerCase().includes(term.toLowerCase());
+            return t.toString().toLowerCase().includes(term.toString().toLowerCase());
         }).length > 0;
     }
 }

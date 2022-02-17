@@ -15,7 +15,7 @@ import type { ToDisplayData } from "../ToDisplayData";
 export abstract class FilterStrategy<T> implements ToDisplayData {
     
     private name: string;
-    protected supplier: () => string;
+    protected supplier: () => T;
 
     /**
      * Construct a new filter.
@@ -29,7 +29,7 @@ export abstract class FilterStrategy<T> implements ToDisplayData {
      * Set the supplier for the current filter value
      * @param supplier A supplier returning the current filter value {@code () => string}
      */
-    public setFilter(supplier: () => string) {
+    public setFilter(supplier: () => T) {
         this.supplier = supplier;
     }
 
