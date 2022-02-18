@@ -7,6 +7,7 @@
     import { Framework } from "$lib/controller/framework";
 
     import { onMount } from "svelte";
+    import { assets } from "$app/paths";
 
     let framework = Framework.getInstance();
     
@@ -227,7 +228,7 @@
 <main class=wrapper>
     <div class=navigation>
         <div class=logo>
-            <img src=/static/favicon.png alt="">
+            <img src={`${assets}/favicon.png`} alt="">
             <h1>KIT-Roomfinder</h1>
         </div>
         <div class="navitems">
