@@ -4,7 +4,6 @@
 
 import { tail } from "./Types";
 import type { Sorter, DataObject } from "./Types";
-import { TableDataAdditions } from "./TableDataAdditions";
 import type { TableCrawler } from "./TableCrawler";
 /**
  * A function which given an html element root and some values renders its data as a child of root.
@@ -630,4 +629,25 @@ export class TitleRow<T> extends TableRow<T> {
         let newData = crawler.crawlTitleRow(this);
         this.data = newData? newData.data : undefined;
     }
+}
+
+/**
+ * An enum representing the possible data values of a {@link TableData}
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
+ export enum TableDataAdditions {
+
+    /**Display the content as HTML-Code */
+    HTML,
+
+    /**Display the content as a value and cast to string */
+    VALUE,
+
+    /**Display the content as a component which should be rendered */
+    COMPONENT,
+
+    /**Display the content as a table */
+    TABLE
 }

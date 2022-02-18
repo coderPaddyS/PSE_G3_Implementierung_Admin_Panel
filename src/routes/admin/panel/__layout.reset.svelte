@@ -7,6 +7,7 @@
     import { Framework } from "$lib/controller/framework";
 
     import { onMount } from "svelte";
+    import { assets } from "$app/paths";
 
     let framework = Framework.getInstance();
     
@@ -105,6 +106,21 @@
             }
         }
 
+        .logo{
+            display: flex;
+            flex-direction: row;   
+            height: 3em; 
+            width: auto;
+
+            img {
+                width: 3em;
+            }
+
+            h1 {
+                margin: auto;
+            }
+        }
+
         @include desktop() {
 
             &, & * {
@@ -127,13 +143,24 @@
                 margin: 0;
 
                 .logo:not(:hover) {
+                    display: flex;
+                    flex-direction: column;
                     max-width: $nav_width_closed;
                     opacity: 1;
+                    height: auto;
+                    padding: 0;
+                    margin: 0;
+                    justify-content: center;
+                    gap: 1em;
+
+                    img:not(:hover) {
+                        transform: rotate(90deg);
+                    }
+
+                    img:not(:hover),
                     h1:not(:hover) {
                         max-width: $nav_width_closed;
                         width: $nav_width_closed;
-                        padding: 0;
-                        margin: 0;
                         opacity: 1;
                         writing-mode: vertical-lr;
                     }
@@ -148,6 +175,11 @@
         @include mobile() {
             max-height: 0;
             bottom: 0;
+            max-width: 100%;
+
+            .logo {
+                max-width: 100%;
+            }
 
             &:not(:hover) {
                 height: fit-content;
@@ -163,9 +195,12 @@
                 }
 
                 .logo:not(:hover) {
-                    display: block;
                     max-height: $nav_height_closed;
                     opacity: 1;
+                    display: flex;
+                    flex-direction: row;
+
+                    img:not(:hover),
                     h1:not(:hover) {
                         display: block;
                         max-height: $nav_height_closed;
@@ -196,15 +231,6 @@
             }
         }
     }
-
-    .nav {
-
-
-        @include mobile() {
-
-        }
-        
-    }
 </style>
 
 <ErrorMessage 
@@ -214,6 +240,7 @@
 <main class=wrapper>
     <div class=navigation>
         <div class=logo>
+            <img src={`${assets}/favicon.png`} alt="">
             <h1>KIT-Roomfinder</h1>
         </div>
         <div class="navitems">

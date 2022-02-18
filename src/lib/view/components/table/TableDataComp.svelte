@@ -4,7 +4,7 @@
 <script lang=ts>
     import { getContext, onMount, SvelteComponent } from "svelte";
     import { crawlerKey } from "$lib/model/recursive_table/Types";
-    import { TableDataAdditions } from "$lib/model/recursive_table/TableDataAdditions";
+    import { TableDataAdditions } from "$lib/model/recursive_table/TableComponents";
 
     import type { TableData } from "$lib/model/recursive_table/TableComponents";
     import SubTableComp from "./SubTableComp.svelte";

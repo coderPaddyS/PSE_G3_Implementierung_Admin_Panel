@@ -2,9 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-import type { Listener } from "$lib/model/Listener";
-
-
+    import type { Listener } from "$lib/model/Listener";
 
     // Functions to retreive the errors and to delete them
     export let errorSupplier: (listener: Listener<Array<Error | string>>) => void;
@@ -32,6 +30,7 @@ import type { Listener } from "$lib/model/Listener";
         margin-right: auto;
         background-color: #ff183f;
         border-radius: 1em;
+        z-index: 5;
 
         @include desktop() {
             width: 25%;

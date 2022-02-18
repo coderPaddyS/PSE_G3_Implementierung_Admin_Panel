@@ -49,6 +49,9 @@
     }
 </style>
 
+<svelte:head><title>Dashboard - Admin-Panel - KIT-Finder</title></svelte:head>
+
+
 <Greeter {username} {name} />
 
 {#await getTables()}

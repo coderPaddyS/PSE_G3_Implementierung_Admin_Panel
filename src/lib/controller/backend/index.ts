@@ -4,8 +4,7 @@
 
 import type { Table } from "$lib/model/recursive_table/TableComponents";
 import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
-import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
-import type { Alias } from "$lib/model/Alias";
+import { Alias, OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
 import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
 import type { User, UserManagerSettings, Profile } from "oidc-client";

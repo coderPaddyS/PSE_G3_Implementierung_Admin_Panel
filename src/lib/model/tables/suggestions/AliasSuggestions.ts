@@ -2,7 +2,6 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import { Alias } from "$lib/model/Alias";
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
 import { Framework } from "$lib/controller/framework";
@@ -11,12 +10,29 @@ import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData"
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter" 
 import { MinimumNumericFilter } from "$lib/model/tables/manager/filter/MinimumNumericFilter"; 
 import type { FilterStrategy } from "../manager/filter/FilterStrategy";
+import { Alias } from "../official/OfficialAliases";
 
+/**
+ * This class describes an entry for the alias suggestions.
+ * 
+ * @author Patrick Schneider
+ * @version 1.0
+ */
 export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
     private suggester: string;
     private upvotes: number;
     private downvotes: number;
 
+    /**
+     * Initialize a new suggestion
+     * @param name the name of the suggestion
+     * @param building the building of the suggestion
+     * @param room the room of the suggestion
+     * @param id the id of the suggestion
+     * @param upvotes the number of upvotes of the suggestion
+     * @param downvotes the number of downvotes of the suggestion
+     * @param suggester the suggester of the suggestion
+     */
     public constructor(
         name: string, 
         building: string, 
@@ -32,14 +48,26 @@ export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
         this.downvotes = downvotes;
     }
 
+    /**
+     * Getter for the suggester
+     * @returns suggester
+     */
     public getSuggester(): string {
         return this.suggester;
     }
 
+    /**
+     * Getter for the upvotes
+     * @returns upvotes
+     */
     public getUpvotes(): number {
         return this.upvotes;
     }
 
+    /**
+     * Getter for the downvotes
+     * @returns downvotes
+     */
     public getDownvotes(): number {
         return this.downvotes;
     }
@@ -55,13 +83,21 @@ export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
  * @author Patrick Schneider
  * @version 1.0
  */
- class AliasSuggestionsTitle implements ToDisplayData {
+export class AliasSuggestionsTitle implements ToDisplayData {
     private name: string;
     private building: string;
     private room: string;
     private upvotes: string;
     private downvotes: string;
 
+    /**
+     * Initialize a new AliasSuggestionsTitle
+     * @param name the name column
+     * @param building the building column
+     * @param room the room column
+     * @param upvotes the number of upvotes column
+     * @param downvotes the number of downvotes column
+     */
     public constructor(
         name: string,
         building: string,

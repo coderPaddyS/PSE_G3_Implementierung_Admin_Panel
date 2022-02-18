@@ -4,7 +4,7 @@
 
 import { TableData } from "$lib/model/recursive_table/TableComponents";
 import { TableCrawler } from "$lib/model/recursive_table/TableCrawler";
-import { TableDataAdditions } from "$lib/model/recursive_table/TableDataAdditions";
+import { TableDataAdditions } from "$lib/model/recursive_table/TableComponents";
 import { jest } from "@jest/globals";
 
 class DummyCrawler<T> extends TableCrawler<T, DummyCrawler<T>> {

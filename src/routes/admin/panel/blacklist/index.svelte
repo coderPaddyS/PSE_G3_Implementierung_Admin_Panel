@@ -7,7 +7,7 @@
     import { Tables } from "$lib/model/tables/Tables";
     import Waiting from "$lib/view/Waiting.svelte";
     import Action from "$lib/view/components/table_actions/Action.svelte";
-import AdderToBlacklist from "$lib/view/Adder/AdderToBlacklist.svelte";
+import AdderToBlacklist from "$lib/view/adder/AdderToBlacklist.svelte";
 
     let framework = Framework.getInstance();
     let {supplier, updater, filterableData} = framework.getTableDisplayInformation(Tables.BLACKLIST);
@@ -28,6 +28,8 @@ import AdderToBlacklist from "$lib/view/Adder/AdderToBlacklist.svelte";
     )
 
 </script>
+
+<svelte:head><title>Blacklist - Admin-Panel - KIT-Finder</title></svelte:head>
 
 <AdderToBlacklist text="Hinzufügen" />
 {#await supplier()}

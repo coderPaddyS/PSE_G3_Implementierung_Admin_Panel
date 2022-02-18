@@ -4,9 +4,8 @@ Dieses Repo ist die Implementierung des Admin-Panels nach Spezifikation des Entw
 
 # Kompilierungsmindestanforderungen
 Zum Kompilieren wird `node` gemeinsam mit `npm` oder ähnlichem (z.B. `yarn`) benötigt.
-Des Weiteren befindet sich in `./src/lib/kit-finder-admin-panel-wasm` eine Rust-Crate.
-Hierfür werden [`rustup`](https://rustup.rs/) und [`wasm-pack`](https://rustwasm.github.io/wasm-pack/installer/) benötigt.
+Getestet mit Node 16 auf Linux.
 
 # Kompilierung
-Änderungen an der Rust-Crate können durch den Befehl `yarn wasm` zu Web-Assembly compiliert werden.
-Durch `npm run dev` bzw. `yarn dev` wird das Projekt gebaut, `npm run build` bzw. `yarn build` bauen die Produktionsvariante.
+Durch `npm run dev` bzw. `yarn dev` wird das Projekt gebaut, `npm run build` bzw. `yarn build` bauen die Produktionsvariante. Mit `npm test` bzw. `yarn test` werden die Tests gestartet.
+Bei erstmaligem Öffnen nach dem Herunterladen muss `npm install` bzw. `yarn` ausgeführt werden.

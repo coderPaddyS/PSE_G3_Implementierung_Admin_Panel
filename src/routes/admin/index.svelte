@@ -9,6 +9,8 @@
 
 </style>
 
+<svelte:head><title>Admin-Panel - KIT-Finder</title></svelte:head>
+
 <div class=text>
     <h1> KIT-Finder</h1>
     <p>

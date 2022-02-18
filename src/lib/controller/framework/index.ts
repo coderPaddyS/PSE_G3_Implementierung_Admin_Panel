@@ -40,7 +40,11 @@ export class Framework {
         this.errors = new ErrorQueue();
         this.backend = new Backend(
             (error) => this.errors.addError(error),
-            (data) => this.containsChangeByMetadata(data)
+            (data) => {
+                let t = !this.containsChangeByMetadata(data)
+                console.log(t)
+                return t
+            }
         );
         this.changes = new Changes();
     }
@@ -116,6 +120,11 @@ export class Framework {
         this.changes.addListener(onUpdate);
     }
 
+    /**
+     * Checks if the given metadata is contained as a change
+     * @param change the metadata as a DataObject<string>
+     * @returns true iff contained
+     */
     public containsChangeByMetadata(change: DataObject<string>): boolean {
         return this.changes.containsMetadata(change)
     }
@@ -214,6 +223,10 @@ export class Framework {
         this.backend.configureAuthentication(config);
     }
 
+    /**
+     * Adds an element to the blacklist.
+     * @param entry to add to the blacklist
+     */
     public addToBlacklist(entry: string) {
         this.addChange(
             () => this.backend.addToBlacklist(new BlacklistEntry(entry)),

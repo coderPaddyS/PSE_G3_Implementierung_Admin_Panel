@@ -39,7 +39,7 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
  * @author Patrick Schneider
  * @version 1.0
  */
-class BlacklistTitle extends BlacklistEntry {}
+export class BlacklistTitle extends BlacklistEntry {}
 
 /**
  * This class represents the blacklist.
@@ -123,7 +123,6 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     }
 
     protected override async fetchData(): Promise<Array<BlacklistEntry>> {
-        console.log("fetching");
         return this.fetch<{data: {getBlacklist: string[]}}>(JSON.stringify({
             query: `
                 query getBlacklistEntries {

@@ -27,6 +27,8 @@ import Action from "$lib/view/components/table_actions/Action.svelte";
     )
 </script>
 
+<svelte:head><title>Offizielle Aliase - Admin-Panel - KIT-Finder</title></svelte:head>
+
 {#await supplier()}
     <Waiting text={"Rufe Daten vom Server ab"} />
 {:then data}

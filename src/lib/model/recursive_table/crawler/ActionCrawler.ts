@@ -4,7 +4,13 @@
 
 import type { Table, TableCell, TableComponent, TableData, TableRow } from "../TableComponents";
 import { TableCrawler } from "../TableCrawler";
-import type { CrawlerAction } from "../Types";
+
+/**
+ * An action used by an TableCrawler crawling the table.
+ * @template T the type of the table.
+ * @template C the crawler which uses this action.
+ */
+ export type CrawlerAction<T, C extends TableCrawler<T,C>> = (crawler: C, component: TableComponent<T>) => void;
 
 /**
  * A {@link TableCrawler} to perform an action onto a table component specified by the index.
