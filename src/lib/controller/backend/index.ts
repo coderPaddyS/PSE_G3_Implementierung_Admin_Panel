@@ -7,12 +7,15 @@ import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist
 import { OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import type { Alias } from "$lib/model/Alias";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
-import type { ActionComponentFactory, TableListener } from "$lib/model/tables/manager/TableManager";
+import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
 import type { User, UserManagerSettings, Profile } from "oidc-client";
 import { UserManager } from "oidc-client";
 import { goto } from "$app/navigation";
 import { Tables } from "$lib/model/tables/Tables";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
+import { Observable } from "$lib/model/Listener";
+import type { Listener } from "$lib/model/Listener";
+import type { DataObject, Predicate } from "$lib/model/recursive_table/Types";
 
 export type UserData = Profile;
 
@@ -21,8 +24,6 @@ export type LoginConfiguration = {
     loginRedirectURI: URL,
     logoutRedirectURI: URL
 };
-
-export type AuthenticationListener = (isAuthenticated: boolean) => void;
 
 /**
  * This class manages the communication with the remote backend on the server.
@@ -38,8 +39,8 @@ export class Backend {
     private auth: UserManager;
     private config: LoginConfiguration;
     private static readonly configStoreKey: string = "authconfig";
-    private onAuthenticationChange: Set<(auth: boolean) => void>;
     private userData: UserData;
+    private isLoggedIn: Observable<boolean>;
 
     private blacklist: Blacklist;
     private official: OfficialAliases;
@@ -55,21 +56,28 @@ export class Backend {
      * Construct a new instance of the Backend
      * @param onError A Consumer which accepts an error in form of `string | Error`
      */
-    public constructor(onError: (error: string | Error) => void) {
+    public constructor(
+        onError: (error: string | Error) => void,
+        showEntry: Predicate<DataObject<string>>) {
         this.#getAccessToken = undefined;
         this.onError = new Set();
         this.onError.add(onError);
-        this.onAuthenticationChange = new Set();
+        this.isLoggedIn = new Observable(false);
 
-        this.blacklist = new Blacklist((body: string) => this.fetchBackend(body));
+        this.blacklist = new Blacklist(
+            (body: string) => this.fetchBackend(body),
+            showEntry
+        );
         this.official = new OfficialAliases(
             (body: string) => this.fetchBackend(body),
-            (entry: string) => {this.blacklist.addEntry(new BlacklistEntry(entry)); return true;}
+            (entry: string) => {this.blacklist.addEntry(new BlacklistEntry(entry)); return true;},
+            showEntry
         );
         this.suggestions = new AliasSuggestions(
             (body: string) => this.fetchBackend(body),
             (entry: string) => this.addToBlacklist(new BlacklistEntry(entry)),
-            (entry: Alias) => this.addToOfficial(entry)            
+            (entry: Alias) => this.addToOfficial(entry),
+            showEntry
         );
         this.displayInformation.set(Tables.BLACKLIST, this.blacklist.getTableDisplayInformation());
         this.displayInformation.set(Tables.ALIAS, this.official.getTableDisplayInformation());
@@ -81,7 +89,7 @@ export class Backend {
      * @param entry The {@link BlacklistEntry} to be added.
      * @returns true if the element wasn't on the blacklist
      */
-    private async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
+    public async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
         let added = await this.fetchBackend<{data: {blacklistAlias: boolean}}>(JSON.stringify({
             query: `
                 mutation addToBlacklist($entry: String!) {
@@ -159,8 +167,8 @@ export class Backend {
      * Get notified on updates of the authentication state.
      * @param onUpdate A boolean-Consumer as listener
      */
-    public addAuthenticationListener(onUpdate: (authenticated: boolean) => void) {
-        this.onAuthenticationChange.add(onUpdate);
+    public addAuthenticationListener(onUpdate: Listener<boolean>) {
+        this.isLoggedIn.add(onUpdate);
     }
 
     /**
@@ -175,16 +183,17 @@ export class Backend {
             this.#getAccessToken = () => user.access_token;
             this.userData = user.profile;
 
-            this.notifyAuthenticationChange();
+            this.isLoggedIn.set(true);
         });
         this.auth.events.addUserUnloaded(() => {
             this.#getAccessToken = undefined;
             this.userData = undefined;
 
-            this.notifyAuthenticationChange();
+            this.isLoggedIn.set(false);
         });
         this.auth.events.addSilentRenewError((error: string | Error) => {
             this.notifyError(error);
+            this.isLoggedIn.set(false);
         });
     }
 
@@ -202,13 +211,6 @@ export class Backend {
      */
     private notifyError(error: string | Error) {
         this.onError.forEach(listener => listener(error));
-    }
-
-    /**
-     * Broadcast the current authentication state to the listeners
-     */
-    private notifyAuthenticationChange() {
-        this.onAuthenticationChange.forEach(listener => listener(this.isAuthenticated()));
     }
 
     /**
@@ -264,7 +266,7 @@ export class Backend {
      * @returns true if the user is authenticated
      */
     public isAuthenticated(): boolean {
-        return this.#getAccessToken !== undefined;
+        return this.isLoggedIn.get();
     }
 
     /**

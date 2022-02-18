@@ -3,18 +3,18 @@
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
 import { Changes } from "$lib/model/tables/changes/Changes";
-import type { ChangesListener } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
-import type { UserData, LoginConfiguration, AuthenticationListener } from "$lib/controller/backend";
+import type { UserData, LoginConfiguration } from "$lib/controller/backend";
 import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
 import { Tables } from "$lib/model/tables/Tables";
 import type { DataObject } from "$lib/model/recursive_table/Types";
 import { ErrorQueue } from "$lib/model/error/ErrorQueue";
-import type { ErrorListener } from "$lib/model/error/ErrorQueue";
 import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
+import { BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
+import type { Listener } from "$lib/model/Listener";
 
 
 /**
@@ -38,7 +38,10 @@ export class Framework {
      */
     private constructor() {
         this.errors = new ErrorQueue();
-        this.backend = new Backend((error) => this.errors.addError(error));
+        this.backend = new Backend(
+            (error) => this.errors.addError(error),
+            (data) => this.containsChangeByMetadata(data)
+        );
         this.changes = new Changes();
     }
 
@@ -107,10 +110,14 @@ export class Framework {
 
     /**
      * Observe changes on the changes
-     * @param update {@link BlacklistListener}
+     * @param update {@link Listener Listener<Table<string>>}
      */
-    public onChangesUpdate(onUpdate: ChangesListener) {
+    public onChangesUpdate(onUpdate: Listener<Table<string>>) {
         this.changes.addListener(onUpdate);
+    }
+
+    public containsChangeByMetadata(change: DataObject<string>): boolean {
+        return this.changes.containsMetadata(change)
     }
 
     /**
@@ -130,10 +137,10 @@ export class Framework {
     }
 
     /**
-     * Register an {@link AuthenticationListener} to be called on update of the authentication state.
-     * @param onUpdate {@link AuthenticationListener}
+     * Register an {@link Listener Listener<boolean>} to be called on update of the authentication state.
+     * @param onUpdate {@link Listener Listener<boolean>}
      */
-    public onAuthenticationUpdate(onUpdate: AuthenticationListener) {
+    public onAuthenticationUpdate(onUpdate: Listener<boolean>) {
         this.backend.addAuthenticationListener(onUpdate);
     }
 
@@ -169,9 +176,9 @@ export class Framework {
 
     /**
      * Register an error listener
-     * @param onError {@link ErrorListener}
+     * @param onError {@link Listener Listener<(Error | string)[]>}
      */
-    public onError(onError: ErrorListener) {
+    public onError(onError: Listener<(Error | string)[]>) {
         this.errors.addListener(onError);
     }
 
@@ -205,5 +212,15 @@ export class Framework {
      */
     public configureAuthentication(config: LoginConfiguration) {
         this.backend.configureAuthentication(config);
+    }
+
+    public addToBlacklist(entry: string) {
+        this.addChange(
+            () => this.backend.addToBlacklist(new BlacklistEntry(entry)),
+            () => Promise.resolve(true),
+            "Blacklist",
+            "Hinzufügen",
+            {"0": ["Begriff", [entry]]}
+        )
     }
 }

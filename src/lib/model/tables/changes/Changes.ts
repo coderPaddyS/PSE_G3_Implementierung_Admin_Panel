@@ -6,12 +6,9 @@ import type { Table, TableRow } from "$lib/model/recursive_table/TableComponents
 import type { ChangeAction } from "./ChangeAction";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData";
-import type { Sorter } from "$lib/model/recursive_table/Types";
+import type { DataObject, Sorter } from "$lib/model/recursive_table/Types";
 import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
-
-/**A Listener to get notified on updates on the changes table */
-export type ChangesListener = (table: Table<string>) => void;
 
 /**
  * This class represents the title of the changes table.
@@ -144,5 +141,9 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
 
     protected async size(): Promise<number> {
         return undefined;
+    }
+
+    public containsMetadata(data: DataObject<string>): boolean {
+        return super.filter(action => action.equalsData(data)).length == 0;
     }
 }
