@@ -26,20 +26,28 @@
 </script>
 
 <style lang=scss>
+    @import '../../../global.scss';
     .greeter {
         display: flex;
-        flex-direction: column;
         justify-content: center;
         align-items: center;
         font-size: 2em;
         padding: 2em;
 
-        span {
+        @include desktop() {
+            flex-direction: row
+        }
+
+        @include mobile() {
+            flex-direction: column;
+        }
+
+        .name, .wrapper {
             text-align: center;
         }
     }
 </style>
 
 <div class=greeter>
-    Hallo&nbsp;<span in:typewriter>{name? `${name} (${username})` : username}</span>!
+    Hallo&nbsp;<span class=wrapper><span class=name in:typewriter>{name? `${name} (${username})` : username}</span>!</span>
 </div>

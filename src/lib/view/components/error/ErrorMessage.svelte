@@ -18,6 +18,7 @@
 <style lang=scss>
 
     @use "sass:color";
+    @import "../../../../global.scss";
 
     .errorbox {
         position: absolute;
@@ -26,9 +27,16 @@
         right: 0;
         margin-left: auto;
         margin-right: auto;
-        width: 25%;
         background-color: #ff183f;
         border-radius: 1em;
+
+        @include desktop() {
+            width: 25%;
+        }
+
+        @include mobile() {
+            width: fit-content;
+        }
 
         .error {
 

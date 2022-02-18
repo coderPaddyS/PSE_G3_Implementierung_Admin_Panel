@@ -44,6 +44,7 @@
     .stats {
         display: grid;
         gap: 1em;
+        margin: 1em;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     }
 </style>
