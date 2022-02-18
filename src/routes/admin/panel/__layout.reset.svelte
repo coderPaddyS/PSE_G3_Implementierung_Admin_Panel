@@ -110,6 +110,11 @@
             display: flex;
             flex-direction: row;   
             height: 3em; 
+            width: auto;
+
+            img {
+                width: 3em;
+            }
 
             h1 {
                 margin: auto;
@@ -170,6 +175,11 @@
         @include mobile() {
             max-height: 0;
             bottom: 0;
+            max-width: 100%;
+
+            .logo {
+                max-width: 100%;
+            }
 
             &:not(:hover) {
                 height: fit-content;
@@ -187,6 +197,8 @@
                 .logo:not(:hover) {
                     max-height: $nav_height_closed;
                     opacity: 1;
+                    display: flex;
+                    flex-direction: row;
 
                     img:not(:hover),
                     h1:not(:hover) {
