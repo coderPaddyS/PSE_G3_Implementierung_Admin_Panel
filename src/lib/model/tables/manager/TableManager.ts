@@ -2,23 +2,20 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { Sorter, DataObject } from "$lib/model/recursive_table/Types"
+import type { Sorter, DataObject, Predicate } from "$lib/model/recursive_table/Types"
 import { Table, TableCell, TableData, TableDataComponent, TableDataTable, TableRow, TitleCell, TitleRow } from "$lib/model/recursive_table/TableComponents";
 import type { ComponentFactory } from "$lib/model/recursive_table/TableComponents";
 import lodash from "lodash";
 import type { ToDisplayData } from "./ToDisplayData";
 import type { FilterStrategy } from "./filter/FilterStrategy";
 import type { TableDisplayInformation } from "./TableDisplayInformation";
+import type { Listener } from "$lib/model/Listener";
+import { Observable } from "$lib/model/Listener";
 
 /**
  * A function to produce a component which can perform actions.
  */
 export type ActionComponentFactory = (onClick: (() => void)[], text: string) => ComponentFactory;
-
-/**
- * A listener to get notified on table updates.
- */
-export type TableListener = (table: Table<string>) => void;
 
 /**
  * Producer for a lexicographical sorter given an index.
@@ -46,7 +43,7 @@ export const lexicographicSorter: (index: number) => Sorter<TableRow<string>> =
 export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayData> {
 
     private name: string;
-    private table: Table<string>;
+    private table: Observable<Table<string>>;
     private data: R[];
     private dataToBeAdded: R[];
     private title: T;
@@ -54,7 +51,8 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
     private actionFactory: ActionComponentFactory = undefined;
     private actions: {onClick: (entry: R) => (() => void)[], text: string}[];
     private actionTitle: string;
-    private listeners: Set<TableListener> = new Set();
+    private listeners: Set<Listener<Table<string>>> = new Set();
+    private showEntry: Predicate<DataObject<string>>;
 
     /**
      * Construct a new table with initial values.
@@ -64,41 +62,52 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param sorters The sorting algorithm used to sort the columns by.
      * @param actions   An object containing the actions and the title for the column. The actions are an array of objects,
      *                  containing an array of onClick-functions and a text to display the action.
+     * @param showEntry A predicate which is executed on any new element to decide whether it gets shown or not.
      */
     public constructor(
         name: string,
         title: T, 
         data?: R[],
         sorters?: Map<string, Sorter<TableRow<string>>>,
-        actions?: {actions: {onClick: (entry: R) => (() => void)[], text: string}[], title: string}) {
+        actions?: {actions: {onClick: (entry: R) => (() => void)[], text: string}[], title: string},
+        showEntry?: Predicate<DataObject<string>>) {
 
         if (!this.checkMatchingColumns(data, title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
         this.title = title;
         this.data = [];
-        this.dataToBeAdded = data;
+        this.dataToBeAdded = data ? data : [];
         this.sorters = new Map(sorters);
-        this.actions = actions.actions;
-        this.actionTitle = actions.title;
-        this.table = this.createTable();
+        this.actions = actions? actions.actions : undefined;
+        this.actionTitle = actions? actions.title : undefined;
+        this.table = new Observable(undefined);
         this.name = name;
+        this.showEntry = showEntry;
+        this.createTable();
     }
 
     private checkMatchingColumns(data: R[], title: T): boolean {
-        if (!data) {
+        if (!data || data.length == 0) {
             return true;
         }
-        return data.filter((entry: R) => entry.toDisplayData().length != title.toDisplayData().length) !== undefined;
+        let matches = true;
+        data.forEach((entry: R) => {
+            if (entry) {
+                matches = matches && entry.toDisplayData().length == title.toDisplayData().length
+            } else {
+                matches = undefined;
+            }
+        });
+        return matches;
     }
 
     /**
-     * Convert the given data to a {@link Table<string>}.
-     * @returns {@link Table<string>}
+     * Convert the given data to a {@link Table<string>} and updates the table.
      */
-    private createTable(): Table<string> {
+    private createTable()    {
         let table = new Table<string>();
-        
+        this.table.set(table);
         // Set the title row
         table.setTitle(new TitleRow<string>().add(
             ...this.title.toDisplayData().map(
@@ -115,11 +124,8 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (this.data) {
 
             // ... then add each data entry as row
-            table.add(
-                ...this.data.map(entry => this.buildRow(entry))
-            );
+            table.add(...this.data.map(entry => this.buildRow(entry)));
         }
-        return table;
     }
 
     /**
@@ -129,6 +135,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      */
     private buildRow(entry: R): TableRow<string> {
         const data: (string | DataObject<string>)[] = lodash.cloneDeep(entry.toDisplayData());
+        let isNormal = true;
 
         // Build the row containing the displayData specified by ToDisplayData::toDisplayData ...
         const row = new TableRow<string>().add(...data.map(
@@ -139,6 +146,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 if (typeof datum === 'string') {
                     cell.add(new TableData<string>(datum));
                 } else {
+                    isNormal = false;
                     cell.add(new TableDataTable<string>(new Table<string>().rowsFromObject(datum)));
                 }
                 
@@ -157,14 +165,12 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 })
             ))
         }
-        return row;
-    }
 
-    /**
-     * Notify the listeners listening on table changes
-     */
-    private notify() {
-        this.listeners.forEach(listener => listener(this.table));
+        if (this.showEntry && isNormal && !this.showEntry(this.table.get().matchData(data as string[]))) {
+            row.hide();
+        }
+
+        return row;
     }
 
     /**
@@ -176,9 +182,9 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (!this.checkMatchingColumns(data, this.title)) {
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
+        this.dataToBeAdded = [];
         this.data = data;
-        this.table = this.createTable();
-        this.notify();
+        this.createTable();
     }
 
     /**
@@ -191,7 +197,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             throw new Error("There has to be a title for every entry of data.toDisplayData");
         }
         this.dataToBeAdded.push(...data);
-        this.notify();
     }
 
     /**
@@ -199,29 +204,35 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param entry The entries: {@code string[]} to be removed
      */
     protected removeData(...data: R[]) {
-        data.forEach(entry => {
-            let index = this.data.indexOf(entry);
-            if (index >= 0) {
-                this.data.splice(index, 1);
-                this.table.remove(index);
-            }
-        });
-        this.notify();
+        if (!data) {
+            return;
+        }
+        this.updateTable();
+        this.table.update(table => {
+            data.forEach(entry => {
+                let index = this.data.indexOf(entry);
+                if (index >= 0) {
+                    this.data.splice(index, 1);
+                    table.remove(index);
+                }
+            });
+            return table;
+        })
     }
 
     /**
      * Add a listener to be called when changes happen.
-     * @param listener {@link TableListener}
+     * @param listener {@link Listener Listener<Table<string>>}
      */
-    public addListener(listener: TableListener) {
-        this.listeners.add(listener);
+    public addListener(listener: Listener<Table<string>>) {
+        this.table.add(listener);
     }
 
     /**
      * Remove the given listener.
-     * @param listener {@link TableListener}
+     * @param listener {@link Listener Listener<Table<string>>}
      */
-    public removeListener(listener: TableListener) {
+    public removeListener(listener: Listener<Table<string>>) {
         this.listeners.delete(listener);
     }
 
@@ -235,11 +246,17 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                 this.setData(data)
             }
         });
-        this.data.push(...this.dataToBeAdded)
-        this.table.add(...this.dataToBeAdded.map(entry => this.buildRow(entry)));
-        this.dataToBeAdded = [];
+        this.updateTable();
 
-        return this.table;
+        return this.table.get();
+    }
+
+    private updateTable() {
+        this.data.push(...this.dataToBeAdded);
+        this.table.update(table => table.add(...this.dataToBeAdded.map(entry => {
+            return this.buildRow(entry)
+        })))
+        this.dataToBeAdded = [];
     }
 
     /**
@@ -247,7 +264,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns Table<string>
      */
     protected getTableWithoutFetch(): Table<string> {
-        return this.table;
+        return this.table.get();
     }
 
     /**
@@ -257,22 +274,24 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param data R[]
      */
     public hide(...data: R[]) {
-        let notifyObserver: boolean = false;
-        data.forEach(entry => {
-            let indices: Array<number> = [];
-            this.data.forEach((datum, index) => {
-                if (lodash.isEqual(entry, datum)) {
-                    indices.push(index);
-                }
-            })
-            indices.forEach((index) => {
-                this.table.getChildren()[index].hide();
-                notifyObserver = true;
-            })
-        });
-        if (notifyObserver) {
-            this.notify();
+        if (!data) {
+            return;
         }
+        this.updateTable();
+        this.table.update(table => {
+            data.forEach(entry => {
+                let indices: Array<number> = [];
+                this.data.forEach((datum, index) => {
+                    if (lodash.isEqual(entry, datum)) {
+                        indices.push(index);
+                    }
+                })
+                indices.forEach((index) => {
+                    table.getChildren()[index].hide();
+                })
+            });
+            return table;
+        });
     }
 
     /**
@@ -282,17 +301,23 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @param data R[]
      */
     public show(...data: R[]) {
-        let notifyObserver: boolean = false;
-        data.forEach(entry => {
-            let index = this.data.indexOf(entry);
-            if (index > 0) {
-                this.table.getChildren()[index].show();
-                notifyObserver = true;
-            }
-        });
-        if (notifyObserver) {
-            this.notify();
+        if (!data) {
+            return;
         }
+        this.table.update(table => {
+            data.forEach(entry => {
+                let indices: Array<number> = [];
+                this.data.forEach((datum, index) => {
+                    if (lodash.isEqual(entry, datum)) {
+                        indices.push(index);
+                    }
+                })
+                indices.forEach((index) => {
+                    table.getChildren()[index].show();
+                })
+            });
+            return table;
+        });
     }
 
     /**
@@ -301,7 +326,8 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns true if contained
      */
     public contains(entry: R): boolean {
-        return this.data.includes(entry)
+        return this.data.filter(e => lodash.isEqual(entry, e)).length > 0 
+            || this.dataToBeAdded.filter(e => lodash.isEqual(entry, e)).length > 0;
     }
 
     /**
@@ -310,7 +336,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      * @returns All entries for which {@code predicate} evaluates as true
      */
     protected filter(predicate: (value: R, index?: number, array?: R[]) => boolean): R[] {
-        return this.data.filter(predicate);
+        return [...this.data.filter(predicate), ...this.dataToBeAdded.filter(predicate)];
     }
 
     /**

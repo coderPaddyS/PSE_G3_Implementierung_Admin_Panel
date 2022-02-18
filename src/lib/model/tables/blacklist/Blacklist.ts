@@ -2,7 +2,7 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { Sorter } from "$lib/model/recursive_table/Types"
+import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types"
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
@@ -64,7 +64,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
      * @param fetch The function used to fetch data from the backend.
      * @param data If provided sets the data of the table. 
      */
-    public constructor(fetch: <T>(body: string) => Promise<T>,data?: BlacklistEntry[]) {
+    public constructor(fetch: <T>(body: string) => Promise<T>, showEntry: Predicate<DataObject<string>>, data?: BlacklistEntry[]) {
         let sorter: Map<string, Sorter<TableRow<string>>> = new Map();
         sorter.set(Blacklist.colEntry, lexicographicSorter(0));
         super(
@@ -80,7 +80,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
                     ],
                     text: Blacklist.butDelete,
                 }]
-            }
+            }, showEntry
         );
         this.fetch = fetch;
     }
@@ -123,6 +123,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     }
 
     protected override async fetchData(): Promise<Array<BlacklistEntry>> {
+        console.log("fetching");
         return this.fetch<{data: {getBlacklist: string[]}}>(JSON.stringify({
             query: `
                 query getBlacklistEntries {

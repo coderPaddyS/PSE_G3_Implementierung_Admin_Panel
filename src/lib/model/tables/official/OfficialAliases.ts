@@ -4,7 +4,7 @@
 
 import { Alias } from "$lib/model//Alias";
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
-import type { Sorter } from "$lib/model/recursive_table/Types";
+import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
@@ -57,6 +57,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
      public constructor(
         fetch: <T>(body: string) => Promise<T>,
         addToBlacklist: (entry: string) => boolean, 
+        showEntry: Predicate<DataObject<string>>,
         data?: Alias[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
@@ -82,7 +83,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
                         text: OfficialAliases.butBlacklist
                     }
                 ]
-            }
+            }, showEntry
         );
         this.addToBlacklist = addToBlacklist;
         this.fetch = fetch;

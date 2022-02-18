@@ -13,6 +13,7 @@
     import lodash from "lodash"
     import FilterElement from "./FilterElement.svelte";
     import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
+import type { Listener } from "$lib/model/Listener";
 
     // Generic Types: 
     //      TA extends Table<T>
@@ -30,7 +31,7 @@
 
     // A supplier and an updater to retreive table data
     export let supplier: () => TA;
-    export let updater: (listener: (table: TA) => void) => void;
+    export let updater: (listener: Listener<TA>) => void;
     export let filterableData: () => [number, FilterStrategy<string>][];
 
     // Get the table data, but only work on a copy to preserve the original state

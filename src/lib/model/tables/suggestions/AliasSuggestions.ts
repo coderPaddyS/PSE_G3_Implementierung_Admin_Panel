@@ -4,7 +4,7 @@
 
 import { Alias } from "$lib/model/Alias";
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
-import type { Sorter } from "$lib/model/recursive_table/Types";
+import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
 import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager"
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData"
@@ -130,6 +130,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         fetch: <T>(body: string) => Promise<T>,
         addToBlacklist: (entry: string) => Promise<boolean>,
         acceptAlias: (alias: Alias) => Promise<boolean>,
+        showEntry: Predicate<DataObject<string>>,
         data?: AliasSuggestionsEntry[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
@@ -163,7 +164,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                         text: AliasSuggestions.butAccept
                     }
                 ]
-            }
+            }, showEntry
         );
         this.fetch = fetch;
         this.addToBlacklist = addToBlacklist;

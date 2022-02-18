@@ -2,9 +2,12 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
+import type { Listener } from "$lib/model/Listener";
+
+
 
     // Functions to retreive the errors and to delete them
-    export let errorSupplier: (listener: (errors: Array<Error | string>) => void) => void;
+    export let errorSupplier: (listener: Listener<Array<Error | string>>) => void;
     export let remove: (error: Error | string) => void;
 
     let errors: Array<Error | string> = [];

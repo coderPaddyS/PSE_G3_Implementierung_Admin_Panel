@@ -100,6 +100,11 @@ export class ChangeAction implements ToDisplayData {
         return lodash.isEqual(time, this.creationTime) && this.category == category && this.description == description && lodash.isEqual(this.metadata, metadata);
     }
 
+    public equalsData(data: DataObject<string>) {
+        console.log("comparing: ", data, "to", this.metadata)
+        return lodash.isEqual(data, this.metadata);
+    }
+
     public toDisplayData(): (string | DataObject<string>)[] {
         return [this.creationTime.toLocaleTimeString(), this.category, this.description, this.metadata]
     }

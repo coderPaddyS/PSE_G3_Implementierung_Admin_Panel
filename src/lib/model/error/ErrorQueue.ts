@@ -1,8 +1,5 @@
-
-/**
- * An listener to receive updates on the error list
- */
-export type ErrorListener = (error: Array<Error | string>) => void;
+import type { Listener } from "../Listener";
+import { Observable } from "../Listener";
 
 /**
  * A class managing and broadcasting errors.
@@ -11,16 +8,17 @@ export type ErrorListener = (error: Array<Error | string>) => void;
  * @version 1.0
  */
 export class ErrorQueue {
-    private queue: Array<Error | string> = [];
-    private listeners: Set<ErrorListener> = new Set();
+    private queue: Observable<Array<Error | string>> = new Observable([]);
 
     /**
      * Add an error to be broadcasted.
      * @param error {@code Error | string}
      */
     public addError(error: Error | string) {
-        this.queue.push(error);
-        this.notify()
+        this.queue.update(errors => {
+            errors.push(error);
+            return errors;
+        });
     }
 
     /**
@@ -28,22 +26,20 @@ export class ErrorQueue {
      * @param error {@code Error | string}
      */
     public removeError(error: Error | string) {
-        let index = this.queue.indexOf(error);
-        if (index >= 0) {
-            this.queue.splice(index, 1);
-            this.notify()
-        }
+        this.queue.update(errors => {
+            let index = errors.indexOf(error);
+            if (index >= 0) {
+                errors.splice(index, 1);
+            }
+            return errors;
+        })
     }
 
     /**
      * Add an error listener to be notified on broadcasts
      * @param listener {@code ErrorListener}
      */
-    public addListener(listener: ErrorListener) {
-        this.listeners.add(listener);
-    }
-
-    private notify() {
-        this.listeners.forEach(listener => listener(this.queue))
+    public addListener(listener: Listener<(Error | string)[]>) {
+        this.queue.add(listener);
     }
 }
