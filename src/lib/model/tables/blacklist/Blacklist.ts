@@ -39,7 +39,7 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
  * @author Patrick Schneider
  * @version 1.0
  */
-class BlacklistTitle extends BlacklistEntry {}
+export class BlacklistTitle extends BlacklistEntry {}
 
 /**
  * This class represents the blacklist.

@@ -27,6 +27,8 @@
     )
 </script>
 
+<svelte:head><title>Alias-Vorschläge - Admin-Panel - KIT-Finder</title></svelte:head>
+
 {#await supplier()}
     <Waiting text={"Rufe Daten vom Server ab"} />
 {:then data}

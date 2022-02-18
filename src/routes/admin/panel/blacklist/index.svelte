@@ -29,6 +29,8 @@ import AdderToBlacklist from "$lib/view/Adder/AdderToBlacklist.svelte";
 
 </script>
 
+<svelte:head><title>Blacklist - Admin-Panel - KIT-Finder</title></svelte:head>
+
 <AdderToBlacklist text="Hinzufügen" />
 {#await supplier()}
     <Waiting text={"Rufe Daten vom Server ab"} />

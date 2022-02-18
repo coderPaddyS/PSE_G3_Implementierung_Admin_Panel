@@ -105,6 +105,16 @@
             }
         }
 
+        .logo{
+            display: flex;
+            flex-direction: row;   
+            height: 3em; 
+
+            h1 {
+                margin: auto;
+            }
+        }
+
         @include desktop() {
 
             &, & * {
@@ -127,13 +137,24 @@
                 margin: 0;
 
                 .logo:not(:hover) {
+                    display: flex;
+                    flex-direction: column;
                     max-width: $nav_width_closed;
                     opacity: 1;
+                    height: auto;
+                    padding: 0;
+                    margin: 0;
+                    justify-content: center;
+                    gap: 1em;
+
+                    img:not(:hover) {
+                        transform: rotate(90deg);
+                    }
+
+                    img:not(:hover),
                     h1:not(:hover) {
                         max-width: $nav_width_closed;
                         width: $nav_width_closed;
-                        padding: 0;
-                        margin: 0;
                         opacity: 1;
                         writing-mode: vertical-lr;
                     }
@@ -163,9 +184,10 @@
                 }
 
                 .logo:not(:hover) {
-                    display: block;
                     max-height: $nav_height_closed;
                     opacity: 1;
+
+                    img:not(:hover),
                     h1:not(:hover) {
                         display: block;
                         max-height: $nav_height_closed;
@@ -196,15 +218,6 @@
             }
         }
     }
-
-    .nav {
-
-
-        @include mobile() {
-
-        }
-        
-    }
 </style>
 
 <ErrorMessage 
@@ -214,6 +227,7 @@
 <main class=wrapper>
     <div class=navigation>
         <div class=logo>
+            <img src=/static/favicon.png alt="">
             <h1>KIT-Roomfinder</h1>
         </div>
         <div class="navitems">

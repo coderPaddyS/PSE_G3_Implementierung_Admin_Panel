@@ -16,7 +16,7 @@ import { LexicographicFilter } from "$lib/model/tables/manager/filter/Lexicograp
  * @author Patrick Schneider
  * @version 1.0
  */
-class ChangeTitle implements ToDisplayData {
+export class ChangeTitle implements ToDisplayData {
     private time: string;
     private category: string;
     private description: string;

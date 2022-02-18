@@ -16,7 +16,7 @@ import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStra
  * @author Patrick Schneider
  * @version 1.0
  */
- class OfficialAliasesTitle extends Alias {
+export class OfficialAliasesTitle extends Alias {
     public constructor(colAlias: string, colBuilding: string, colRoom: string) {
         super(colAlias, colBuilding, colRoom, undefined);
     }
