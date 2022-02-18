@@ -93,15 +93,19 @@ export class ChangeAction implements ToDisplayData {
      * @param time Date
      * @param category string
      * @param description string
-     * @param metadata Key-Value-Object
+     * @param metadata the data to check
      * @returns {@code true} iff equal
      */
     public equals(time: Date, category: string, description: string, metadata: Object): boolean {
         return lodash.isEqual(time, this.creationTime) && this.category == category && this.description == description && lodash.isEqual(this.metadata, metadata);
     }
 
-    public equalsData(data: DataObject<string>) {
-        console.log("comparing: ", data, "to", this.metadata)
+    /**
+     * Test if the current action is identified by the provided data.
+     * @param metadata the data to check
+     * @returns {@code true} iff equal
+     */
+    public equalsData(data: DataObject<string>): boolean {
         return lodash.isEqual(data, this.metadata);
     }
 

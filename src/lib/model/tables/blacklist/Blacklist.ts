@@ -123,7 +123,6 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     }
 
     protected override async fetchData(): Promise<Array<BlacklistEntry>> {
-        console.log("fetching");
         return this.fetch<{data: {getBlacklist: string[]}}>(JSON.stringify({
             query: `
                 query getBlacklistEntries {

@@ -2,7 +2,6 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import { Alias } from "$lib/model/Alias";
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
 import { Framework } from "$lib/controller/framework";
@@ -11,6 +10,7 @@ import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData"
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter" 
 import { MinimumNumericFilter } from "$lib/model/tables/manager/filter/MinimumNumericFilter"; 
 import type { FilterStrategy } from "../manager/filter/FilterStrategy";
+import { Alias } from "../official/OfficialAliases";
 
 /**
  * This class describes an entry for the alias suggestions.

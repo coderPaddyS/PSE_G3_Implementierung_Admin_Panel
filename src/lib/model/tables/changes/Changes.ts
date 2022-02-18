@@ -143,7 +143,12 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
         return undefined;
     }
 
+    /**
+     * Checks if the given metadata is contained as a change
+     * @param change the metadata as a DataObject<string>
+     * @returns true if contained
+     */
     public containsMetadata(data: DataObject<string>): boolean {
-        return super.filter(action => action.equalsData(data)).length == 0;
+        return super.filter(action => action.equalsData(data)).length > 0;
     }
 }
