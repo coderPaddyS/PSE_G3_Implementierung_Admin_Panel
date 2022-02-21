@@ -23,6 +23,7 @@ export class MaximumNumericFilter<T> extends FilterStrategy<T> {
         if (!term) {
             return undefined;
         } 
-        return data.filter(t => Number(term) >= Number(t)).length > 0;
+        // replaceAll is needed as the original data "0" gets automatically converted to "\"0\""
+        return data.filter(t => Number(term) >= Number(data[0].toString().replaceAll('"', ""))).length > 0;
     }
 }
