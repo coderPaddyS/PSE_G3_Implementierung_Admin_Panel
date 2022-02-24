@@ -18,11 +18,11 @@ export class MinimumNumericFilter<T> extends FilterStrategy<T> {
         if (!this.supplier || !this.supplier() || !data) {
             return undefined;
         }
-
         let term = this.supplier();
         if (!term) {
             return undefined;
         } 
-        return data.filter(t => Number(term) <= Number(t)).length > 0;
+        // replaceAll is needed as the original data "0" gets automatically converted to "\"0\""
+        return data.filter(t => Number(term) <= Number(data[0].toString().replaceAll('"', ""))).length > 0;
     }
 }

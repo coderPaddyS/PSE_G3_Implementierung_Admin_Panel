@@ -210,17 +210,17 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     }
 
     private removeFromRemote(entry: Alias): Promise<boolean> {
-        return this.fetch(JSON.stringify({
+        return this.fetch<{data: {disapproveAliasSuggestion: boolean}}>(JSON.stringify({
             query: `
                 mutation removeSuggestion($alias: String!, $id: Int!) {
-                    disapproveAliasSuggestion(aliasSuggestion: $alias, mapID: $id): Boolean
+                    disapproveAliasSuggestion(aliasSuggestion: $alias, mapID: $id)
                 }
             `,
             variables: {
                 alias: entry.getName(),
                 id: entry.getId()
             }
-        }))
+        })).then(response => response.data.disapproveAliasSuggestion);
     }
 
     private removeEntry(entry: AliasSuggestionsEntry) {
@@ -294,7 +294,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                     return new AliasSuggestionsEntry(
                         entry.name,
                         building,
-                        room,
+                        room? room : "-",
                         entry.mapID,
                         entry.posVotes,
                         entry.negVotes,

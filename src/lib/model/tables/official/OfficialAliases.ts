@@ -218,9 +218,9 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
             query: `
                 query getAllAlias {
                     getAllAliases {
-                        name: String
-                        mapID: Int
-                        mapObject: String
+                        name
+                        mapID
+                        mapObject
                     }
                 }
             `
@@ -231,7 +231,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
                     return new Alias(
                         entry.name,
                         building,
-                        room,
+                        room? room : "-",
                         entry.mapID,
                     );
                 });
@@ -246,7 +246,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     }
 
     protected async size(): Promise<number> {
-        return this.fetch<{data: {getAmountEntriesAliases: string}}>(JSON.stringify({
+        return this.fetch<{data: {getAmountEntriesAlias: string}}>(JSON.stringify({
             query:`
                 query size {
                     getAmountEntriesAlias
@@ -254,7 +254,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
             `
         })).then(response => {
             if (response.data) {
-                return Number(response.data.getAmountEntriesAliases)
+                return Number(response.data.getAmountEntriesAlias)
             } else {
                 console.log(response)
             }
