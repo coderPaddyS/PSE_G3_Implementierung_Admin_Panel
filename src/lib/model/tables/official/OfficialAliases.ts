@@ -221,7 +221,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
                         name
                         mapID
                         mapObject
-                      }
+                    }
                 }
             `
         })).then(response => {
