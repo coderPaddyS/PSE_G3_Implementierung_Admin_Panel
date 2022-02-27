@@ -4,11 +4,11 @@
 
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types"
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
-import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData";
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
 import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
+import { ChangeAction } from "../changes/ChangeAction";
 
 /**
  * This class represents the data of the Blacklist.
@@ -58,13 +58,18 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
 
     private static readonly title: BlacklistTitle = new BlacklistTitle(this.colEntry);
     private fetch: <T>(body: string) => Promise<T>;
+    private addChange: (ChangeAction) => void;
 
     /**
      * Create the blacklist and set its data accordingly.
      * @param fetch The function used to fetch data from the backend.
      * @param data If provided sets the data of the table. 
      */
-    public constructor(fetch: <T>(body: string) => Promise<T>, showEntry: Predicate<DataObject<string>>, data?: BlacklistEntry[]) {
+    public constructor(
+        fetch: <T>(body: string) => Promise<T>, 
+        showEntry: Predicate<DataObject<string>>, 
+        addChange: (ChangeAction) => void,
+        data?: BlacklistEntry[]) {
         let sorter: Map<string, Sorter<TableRow<string>>> = new Map();
         sorter.set(Blacklist.colEntry, lexicographicSorter(0));
         super(
@@ -83,6 +88,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
             }, showEntry
         );
         this.fetch = fetch;
+        this.addChange = addChange;
     }
 
     /**
@@ -94,7 +100,7 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     }
 
     private removeEntry(entry: BlacklistEntry) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => {
                 let success = await this.removeFromBackend(entry);
                 if (success) {
@@ -103,10 +109,10 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
                 return success;
             }, 
             async () => {this.show(entry); return true;}, 
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             Blacklist.tableName, 
-            Blacklist.butDelete, 
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        );
+            Blacklist.butDelete
+        ));
     }
 
     private removeFromBackend(entry: BlacklistEntry): Promise<boolean> {

@@ -5,7 +5,6 @@
 import { Changes } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
-import type { UserData, LoginConfiguration } from "$lib/controller/backend";
 import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
@@ -15,7 +14,7 @@ import { ErrorQueue } from "$lib/model/error/ErrorQueue";
 import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
 import { BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
 import type { Listener } from "$lib/model/Listener";
-
+import type { LoginConfiguration, UserData } from "../AuthManager";
 
 /**
  * The Framework represents the backend of this SPA.
@@ -31,12 +30,13 @@ export class Framework {
     private backend: Backend;
     private changes: Changes;
     private errors: ErrorQueue;
+    private redirect: (href: string) => void;
 
     /**
      * Construct the framework.
      * Private due to being a singleton.
      */
-    private constructor() {
+    protected constructor() {
         this.errors = new ErrorQueue();
         this.backend = new Backend(
             (error) => this.errors.addError(error),
@@ -44,7 +44,8 @@ export class Framework {
                 let t = !this.containsChangeByMetadata(data)
                 console.log(t)
                 return t
-            }
+            },
+            (change) => this.addChange(change)
         );
         this.changes = new Changes();
     }
@@ -53,7 +54,7 @@ export class Framework {
      * Retrieve the current instance.
      * @returns Framework
      */
-    public static getInstance(): Framework {
+    public static getInstance(redirect?: (href: string) => void): Framework {
         if (Framework.instance === undefined) {
             Framework.instance = new Framework();
         }
@@ -102,14 +103,10 @@ export class Framework {
      * This does not execute the action, the user may delete the action.
      * If the user deletes the action, then {@link onRemove} is called.
      * 
-     * @param action The {@link Action} to be executed.
-     * @param onRemove An {@link Action} to be executed if the change is aborted.
-     * @param category The category as {@link string} where the action was created.
-     * @param description The resulting effect of the action as {@link string} to inform the user
-     * @param metadata The by the action affected data as Key-Value-Object to inform the user.
+     * @param action The {@link ChangeAction} to be added.
      */
-    public addChange(action: Action, onRemove: Action, category: string, description: string, metadata: DataObject<string>) {
-        this.changes.add(new ChangeAction(action, onRemove, metadata, category, description));
+    public addChange(action: ChangeAction) {
+        this.changes.add(action);
     }
 
     /**
@@ -164,15 +161,15 @@ export class Framework {
     /**
      * Finish the login authentication process after the authentication provider redirected.
      */
-    public redirectAfterLogin() {
-        this.backend.redirectAfterLogin();
+    public redirectAfterLogin(redirect: (href: string) => void) {
+        this.backend.redirectAfterLogin(redirect);
     }
 
     /**
      * Finish the logout authentication process after the authentication provider redirected.
      */
-    public redirectAfterLogout() {
-        this.backend.redirectAfterLogout();
+    public redirectAfterLogout(redirect: (href: string) => void) {
+        this.backend.redirectAfterLogout(redirect);
     }
 
     /**
@@ -228,12 +225,12 @@ export class Framework {
      * @param entry to add to the blacklist
      */
     public addToBlacklist(entry: string) {
-        this.addChange(
+        this.addChange(new ChangeAction(
             () => this.backend.addToBlacklist(new BlacklistEntry(entry)),
             () => Promise.resolve(true),
+            {"0": ["Begriff", [entry]]},
             "Blacklist",
-            "Hinzufügen",
-            {"0": ["Begriff", [entry]]}
-        )
+            "Hinzufügen"
+        ))
     }
 }

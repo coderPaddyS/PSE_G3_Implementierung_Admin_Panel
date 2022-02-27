@@ -35,6 +35,5 @@
     }
   },
   "testEnvironment": "jsdom",
-  "collectCoverage": true,
   "collectCoverageFrom": ["./src/**"]
 }

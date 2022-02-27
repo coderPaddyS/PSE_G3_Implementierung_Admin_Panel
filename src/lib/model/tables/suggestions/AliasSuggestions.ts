@@ -11,6 +11,7 @@ import { LexicographicFilter } from "$lib/model/tables/manager/filter/Lexicograp
 import { MinimumNumericFilter } from "$lib/model/tables/manager/filter/MinimumNumericFilter"; 
 import type { FilterStrategy } from "../manager/filter/FilterStrategy";
 import { Alias } from "../official/OfficialAliases";
+import { ChangeAction } from "../changes/ChangeAction";
 
 /**
  * This class describes an entry for the alias suggestions.
@@ -151,6 +152,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     private fetch: <T>(body: string) => Promise<T>;
     private addToBlacklist: (entry: string) => Promise<boolean>;
     private acceptAlias: (alias: Alias) => Promise<boolean>;
+    private addChange: (ChangeAction) => void;
 
     private minUpvotes: number;
     private minDownvotes: number;
@@ -167,6 +169,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         addToBlacklist: (entry: string) => Promise<boolean>,
         acceptAlias: (alias: Alias) => Promise<boolean>,
         showEntry: Predicate<DataObject<string>>,
+        addChange: (ChangeAction) => void,
         data?: AliasSuggestionsEntry[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
@@ -224,7 +227,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     }
 
     private removeEntry(entry: AliasSuggestionsEntry) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => {
                 if (await this.removeFromRemote(entry)) {
                     this.removeData(entry);
@@ -233,30 +236,31 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                 return false;
             }, 
             async () => {this.show(entry); return true;}, 
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             AliasSuggestions.tableName, 
-            AliasSuggestions.butDelete, 
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        );
+            AliasSuggestions.butDelete
+        
+        ));
     }
 
     private blacklist(entry: AliasSuggestionsEntry) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => this.addToBlacklist(entry.getName()),
             async () => {this.show(entry); return true;},
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             AliasSuggestions.tableName,
-            AliasSuggestions.butBlacklist,
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        );
+            AliasSuggestions.butBlacklist
+        ));
     }
 
     private accept(entry: AliasSuggestionsEntry) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => this.acceptAlias(entry),
             async () => {this.show(entry); return true;},
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             AliasSuggestions.tableName,
-            AliasSuggestions.butAccept,
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        )
+            AliasSuggestions.butAccept
+        ))
     }
 
     protected async fetchData(): Promise<Array<AliasSuggestionsEntry>> {

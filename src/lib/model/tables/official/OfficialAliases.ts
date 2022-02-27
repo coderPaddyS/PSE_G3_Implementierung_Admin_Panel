@@ -9,6 +9,7 @@ import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/Tab
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
 import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
 import type { ToDisplayData } from "../manager/ToDisplayData";
+import { ChangeAction } from "../changes/ChangeAction";
 
 /**
  * This class represents an Alias.
@@ -118,6 +119,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
 
     private addToBlacklist: (entry: string) => boolean;
     private fetch: <T>(body: string) => Promise<T>
+    private addChange: (ChangeAction) => void;
 
     /**
      * Create the official aliases and set the data accordingly.
@@ -129,6 +131,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         fetch: <T>(body: string) => Promise<T>,
         addToBlacklist: (entry: string) => boolean, 
         showEntry: Predicate<DataObject<string>>,
+        addChange: (ChangeAction) => void,
         data?: Alias[]) {
 
         let sorters: Map<string, Sorter<TableRow<string>>> = new Map();
@@ -183,7 +186,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     }
 
     private removeEntry(entry: Alias) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => {
                 if (await this.removeFromRemote(entry)) {
                     this.removeData(entry);
@@ -192,20 +195,20 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
                 return false;
             }, 
             async () => {this.show(entry); return true;}, 
-            OfficialAliases.tableName, 
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
+            OfficialAliases.tableName,
             OfficialAliases.butDelete, 
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        );
+        ));
     }
 
     private blacklist(entry: Alias) {
-        Framework.getInstance().addChange(
+        this.addChange(new ChangeAction(
             async () => this.addToBlacklist(entry.getName()),
             async () => {this.show(entry); return true;},
+            this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             OfficialAliases.tableName,
-            OfficialAliases.butBlacklist,
-            this.getTableWithoutFetch().matchData(entry.toDisplayData())
-        );
+            OfficialAliases.butBlacklist
+        ));
     }
 
     protected async fetchData(): Promise<Alias[]> {

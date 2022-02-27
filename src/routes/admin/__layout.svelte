@@ -8,7 +8,7 @@
     import KITLogin from '$lib/view/logins/KIT/index.svelte'
     import { onMount } from "svelte";
 
-    let framework = Framework.getInstance();
+    let framework = Framework.getInstance((href: string) => goto(href, {replaceState: true}));
 
     framework.onAuthenticationUpdate(async (isAuthenticated) => {
         if (isAuthenticated && await framework.isAdmin()) {

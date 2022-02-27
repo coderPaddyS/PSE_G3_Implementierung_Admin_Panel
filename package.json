@@ -6,7 +6,8 @@
     "build": " npm run test && svelte-kit build",
     "package": "npm run test && svelte-kit package",
     "preview": "svelte-kit preview",
-    "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --coverage",
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json",
+    "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --coverage",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
     "test:watch": "npm run test -- --watch"
@@ -22,7 +23,8 @@
     "@types/jest": "^27.0.0",
     "@types/testing-library__jest-dom": "^5.14.0",
     "babel-jest": "^27.0.0",
-    "jest": "^27.0.0",
+    "jest": "27",
+    "jsdom": "^19.0.0",
     "sass": "^1.47.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
@@ -35,8 +37,8 @@
   },
   "type": "module",
   "dependencies": {
-    "@dopry/svelte-oidc": "^1.0.1",
     "lodash": "^4.17.21",
+    "oidc-client": "^1.11.5",
     "svelte-css-vars": "^0.0.3"
   }
 }
