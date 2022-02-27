@@ -38,6 +38,7 @@
   "type": "module",
   "dependencies": {
     "lodash": "^4.17.21",
+    "oidc-client": "^1.11.5",
     "svelte-css-vars": "^0.0.3"
   }
 }
