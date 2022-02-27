@@ -156,7 +156,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         ));
 
         // ... and if actions are specified ...
-        if (this.actions && this.actions.length > 0) {
+        if (this.actions && this.actions.length > 0 && this.actionFactory) {
 
             // ... append those actions in an Action component inside the table data ...
             row.add(new TableCell<string>().add(
@@ -207,17 +207,13 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         if (!data) {
             return;
         }
+        let [indices, remaining] = this.getIndices(this.data, data);
+        indices.sort((a, b) => b - a).forEach(index => this.data.splice(index, 1));
+
+        [indices,] = this.getIndices(this.dataToBeAdded, remaining);
+        indices.sort((a, b) => b - a).forEach(index => this.dataToBeAdded.splice(index, 1));
+
         this.updateTable();
-        this.table.update(table => {
-            data.forEach(entry => {
-                let index = this.data.indexOf(entry);
-                if (index >= 0) {
-                    this.data.splice(index, 1);
-                    table.remove(index);
-                }
-            });
-            return table;
-        })
     }
 
     /**
@@ -267,6 +263,23 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         return this.table.get();
     }
 
+    private getIndices(source: R[], toFind: R[]): [number[], R[]] {
+        let indices = [];
+        let remaining = toFind;
+
+        source.forEach((entry, index) => {
+            for (let i = remaining.length; i >= 0; i--) {
+                if (lodash.isEqual(remaining[i], entry)) {
+                    indices.push(index);
+                    remaining.splice(i, 1);
+                    break;
+                }
+            }
+        });
+
+        return [indices, remaining];
+    }
+
     /**
      * Hide the given entries to be not displayed.
      * Does not delete the entries.
@@ -290,6 +303,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
                     table.getChildren()[index].hide();
                 })
             });
+            
             return table;
         });
     }

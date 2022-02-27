@@ -13,6 +13,7 @@ import type { Listener } from "$lib/model/Listener";
 import type { DataObject, Predicate } from "$lib/model/recursive_table/Types";
 import AuthManager from "$lib/controller/AuthManager";
 import type { LoginConfiguration, UserData } from "$lib/controller/AuthManager";
+import type { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 
 /**
  * This class manages the communication with the remote backend on the server.
@@ -40,24 +41,27 @@ export class Backend {
      */
     public constructor(
         onError: (error: string | Error) => void,
-        showEntry: Predicate<DataObject<string>>,) {
+        showEntry: Predicate<DataObject<string>>,
+        addChange: (action: ChangeAction) => void) {
         this.onError = new Set();
         this.onError.add(onError);
 
         this.blacklist = new Blacklist(
             (body: string) => this.fetchBackend(body),
-            showEntry
+            showEntry,
+            addChange
         );
         this.official = new OfficialAliases(
             (body: string) => this.fetchBackend(body),
             (entry: string) => {this.blacklist.addEntry(new BlacklistEntry(entry)); return true;},
-            showEntry
+            showEntry,
+            addChange
         );
         this.suggestions = new AliasSuggestions(
             (body: string) => this.fetchBackend(body),
             (entry: string) => this.addToBlacklist(new BlacklistEntry(entry)),
             (entry: Alias) => this.addToOfficial(entry),
-            showEntry
+            showEntry, addChange
         );
         this.displayInformation.set(Tables.BLACKLIST, this.blacklist.getTableDisplayInformation());
         this.displayInformation.set(Tables.ALIAS, this.official.getTableDisplayInformation());
@@ -228,11 +232,10 @@ export class Backend {
                 }
             `
         })).then(response => {
-            console.log(response);
             if (response.data) {
                 admin = response.data.isAdmin
             }
-        });
+        }).catch(error => this.notifyError(error));
         return admin;
     }
 
