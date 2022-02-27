@@ -5,7 +5,6 @@
 import { Changes } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
-import type { UserData, LoginConfiguration } from "$lib/controller/backend";
 import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
@@ -15,7 +14,7 @@ import { ErrorQueue } from "$lib/model/error/ErrorQueue";
 import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
 import { BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
 import type { Listener } from "$lib/model/Listener";
-
+import type { LoginConfiguration, UserData } from "../AuthManager";
 
 /**
  * The Framework represents the backend of this SPA.
@@ -31,6 +30,7 @@ export class Framework {
     private backend: Backend;
     private changes: Changes;
     private errors: ErrorQueue;
+    private redirect: (href: string) => void;
 
     /**
      * Construct the framework.
@@ -53,7 +53,7 @@ export class Framework {
      * Retrieve the current instance.
      * @returns Framework
      */
-    public static getInstance(): Framework {
+    public static getInstance(redirect?: (href: string) => void): Framework {
         if (Framework.instance === undefined) {
             Framework.instance = new Framework();
         }
@@ -164,15 +164,15 @@ export class Framework {
     /**
      * Finish the login authentication process after the authentication provider redirected.
      */
-    public redirectAfterLogin() {
-        this.backend.redirectAfterLogin();
+    public redirectAfterLogin(redirect: (href: string) => void) {
+        this.backend.redirectAfterLogin(redirect);
     }
 
     /**
      * Finish the logout authentication process after the authentication provider redirected.
      */
-    public redirectAfterLogout() {
-        this.backend.redirectAfterLogout();
+    public redirectAfterLogout(redirect: (href: string) => void) {
+        this.backend.redirectAfterLogout(redirect);
     }
 
     /**

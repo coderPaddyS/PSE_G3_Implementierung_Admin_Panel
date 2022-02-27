@@ -7,22 +7,12 @@ import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist
 import { Alias, OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
 import type { ActionComponentFactory } from "$lib/model/tables/manager/TableManager";
-import type { User, UserManagerSettings, Profile } from "oidc-client";
-import { UserManager } from "oidc-client";
-import { goto } from "$app/navigation";
 import { Tables } from "$lib/model/tables/Tables";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
-import { Observable } from "$lib/model/Listener";
 import type { Listener } from "$lib/model/Listener";
 import type { DataObject, Predicate } from "$lib/model/recursive_table/Types";
-
-export type UserData = Profile;
-
-export type LoginConfiguration = {
-    settings: UserManagerSettings,
-    loginRedirectURI: URL,
-    logoutRedirectURI: URL
-};
+import AuthManager from "$lib/controller/AuthManager";
+import type { LoginConfiguration, UserData } from "$lib/controller/AuthManager";
 
 /**
  * This class manages the communication with the remote backend on the server.
@@ -35,21 +25,14 @@ export class Backend {
 
     private static readonly backendURL: string = "https://pse.itermori.de/graphql";
 
-    private auth: UserManager;
-    private config: LoginConfiguration;
-    private static readonly configStoreKey: string = "authconfig";
-    private userData: UserData;
-    private isLoggedIn: Observable<boolean>;
-
     private blacklist: Blacklist;
     private official: OfficialAliases;
     private suggestions: AliasSuggestions;
     private displayInformation: Map<Tables, TableDisplayInformation<string, Table<string>>> = new Map();
 
-    // A true private variable in javascript is prepended with #
-    #getAccessToken: () => string;
-
     private onError: Set<(error: string | Error) => void>;
+
+    #auth: AuthManager;
 
     /**
      * Construct a new instance of the Backend
@@ -57,11 +40,9 @@ export class Backend {
      */
     public constructor(
         onError: (error: string | Error) => void,
-        showEntry: Predicate<DataObject<string>>) {
-        this.#getAccessToken = undefined;
+        showEntry: Predicate<DataObject<string>>,) {
         this.onError = new Set();
         this.onError.add(onError);
-        this.isLoggedIn = new Observable(false);
 
         this.blacklist = new Blacklist(
             (body: string) => this.fetchBackend(body),
@@ -81,6 +62,8 @@ export class Backend {
         this.displayInformation.set(Tables.BLACKLIST, this.blacklist.getTableDisplayInformation());
         this.displayInformation.set(Tables.ALIAS, this.official.getTableDisplayInformation());
         this.displayInformation.set(Tables.ALIAS_SUGGESTIONS, this.suggestions.getTableDisplayInformation());
+
+        this.#auth = new AuthManager((error: string | Error) => this.notifyError(error));
     }
 
     /**
@@ -167,33 +150,7 @@ export class Backend {
      * @param onUpdate A boolean-Consumer as listener
      */
     public addAuthenticationListener(onUpdate: Listener<boolean>) {
-        this.isLoggedIn.add(onUpdate);
-    }
-
-    /**
-     * The configuration used to configure the login process
-     * @param config {@link LoginConfiguration}
-     */
-    private configureManager(config: LoginConfiguration) {
-        this.config = config;
-        window.sessionStorage.setItem(Backend.configStoreKey, JSON.stringify(config));
-        this.auth = new UserManager(config.settings);
-        this.auth.events.addUserLoaded((user: User) => {
-            this.#getAccessToken = () => user.access_token;
-            this.userData = user.profile;
-
-            this.isLoggedIn.set(true);
-        });
-        this.auth.events.addUserUnloaded(() => {
-            this.#getAccessToken = undefined;
-            this.userData = undefined;
-
-            this.isLoggedIn.set(false);
-        });
-        this.auth.events.addSilentRenewError((error: string | Error) => {
-            this.notifyError(error);
-            this.isLoggedIn.set(false);
-        });
+        this.#auth.addAuthenticationListener(onUpdate);
     }
 
     /**
@@ -201,7 +158,7 @@ export class Backend {
      * @returns The {@link UserData} containing the required information
      */
     public getUserData(): UserData {
-        return this.userData;
+        return this.#auth.getUserData();
     }
 
     /**
@@ -217,48 +174,37 @@ export class Backend {
      * @param config The {@link LoginConfiguration} with the required settings.
      */
     public configureAuthentication(config: LoginConfiguration) {
-        this.configureManager(config);
+        this.#auth.configureAuthentication(config);
     }
 
     /**
      * Login using the previously via {@link configureAuthentication} configured settings.
      */
     public async login() {
-        await this.auth.signinRedirect().catch((error) => this.notifyError(error));
+        this.#auth.login();
     }
 
     /**
      * Method to call after the user was redirected of the authorization provider after login.
      * Finishes the login procedure.
      */
-    public redirectAfterLogin() {
-        this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));
-        this.auth.signinCallback()
-            .then(() => {
-                let redirect = window.location.href.match("itermori.de/admin/panel")? window.location.href : this.config.loginRedirectURI.toString();
-                goto(redirect, {replaceState: true});
-            })
-            .catch((error) => this.notifyError(error));
+    public redirectAfterLogin(redirect: (href: string) => void) {
+        this.#auth.redirectAfterLogin(redirect);
     }
 
     /**
      * Logout using the previously via {@link configureAuthentication} configured settings.
      */
     public async logout() {
-        this.configureManager(JSON.parse(window.sessionStorage.getItem(Backend.configStoreKey)));
-        this.auth.signoutRedirect().catch((error) => this.notifyError(error));
+        this.#auth.logout();
     }
 
     /**
      * Method to call after the user was redirected of the authorization provider after logout.
      * Finishes the logout procedure.
      */
-    public redirectAfterLogout() {
-        this.auth.signoutRedirectCallback()
-            .then(() => 
-                goto(this.config.logoutRedirectURI.toString(), {replaceState: true})
-            )
-            .catch((error) => this.notifyError(error));
+    public redirectAfterLogout(redirect: (href: string) => void) {
+        this.#auth.redirectAfterLogout(redirect);
     }
 
     /**
@@ -266,7 +212,7 @@ export class Backend {
      * @returns true if the user is authenticated
      */
     public isAuthenticated(): boolean {
-        return this.isLoggedIn.get();
+        return this.#auth.isAuthenticated();
     }
 
     /**
@@ -303,7 +249,7 @@ export class Backend {
         try {
             return fetch(Backend.backendURL, {
                 headers: {
-                    'Authorization': `Bearer ${this.#getAccessToken()}`,
+                    'Authorization': `Bearer ${this.#auth.getAccessToken()}`,
                     'content-type': "application/json"
                 },
                 method: "POST",

@@ -2,7 +2,7 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-    import type { LoginConfiguration } from "$lib/controller/backend";
+    import type { LoginConfiguration } from "$lib/controller/AuthManager";
 
     // Retreive methods to configure the login and logout
     export let configure: (config: LoginConfiguration) => void;
@@ -10,7 +10,7 @@
 
     function handleOnClick() {
         configure({
-                loginRedirectURI: new URL(`${window.location.origin}/admin`),
+                loginRedirectURI: new URL(`${window.location.origin}/admin/panel`),
                 logoutRedirectURI: new URL(`${window.location.origin}/admin`),
                 settings: {
                     authority: "https://oidc.scc.kit.edu/auth/realms/kit/",
