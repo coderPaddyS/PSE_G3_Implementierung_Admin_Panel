@@ -171,13 +171,13 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     private removeFromRemote(entry: Alias): Promise<boolean> {
         return this.fetch<{data: {removeAlias: boolean}}>(JSON.stringify({
             query: `
-                mutation removeOfficial($alias: String!, $id: Int!) {
-                    removeAlias(alias: $alias, mapID: $id)
+                mutation removeOfficial($alias: String!) {
+                    removeAlias(alias: $alias)
                 }
             `,
             variables: {
                 alias: entry.getName(),
-                id: entry.getId()
+                // id: entry.getId()
             }
         })).then(response => response.data.removeAlias);
     }
