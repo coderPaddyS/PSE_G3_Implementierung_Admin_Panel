@@ -35,9 +35,5 @@
     }
   },
   "testEnvironment": "jsdom",
-  "collectCoverageFrom": ["./src/**"],
-  "autoMock": true,
-  "transformIgnorePatterns": [
-    "node_modules/(?!(oidc-client))"
-  ]
+  "collectCoverageFrom": ["./src/**"]
 }
