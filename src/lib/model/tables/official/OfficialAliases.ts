@@ -4,7 +4,6 @@
 
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
-import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter";
 import type { FilterStrategy } from "$lib/model/tables/manager/filter/FilterStrategy";
@@ -161,6 +160,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
         );
         this.addToBlacklist = addToBlacklist;
         this.fetch = fetch;
+        this.addChange = addChange;
     }
 
     /**
