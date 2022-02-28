@@ -4,7 +4,6 @@
 
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
-import { Framework } from "$lib/controller/framework";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager"
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData"
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter" 
@@ -208,6 +207,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         this.fetch = fetch;
         this.addToBlacklist = addToBlacklist;
         this.acceptAlias = acceptAlias;
+        this.addChange = addChange;
         this.minDownvotes = 0;
         this.minUpvotes = 0;
     }
