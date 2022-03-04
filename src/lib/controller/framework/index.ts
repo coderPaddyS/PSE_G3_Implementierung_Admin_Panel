@@ -42,7 +42,6 @@ export class Framework {
             (error) => this.errors.addError(error),
             (data) => {
                 let t = !this.containsChangeByMetadata(data)
-                console.log(t)
                 return t
             },
             (change) => this.addChange(change)

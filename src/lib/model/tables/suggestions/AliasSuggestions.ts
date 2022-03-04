@@ -4,7 +4,7 @@
 
 import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate, Sorter } from "$lib/model/recursive_table/Types";
-import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager"
+import { lexicographicSorter, numericSorter, TableManager } from "$lib/model/tables/manager/TableManager"
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData"
 import { LexicographicFilter } from "$lib/model/tables/manager/filter/LexicographicFilter" 
 import { MinimumNumericFilter } from "$lib/model/tables/manager/filter/MinimumNumericFilter"; 
@@ -70,6 +70,14 @@ export class AliasSuggestionsEntry extends Alias implements ToDisplayData {
      */
     public getDownvotes(): number {
         return this.downvotes;
+    }
+
+    /**
+     * Get the alias representation of this suggestion.
+     * @returns this suggestion transformed to an alias.
+     */
+    public toAlias(): Alias {
+        return new Alias(this.getName(), this.getBuilding(), this.getRoom(), this.getId());
     }
 
     public override toDisplayData(): string[] {
@@ -175,8 +183,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         sorters.set(AliasSuggestions.colAlias, lexicographicSorter(0));
         sorters.set(AliasSuggestions.colBuilding, lexicographicSorter(1));
         sorters.set(AliasSuggestions.colRoom, lexicographicSorter(2));
-        sorters.set(AliasSuggestions.colUpvotes, lexicographicSorter(3));
-        sorters.set(AliasSuggestions.colDownvotes, lexicographicSorter(4));
+        sorters.set(AliasSuggestions.colUpvotes, numericSorter(3));
+        sorters.set(AliasSuggestions.colDownvotes, numericSorter(4));
         super(
             AliasSuggestions.tableName,
             AliasSuggestions.title, data? data : [], sorters, {
@@ -255,7 +263,7 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
 
     private accept(entry: AliasSuggestionsEntry) {
         this.addChange(new ChangeAction(
-            async () => this.acceptAlias(entry),
+            async () => this.acceptAlias(entry.toAlias()),
             async () => {this.show(entry); return true;},
             this.getTableWithoutFetch().matchData(entry.toDisplayData()),
             AliasSuggestions.tableName,

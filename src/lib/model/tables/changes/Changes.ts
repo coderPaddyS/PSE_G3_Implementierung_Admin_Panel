@@ -87,12 +87,12 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
                 actions: [
                     {
                         onClick: (entry: ChangeAction) => [
-                            () => entry.perform() && this.remove(entry)
+                            async () => await entry.perform() && this.remove(entry),
                         ],
                         text: Changes.butAccept,
                     }, {
                         onClick: (entry: ChangeAction) => [
-                            () => this.remove(entry) && entry.remove()
+                            () => this.remove(entry) && entry.remove(),
                         ],
                         text: Changes.butDelete,
                     }, 
@@ -120,7 +120,6 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
     public remove(action: ChangeAction): boolean {
         if (this.contains(action)) {
             super.removeData(action);
-            action.remove();
             return true;
         }
         return false;
