@@ -52,7 +52,7 @@ import type { Listener } from "$lib/model/Listener";
 
     // Add the listener to update the table data
     updater(newTable => {
-        data = lodash.cloneDeep(newTable);
+        data = newTable;
         updateTableView();
     });
 
@@ -64,8 +64,6 @@ import type { Listener } from "$lib/model/Listener";
      */
     function updateTableView() {
 
-        // A clone is sadly currently needed as otherwise the changes to the
-        // data are not detected and reflected.
         tableViewData = lodash.cloneDeep(data);
 
         if (tableViewData) {

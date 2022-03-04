@@ -34,6 +34,22 @@ export const lexicographicSorter: (index: number) => Sorter<TableRow<string>> =
     }
 
 /**
+ * Producer for a numeric sorter given an index.
+ * @param index The index of the column to sort by
+ * @returns Sorter<TableRow<string>> which sorts numerically
+ */
+export const numericSorter: (index: number) => Sorter<TableRow<string>> = 
+    index => {
+        return (a: TableRow<string>, b: TableRow<string>) => {
+            if (Number(a.getData()[index]) < Number(b.getData()[index])) {
+                return [b,a]
+            } else {
+                return [a, b]
+            }
+        };
+    }
+
+/**
  * This class represents a base class to manage a {@link Table Table<string>} with the possibility to update and change values.
  * Allows the notification of listeners on updates and enables to add user events on click of a button with custom behavior.
  * 
@@ -85,6 +101,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
         this.name = name;
         this.showEntry = showEntry;
         this.createTable();
+        this.table.setNotificationInterceptor(table => lodash.cloneDeep(table))
     }
 
     private checkMatchingColumns(data: R[], title: T): boolean {
@@ -107,7 +124,6 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
      */
     private createTable()    {
         let table = new Table<string>();
-        this.table.set(table);
         // Set the title row
         table.setTitle(new TitleRow<string>().add(
             ...this.title.toDisplayData().map(
@@ -126,6 +142,7 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
             // ... then add each data entry as row
             table.add(...this.data.map(entry => this.buildRow(entry)));
         }
+        this.table.set(table);
     }
 
     /**
@@ -249,10 +266,8 @@ export abstract class TableManager<R extends ToDisplayData, T extends ToDisplayD
 
     private updateTable() {
         this.data.push(...this.dataToBeAdded);
-        this.table.update(table => table.add(...this.dataToBeAdded.map(entry => {
-            return this.buildRow(entry)
-        })))
         this.dataToBeAdded = [];
+        this.createTable();
     }
 
     /**

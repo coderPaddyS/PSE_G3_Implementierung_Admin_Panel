@@ -23,6 +23,7 @@ export type Listener<T> = (value: T) => void;
 export class Observable<T> {
     private value: T;
     private listeners: Set<Listener<T>>;
+    private interceptor: (value: T) => T;
 
     /**
      * Initialize the observable with a new value.
@@ -77,6 +78,15 @@ export class Observable<T> {
     }
 
     private notify() {
-        this.listeners.forEach(listener => listener(this.value))
+        let value = this.interceptor? this.interceptor(this.value) : this.value;
+        this.listeners.forEach(listener => listener(value))
+    }
+
+    /**
+     * Set an interceptor to be called before the listeners are notified. Used to perform an action on the new value.
+     * @param interceptor A function to be called just before the listeners are notified.
+     */
+    public setNotificationInterceptor(interceptor: (value: T) => T){
+        this.interceptor = interceptor;
     }
 }

@@ -2,9 +2,6 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { TableCrawler } from "./TableCrawler";
-import type { TableComponent } from "./TableComponents";
-
 /**
  * A Predicate is a function which given an element returns true or false
  */
