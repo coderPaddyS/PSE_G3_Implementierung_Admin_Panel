@@ -2,16 +2,14 @@
 <!-- 2022, Patrick Schneider <patrick@itermori.de> -->
 
 <script lang=ts>
-import { Framework } from "$lib/controller/framework";
-
     export let text: string;
+    export let onClick: (value: string) => void;
 
-    let framework = Framework.getInstance();
     let value: string = "";
     
     function handleOnClick() {
         if (value && value.trim().length > 0) {
-            framework.addToBlacklist(value);
+            onClick(value);
             value = "";
         }
     }
