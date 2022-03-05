@@ -249,6 +249,7 @@
             <div class="navitem"><a class=item href=/admin/panel/alias>Offizielle Aliasse      </a></div>
             <div class="navitem"><a class=item href=/admin/panel/blacklist>Blacklist           </a></div>
             <div class="navitem"><a class=item href=/admin/panel/changes>Änderungen            </a></div>
+            <div class="navitem"><a class=item href=/admin/panel/settings>Einstellungen        </a></div>
             <div class="logout navitem">
                 <button class=item on:click={() => Framework.getInstance().logout()}> Logout </button>
             </div>
