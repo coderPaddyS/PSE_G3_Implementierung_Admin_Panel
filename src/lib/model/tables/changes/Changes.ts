@@ -2,7 +2,7 @@
 /// 
 /// 2022, Patrick Schneider <patrick@itermori.de>
 
-import type { Table, TableRow } from "$lib/model/recursive_table/TableComponents";
+import type { TableRow } from "$lib/model/recursive_table/TableComponents";
 import type { ChangeAction } from "./ChangeAction";
 import { lexicographicSorter, TableManager } from "$lib/model/tables/manager/TableManager";
 import type { ToDisplayData } from "$lib/model/tables/manager/ToDisplayData";

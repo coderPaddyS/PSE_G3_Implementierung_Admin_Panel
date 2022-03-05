@@ -5,7 +5,6 @@
 import { Changes } from "$lib/model/tables/changes/Changes";
 import type { Table } from "$lib/model/recursive_table/TableComponents"
 import { Backend } from "$lib/controller/backend";
-import type { Action } from "$lib/model/tables/changes/Action";
 import { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 import type { TableDisplayInformation } from "$lib/model/tables/manager/TableDisplayInformation";
 import { Tables } from "$lib/model/tables/Tables";
@@ -30,7 +29,6 @@ export class Framework {
     private backend: Backend;
     private changes: Changes;
     private errors: ErrorQueue;
-    private redirect: (href: string) => void;
 
     /**
      * Construct the framework.
@@ -40,10 +38,7 @@ export class Framework {
         this.errors = new ErrorQueue();
         this.backend = new Backend(
             (error) => this.errors.addError(error),
-            (data) => {
-                let t = !this.containsChangeByMetadata(data)
-                return t
-            },
+            (data) => !this.containsChangeByMetadata(data),
             (change) => this.addChange(change)
         );
         this.changes = new Changes();
@@ -53,7 +48,7 @@ export class Framework {
      * Retrieve the current instance.
      * @returns Framework
      */
-    public static getInstance(redirect?: (href: string) => void): Framework {
+    public static getInstance(): Framework {
         if (Framework.instance === undefined) {
             Framework.instance = new Framework();
         }

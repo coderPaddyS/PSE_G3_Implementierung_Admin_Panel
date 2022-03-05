@@ -3,6 +3,7 @@ import { Backend } from "$lib/controller/backend";
 import type { Table } from "$lib/model/recursive_table/TableComponents";
 import type { DataObject, Predicate } from "$lib/model/recursive_table/Types";
 import { Blacklist, BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
+import type { ChangeAction } from "$lib/model/tables/changes/ChangeAction";
 import type { TableManager } from "$lib/model/tables/manager/TableManager";
 import { Alias, OfficialAliases } from "$lib/model/tables/official/OfficialAliases";
 import { AliasSuggestions } from "$lib/model/tables/suggestions/AliasSuggestions";
@@ -110,17 +111,8 @@ describe("Testing Backend.ts", () => {
                         if (expected) {
                             expect(official.addEntry).toBeCalled();
                         }
-                        done()
-                    })
-                    // (async () => {
-                    //     await (async () => (backend as any).addToOfficial(alias).then(result => {
-                    //         expect(result).toBe(expected);
-                    //         if (expected) {
-                    //             expect(official.addEntry).toBeCalled();
-                    //         }
-                    //         done()
-                    //     }))();
-                    // })()
+                        done();
+                    });
                 });
             });
 
@@ -190,6 +182,6 @@ describe("Testing Backend.ts", () => {
             test("changes", () => {
                 expect(() => backend.setActionComponentFactory(Tables.CHANGES, undefined)).toThrowError("matching")
             });
-        })
-    })
-})
+        });
+    });
+});
