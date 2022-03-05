@@ -15,12 +15,12 @@ import { FilterStrategy } from "./FilterStrategy";
 export class LexicographicFilter<T> extends FilterStrategy<T> {
 
     public filter(data: T[]): boolean {
-        if (!this.supplier || !this.supplier() || !data) {
+        if (!this.supplier || !data) {
             return undefined;
         }
 
         let term = this.supplier();
-        if (term.toString().length == 0) {
+        if (!term || term.toString().length == 0) {
             return undefined;
         } 
         

@@ -34,22 +34,9 @@ export default class AuthManager {
         this.config = config;
         window.sessionStorage.setItem(AuthManager.configStoreKey, JSON.stringify(config));
         this.auth = new oidc.UserManager(config.settings);
-        this.auth.events.addUserLoaded((user: User) => {
-            this.getAccessToken = () => user.access_token;
-            this.userData = user.profile;
-
-            this.isLoggedIn.set(true);
-        });
-        this.auth.events.addUserUnloaded(() => {
-            this.getAccessToken = undefined;
-            this.userData = undefined;
-
-            this.isLoggedIn.set(false);
-        });
-        this.auth.events.addSilentRenewError((error: string | Error) => {
-            this.onError(error);
-            this.isLoggedIn.set(false);
-        });
+        this.auth.events.addUserLoaded((user) => this.onUserLoaded(user));
+        this.auth.events.addUserUnloaded(() => this.onUserUnloaded());
+        this.auth.events.addSilentRenewError((error: string | Error) => this.onSilentRenewError(error));
     }
 
     /**
@@ -74,7 +61,7 @@ export default class AuthManager {
     public redirectAfterLogin(redirect: (href: string) => void) {
         this.configureManager(JSON.parse(window.sessionStorage.getItem(AuthManager.configStoreKey)));
         this.auth.signinCallback()
-            .then((user) => redirect(this.config.loginRedirectURI.toString()))
+            .then((_) => redirect(this.config.loginRedirectURI.toString()))
             .catch((error) => this.onError(error));
     }
 
@@ -82,7 +69,6 @@ export default class AuthManager {
      * Logout using the previously via {@link configureAuthentication} configured settings.
      */
     public async logout() {
-        this.configureManager(JSON.parse(window.sessionStorage.getItem(AuthManager.configStoreKey)));
         this.auth.signoutRedirect().catch((error) => this.onError(error));
     }
 
@@ -91,6 +77,7 @@ export default class AuthManager {
      * Finishes the logout procedure.
      */
     public redirectAfterLogout(redirect: (href: string) => void) {
+        this.configureManager(JSON.parse(window.sessionStorage.getItem(AuthManager.configStoreKey)));
         this.auth.signoutRedirectCallback()
             .then(() => 
                 redirect(this.config.logoutRedirectURI.toString())
@@ -120,5 +107,24 @@ export default class AuthManager {
      */
     public addAuthenticationListener(onUpdate: Listener<boolean>) {
         this.isLoggedIn.add(onUpdate);
+    }
+
+    private onUserLoaded(user: User) {
+        this.getAccessToken = () => user.access_token;
+        this.userData = user.profile;
+
+        this.isLoggedIn.set(true);
+    }
+
+    private onUserUnloaded() {
+        this.getAccessToken = undefined;
+        this.userData = undefined;
+
+        this.isLoggedIn.set(false);
+    }
+
+    private onSilentRenewError(error: string | Error) {
+        this.onError(error);
+        this.isLoggedIn.set(false);
     }
 }

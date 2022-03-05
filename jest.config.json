@@ -35,5 +35,10 @@
     }
   },
   "testEnvironment": "jsdom",
-  "collectCoverageFrom": ["./src/**"]
+  "collectCoverageFrom": [
+    "./src/**",
+    "!./src/routes/**",
+    "!./src/global.d.ts",
+    "!./src/hooks.ts"
+  ]
 }

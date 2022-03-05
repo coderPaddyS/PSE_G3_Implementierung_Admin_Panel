@@ -19,7 +19,7 @@
     let predicates: Predicate<T[]>[] = new Array();
 
     // Create a predicate for each filter using its strategy to filter
-    filters.forEach(([, strategy], i) => {
+    filters.forEach(([_, strategy], i) => {
         predicates.push(data => {
             strategy.setFilter(() => values[i]);
             let tested = data.map(entry => strategy.filter([JSON.stringify(entry)]));

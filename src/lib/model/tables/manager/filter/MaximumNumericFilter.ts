@@ -15,7 +15,7 @@ import { FilterStrategy } from "./FilterStrategy";
 export class MaximumNumericFilter<T> extends FilterStrategy<T> {
 
     public filter(data: T[]): boolean {
-        if (!this.supplier || !this.supplier() || !data) {
+        if (!this.supplier || !data) {
             return undefined;
         }
 
