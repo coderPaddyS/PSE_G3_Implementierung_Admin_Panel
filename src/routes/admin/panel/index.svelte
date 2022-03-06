@@ -4,7 +4,7 @@
 <script lang=ts>
     import { Framework } from "$lib/controller/framework";
     import TableOverview from "$lib/view/components/table/TableOverview.svelte";
-    import type { UserData } from "$lib/controller/backend";
+    import type { UserData } from "$lib/controller/AuthManager";
     import Greeter from "$lib/view/dashboard/Greeter.svelte";
     import Waiting from "$lib/view/Waiting.svelte";
     import { Tables } from "$lib/model/tables/Tables";

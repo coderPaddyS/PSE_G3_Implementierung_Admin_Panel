@@ -11,6 +11,8 @@ import { MinimumNumericFilter } from "$lib/model/tables/manager/filter/MinimumNu
 import type { FilterStrategy } from "../manager/filter/FilterStrategy";
 import { Alias } from "../official/OfficialAliases";
 import { ChangeAction } from "../changes/ChangeAction";
+import { Settings } from "$lib/model/settings/Settings";
+import type { SettingsData } from "$lib/model/settings/Settings";
 
 /**
  * This class describes an entry for the alias suggestions.
@@ -216,8 +218,15 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
         this.addToBlacklist = addToBlacklist;
         this.acceptAlias = acceptAlias;
         this.addChange = addChange;
-        this.minDownvotes = 0;
-        this.minUpvotes = 0;
+
+        Settings.getInstance().onUpdate((settings) => this.onSettingsChange(settings));
+        this.onSettingsChange(Settings.getInstance().getData());
+    }
+
+    private onSettingsChange(settings: SettingsData) {
+        this.minDownvotes = settings.suggestionsMinNegative;
+        this.minUpvotes = settings.suggestionsMinPositive;
+        console.log(settings);
     }
 
     private removeFromRemote(entry: Alias): Promise<boolean> {
