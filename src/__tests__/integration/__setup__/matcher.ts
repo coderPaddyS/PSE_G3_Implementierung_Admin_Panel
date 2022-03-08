@@ -136,7 +136,6 @@ export const matchers = {
             (source as ToDisplayData[]).map((s: ToDisplayData) => s.toDisplayData() as string[]);
         let result: [boolean, string, string[]][] = texts.map(e => [...rowMatcher(e, contents), e]);
         let matches = result.filter(([matches,]) => !matches).length == 0;
-        console.log(result.filter(([matches,]) => !matches))
         if (matches) {
             let matched: [string, string[]][] = result.filter(([matches,]) => matches).map(([_, where, text]) => [where, text]);
             return {
@@ -188,7 +187,6 @@ export const matchers = {
             (source as ToDisplayData[]).map((s: ToDisplayData) => s.toDisplayData() as string[]);
         let result: [boolean, string, string[]][] = texts.map(e => [...rowMatcher(e, contents), e]);
         let matches = result.filter(([matches,]) => !matches).length == 0;
-        console.log(result.filter(([matches,]) => !matches))
         if (matches) {
             let matched: [string, string[]][] = result.filter(([matches,]) => matches).map(([_, where, text]) => [where, text]);
             return {
