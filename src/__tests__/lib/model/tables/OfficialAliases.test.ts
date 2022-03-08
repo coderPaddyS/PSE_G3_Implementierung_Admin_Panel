@@ -9,7 +9,7 @@ describe("Testing OfficialAliases.ts", () => {
 
     function init(
         fetch?: <T>(body: string) => Promise<T>, 
-        addToBlacklist?: (entry: string) => boolean,
+        addToBlacklist?: (entry: string) => Promise<boolean>,
         addChange?: (change: ChangeAction) => void) {
         official = new OfficialAliases(
             fetch? fetch : jest.fn(), 
@@ -50,9 +50,9 @@ describe("Testing OfficialAliases.ts", () => {
         });
 
         test("blacklist", (done) => {
-            let addToBlacklist = jest.fn<boolean, [string]>().mockImplementation(entry => {
+            let addToBlacklist = jest.fn<Promise<boolean>, [string]>().mockImplementation(entry => {
                 expect(entry).toBe(alias.getName());
-                return true;
+                return Promise.resolve(true);
             });
             let addChange = jest.fn<void, any>().mockImplementation((action: ChangeAction) => {
                 action.perform().then(_ => {

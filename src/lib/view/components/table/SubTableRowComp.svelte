@@ -25,7 +25,7 @@
 <style lang=scss>
 
     @import '../../../../global.scss';
-    .row {
+    .subtable-row {
         width: auto;
         display: grid;
         gap: $table_gap;
@@ -39,7 +39,7 @@
 </style>
 
 {#if row && !row.isHidden() && row.getChildren()} 
-    <div class=row use:cssVars={styleVars}>
+    <div class=subtable-row use:cssVars={styleVars}>
         {#each row.getChildren() as cell, i}
             <SubTableCellComp bind:cell={cell} index={[...index, i]} {styling}/>
         {/each}

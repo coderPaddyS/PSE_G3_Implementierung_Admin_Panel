@@ -19,7 +19,7 @@
 <style lang=scss>
 
     @import '../../../../global.scss';
-    .cell {
+    .subtable-cell {
         display: flex;
         justify-content: center;
         align-items: center;
@@ -33,7 +33,7 @@
 </style>
 
 {#if cell !== undefined && !cell.isHidden()} 
-    <div class=cell>
+    <div class=subtable-cell>
         {#each cell.getChildren() as data, i}
             <TableDataComp bind:data={data} index={[...index, i]} {styling} />
         {/each}

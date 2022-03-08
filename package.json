@@ -3,14 +3,17 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "svelte-kit dev",
-    "build": " npm run test && svelte-kit build",
-    "package": "npm run test && svelte-kit package",
+    "build": " npm run test:all && svelte-kit build",
+    "package": "npm run test:all && svelte-kit package",
     "preview": "svelte-kit preview",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json",
     "test:coverage": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --coverage",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
-    "test:watch": "npm run test -- --watch"
+    "test:watch": "npm run test -- --watch",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --testRegex \"./src/__tests__/integration/.*\\.test\\.ts$\"",
+    "test:integration:coverage": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --testRegex \"./src/__tests__/integration/.*\\.test\\.ts$\" --coverage",
+    "test:all": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json --testRegex \"./src/__tests__/.*\\.test\\.ts$\" --coverage"
   },
   "devDependencies": {
     "@babel/core": "^7.14.0",
@@ -25,12 +28,14 @@
     "babel-jest": "^27.0.0",
     "jest": "27",
     "jsdom": "^19.0.0",
+    "rewire": "^6.0.0",
     "sass": "^1.47.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
     "svelte-jester": "^2.0.1",
     "svelte-preprocess": "^4.9.4",
     "ts-jest": "^27.0.0",
+    "ts-node": "^10.7.0",
     "tslib": "^2.3.1",
     "typedoc": "^0.22.11",
     "typescript": "^4.4.3"

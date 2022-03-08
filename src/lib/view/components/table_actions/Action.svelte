@@ -24,4 +24,4 @@
     }
 </style>
 
-<button on:click={handleOnClick}>{text? text : ""}</button>
+<button class={text} on:click={handleOnClick}>{text? text : ""}</button>
