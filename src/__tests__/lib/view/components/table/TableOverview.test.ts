@@ -1,4 +1,4 @@
-import { render, wait } from "@testing-library/svelte";
+import { render } from "@testing-library/svelte";
 import TableOverview from "$lib/view/components/table/TableOverview.svelte"
 
 describe("Test TableOverview.svelte", () => {

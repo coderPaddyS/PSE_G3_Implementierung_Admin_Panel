@@ -53,7 +53,7 @@ export class Backend {
         );
         this.official = new OfficialAliases(
             (body: string) => this.fetchBackend(body),
-            (entry: string) => {this.blacklist.addEntry(new BlacklistEntry(entry)); return true;},
+            async (entry: string) => this.addToBlacklist(new BlacklistEntry(entry)),
             showEntry,
             addChange
         );
@@ -78,12 +78,12 @@ export class Backend {
     public async addToBlacklist(entry: BlacklistEntry): Promise<boolean> {
         let added = await this.fetchBackend<{data: {blacklistAlias: boolean}}>(JSON.stringify({
             query: `
-                mutation addToBlacklist($entry: String!) {
-                    blacklistAlias(toBlacklist: $entry)
+                mutation addToBlacklist($toBlacklist: String!) {
+                    blacklistAlias(toBlacklist: $toBlacklist)
                 }
             `,
             variables: {
-                entry: entry.toDisplayData()[0]
+                toBlacklist: entry.toDisplayData()[0]
             }
         })).then(response => response.data.blacklistAlias).catch(error => {
             this.notifyError(error);
@@ -103,13 +103,13 @@ export class Backend {
     private async addToOfficial(alias: Alias): Promise<boolean> {
         let added = await this.fetchBackend<{data: {approveAliasSuggestion: boolean}}>(JSON.stringify({
             query: `
-                mutation addToOfficial($alias: String!, $id: Int!) {
-                    approveAliasSuggestion(aliasSuggestion: $alias, mapID: $id)
+                mutation addToOfficial($aliasSuggestion: String!, $mapID: Int!) {
+                    approveAliasSuggestion(aliasSuggestion: $aliasSuggestion, mapID: $mapID)
                 }
             `,
             variables: {
-                alias: alias.getName(),
-                id: alias.getId()
+                aliasSuggestion: alias.getName(),
+                mapID: alias.getId()
             }
         })).then(response => response.data.approveAliasSuggestion).catch(error => {
             this.notifyError(error);
@@ -248,7 +248,7 @@ export class Backend {
      * @param body The fetch body 
      * @returns The specified type
      */
-    private async fetchBackend<T>(body: string): Promise<T> {
+    private async fetchBackend<T extends {data?: Object, error?: {}}>(body: string): Promise<T> {
         try {
             return fetch(Backend.backendURL, {
                 headers: {
@@ -258,6 +258,13 @@ export class Backend {
                 method: "POST",
                 body
             }).then((response: Response) => response.json() as Promise<T>)
+            .then(response => {
+                if (!response.data) {
+                    throw new Error(JSON.stringify(response))
+                } else {
+                    return response
+                }
+            })
             .catch(error => {throw new Error(error)});
         } catch (error){
             this.notifyError(error);

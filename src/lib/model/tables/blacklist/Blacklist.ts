@@ -118,12 +118,12 @@ export class Blacklist extends TableManager<BlacklistEntry, BlacklistTitle> {
     private removeFromBackend(entry: BlacklistEntry): Promise<boolean> {
         return this.fetch<{data: {removeFromBlacklist: boolean}}>(JSON.stringify({
             query: `
-                mutation removeFromBlacklist($entry: String!) {
-                    removeFromBlacklist(blacklistedToRem: $entry)
+                mutation removeFromBlacklist($blacklistedToRem: String!) {
+                    removeFromBlacklist(blacklistedToRem: $blacklistedToRem)
                 }
             `,
             variables: {
-                entry: entry.toDisplayData()[0]
+                blacklistedToRem: entry.toDisplayData()[0]
             }
         })).then(response => response.data.removeFromBlacklist)
     }

@@ -226,19 +226,18 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
     private onSettingsChange(settings: SettingsData) {
         this.minDownvotes = settings.suggestionsMinNegative;
         this.minUpvotes = settings.suggestionsMinPositive;
-        console.log(settings);
     }
 
     private removeFromRemote(entry: Alias): Promise<boolean> {
         return this.fetch<{data: {disapproveAliasSuggestion: boolean}}>(JSON.stringify({
             query: `
-                mutation removeSuggestion($alias: String!, $id: Int!) {
-                    disapproveAliasSuggestion(aliasSuggestion: $alias, mapID: $id)
+                mutation removeSuggestion($aliasSuggestion: String!, $mapID: Int!) {
+                    disapproveAliasSuggestion(aliasSuggestion: $aliasSuggestion, mapID: $mapID)
                 }
             `,
             variables: {
-                alias: entry.getName(),
-                id: entry.getId()
+                aliasSuggestion: entry.getName(),
+                mapID: entry.getId()
             }
         })).then(response => response.data.disapproveAliasSuggestion);
     }

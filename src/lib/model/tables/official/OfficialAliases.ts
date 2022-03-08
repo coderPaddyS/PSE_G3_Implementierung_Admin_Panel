@@ -116,7 +116,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     private static readonly title: OfficialAliasesTitle
         = new OfficialAliasesTitle(OfficialAliases.colAlias, OfficialAliases.colBuilding, OfficialAliases.colRoom);
 
-    private addToBlacklist: (entry: string) => boolean;
+    private addToBlacklist: (entry: string) => Promise<boolean>;
     private fetch: <T>(body: string) => Promise<T>
     private addChange: (ChangeAction) => void;
 
@@ -128,7 +128,7 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
      */
      public constructor(
         fetch: <T>(body: string) => Promise<T>,
-        addToBlacklist: (entry: string) => boolean, 
+        addToBlacklist: (entry: string) => Promise<boolean>, 
         showEntry: Predicate<DataObject<string>>,
         addChange: (ChangeAction) => void,
         data?: Alias[]) {
@@ -174,13 +174,13 @@ export class OfficialAliases extends TableManager<Alias, OfficialAliasesTitle> {
     private removeFromRemote(entry: Alias): Promise<boolean> {
         return this.fetch<{data: {removeAlias: boolean}}>(JSON.stringify({
             query: `
-                mutation removeOfficial($alias: String!, $id: Int!) {
-                    removeAlias(alias: $alias, mapID: $id)
+                mutation removeOfficial($alias: String!, $mapID: Int!) {
+                    removeAlias(alias: $alias, mapID: $mapID)
                 }
             `,
             variables: {
                 alias: entry.getName(),
-                id: entry.getId()
+                mapID: entry.getId()
             }
         })).then(response => response.data.removeAlias);
     }

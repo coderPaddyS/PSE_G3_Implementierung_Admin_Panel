@@ -19,7 +19,7 @@
 <style lang=scss>
     @import '../../../../global.scss';
 
-    .table {
+    .subtable {
         width: 100%;
         justify-content: center;
         align-items: center;        
@@ -27,7 +27,7 @@
 </style>
 
 {#if table !== undefined && !table.isHidden()}
-    <div class=table>
+    <div class=subtable>
         {#if table.getTitle()}
             <TitleRowComp row={table.getTitle()} index={[...index, 0]} {styling}/>
         {/if}
