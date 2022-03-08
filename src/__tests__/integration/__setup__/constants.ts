@@ -16,3 +16,13 @@ export const BUTTON = {
         BLACKLIST: 1
     }
 }
+
+export const INPUT = {
+    BLACKLIST: {
+        ADD: 0
+    },
+    SETTINGS: {
+        MIN_NEGATIVE_SUGGESTION: 0,
+        MIN_POSITIVE_SUGGESTION: 1,
+    }
+}

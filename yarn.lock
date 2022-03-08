@@ -1362,6 +1362,13 @@
   dependencies:
     "@testing-library/dom" "^7.0.3"
 
+"@testing-library/user-event@^14.0.0-beta":
+  version "14.0.0-beta.13"
+  resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-14.0.0-beta.13.tgz#dd7d819588ac28e96b7e7af6d6d61b6f0a99f1a5"
+  integrity sha512-KjgkzbV3TmVOU6rUvNs7coezsPEVZKAcejG+GjxpmzB4JszyX9S6hyN729bIPFE7hl/5/LbfSn9KChUaTxd22Q==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+
 "@tootallnate/once@1":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@tootallnate/once/-/once-1.1.2.tgz#ccb91445360179a04e7fe6aff78c00ffc1eeaf82"

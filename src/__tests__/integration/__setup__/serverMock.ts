@@ -57,16 +57,24 @@ export class ServerMock {
                 return Promise.resolve({data: {getAmountEntriesAlias: this.official.length}})
             }
             if (body.includes("getAliasSuggestions")) {
-                return Promise.resolve({data: {getAliasSuggestions: this.suggestions.map(e => {
-                    return {
-                        suggester: e.getSuggester(),
-                        name: e.getName(),
-                        posVotes: e.getUpvotes(),
-                        negVotes: e.getDownvotes(),
-                        mapID: e.getId(),
-                        mapObject: e.getBuilding() + "," + e.getRoom()
+
+                let { minValToShowPos, minValToShowNeg } = variables;
+                return Promise.resolve({
+                    data: {
+                        getAliasSuggestions: this.suggestions
+                            .filter(e => e.getUpvotes() >= minValToShowPos && e.getDownvotes() >= minValToShowNeg)
+                            .map(e => {
+                                return {
+                                    suggester: e.getSuggester(),
+                                    name: e.getName(),
+                                    posVotes: e.getUpvotes(),
+                                    negVotes: e.getDownvotes(),
+                                    mapID: e.getId(),
+                                    mapObject: e.getBuilding() + "," + e.getRoom()
+                                }
+                            })
                     }
-                })}});
+                });
             }
             if (body.includes("getAllAliases")) {
                 return Promise.resolve({data: {getAllAliases: this.official.map(e => {

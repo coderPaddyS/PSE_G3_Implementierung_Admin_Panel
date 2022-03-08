@@ -1,4 +1,5 @@
 import { fireEvent } from "@testing-library/dom";
+import userEvent from "@testing-library/user-event";
 
 export function getAllRows(page: HTMLElement): HTMLCollection {
     return page.getElementsByClassName("row");
@@ -6,6 +7,10 @@ export function getAllRows(page: HTMLElement): HTMLCollection {
 
 export function getAllButtons(page: HTMLElement): HTMLCollection {
     return page.getElementsByTagName("button");
+}
+
+export function getAllInputs(page: HTMLElement): HTMLCollection {
+    return page.getElementsByTagName("input");
 }
 
 export function clickOnButtonForRows(page: HTMLElement, buttonIndex: number) {
@@ -18,4 +23,8 @@ export function clickOnButtonForRows(page: HTMLElement, buttonIndex: number) {
 export function clickOnButtonForSomeRows(page: HTMLElement, indices: number[], buttonIndex: number) {
     let elements = getAllRows(page);
     indices.forEach(index => fireEvent.click(getAllButtons(elements[index] as HTMLElement)[buttonIndex]))
+}
+
+export async function setValueOfInput(page: HTMLElement, index: number, value: string | number) {
+    await fireEvent.input(getAllInputs(page)[index], {target: {value: String(value)}})
 }

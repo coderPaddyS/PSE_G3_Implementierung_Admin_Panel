@@ -4,6 +4,7 @@ import Svelte__Blacklist from "$lib/../routes/admin/panel/blacklist/index.svelte
 import Svelte__Official from "$lib/../routes/admin/panel/alias/index.svelte";
 import Svelte__Suggestions from "$lib/../routes/admin/panel/suggestions/index.svelte";
 import Svelte__Changes from "$lib/../routes/admin/panel/changes/index.svelte";
+import Svelte__Settings from "$lib/../routes/admin/panel/settings/index.svelte";
 import Svelte__Dashboard from "$lib/../routes/admin/panel/index.svelte";
 
 async function renderBlacklist(): Promise<HTMLElement> {
@@ -51,12 +52,22 @@ async function renderDashboard(): Promise<HTMLElement> {
     return page;
 }
 
+async function renderSettings(): Promise<HTMLElement> {
+    cleanup();
+    let page = r(Svelte__Settings).container;
+    // Cannot intercept on component awaiting its promise, which is resolved immediately
+    // Therefore let the browser finish the rendering of the component by awaiting a pseudo-timeout
+    await new Promise((r) => setTimeout(r, 0));
+    return page;
+}
+
 const render = {
     blacklist: renderBlacklist,
     official: renderOfficial,
     suggestion: renderSuggestions,
     changes: renderChanges,
-    dashboard: renderDashboard
+    dashboard: renderDashboard,
+    settings: renderSettings
 }
 
-export default render 
+export default render;
