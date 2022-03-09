@@ -292,8 +292,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
             }[],
         }}>(JSON.stringify({
             query: `
-                query getAliasSuggestions($minPositive: Int!, $minNegative: Int!) {
-                    getAliasSuggestions(minValToShowPos: $minPositive, minValToShowNeg: $minNegative) {
+                query getAliasSuggestions($minValToShowPos: Int!, $minValToShowNeg: Int!) {
+                    getAliasSuggestions(minValToShowPos: $minValToShowPos, minValToShowNeg: $minValToShowNeg) {
                         suggester
                         name
                         posVotes
@@ -304,8 +304,8 @@ export class AliasSuggestions extends TableManager<AliasSuggestionsEntry, AliasS
                 }
             `,
             variables: {
-                minPositive: this.minUpvotes,
-                minNegative: this.minDownvotes
+                minValToShowPos: Math.trunc(this.minUpvotes),
+                minValToShowNeg: Math.trunc(this.minDownvotes)
             }
         })).then(response => {
             if (response.data) {

@@ -34,7 +34,7 @@ describe("Testing interactions of suggestions as user", () => {
         Framework['instance'] = framework;
         framework['backend']['fetchBackend'] = fetchBackend;
     
-        console.warn = (msg) => !msg.toString().includes('prop') && originalWarn(msg)
+        console.warn = (msg) => !msg.toString().includes('prop') && originalWarn(msg);
     });
 
     afterAll(() => {
