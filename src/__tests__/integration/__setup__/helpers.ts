@@ -22,7 +22,11 @@ export function clickOnButtonForRows(page: HTMLElement, buttonIndex: number) {
 
 export function clickOnButtonForSomeRows(page: HTMLElement, indices: number[], buttonIndex: number) {
     let elements = getAllRows(page);
-    indices.forEach(index => fireEvent.click(getAllButtons(elements[index] as HTMLElement)[buttonIndex]))
+    // console.log(elements.length, indices, getAllButtons(elements[0] as HTMLElement)[buttonIndex].textContent);
+    indices.forEach(index => {
+        fireEvent.click(getAllButtons(elements[index] as HTMLElement)[buttonIndex]);
+        console.log(getAllButtons(elements[index] as HTMLElement)[buttonIndex].textContent)
+    })
 }
 
 export async function setValueOfInput(page: HTMLElement, index: number, value: string | number) {
