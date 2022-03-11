@@ -57,7 +57,6 @@ export class ServerMock {
                 return Promise.resolve({data: {getAmountEntriesAlias: this.official.length}})
             }
             if (body.includes("getAliasSuggestions")) {
-
                 let { minValToShowPos, minValToShowNeg } = variables;
                 return Promise.resolve({
                     data: {
@@ -102,12 +101,20 @@ export class ServerMock {
                 return Promise.resolve({data: {disapproveAliasSuggestion: result != undefined}})
             }
             if (body.includes("blacklistAlias")) {
-                this.blacklist.push(new BlacklistEntry(variables.toBlacklist));
-                this.suggestions = this.suggestions.filter(e => e.getName() != variables.toBlacklist);
-                this.official = this.official.filter(e => e.getName() != variables.toBlacklist);
-                return Promise.resolve({data: {blacklistAlias: true}});
+                if (this.blacklist.filter(e => e.toDisplayData()[0] == variables.toBlacklist).length == 0) {
+                    this.blacklist.push(new BlacklistEntry(variables.toBlacklist));
+                    this.suggestions = this.suggestions.filter(e => e.getName() != variables.toBlacklist);
+                    this.official = this.official.filter(e => e.getName() != variables.toBlacklist);
+                    return Promise.resolve({data: {blacklistAlias: true}});
+                }
+                return Promise.resolve({data: {blacklistAlias: false}});
             }
             if (body.includes("approveAliasSuggestion")) {
+                if (this.blacklist.filter(e => e.toDisplayData()[0] == variables.aliasSuggestion).length != 0 ||
+                    this.official.filter(e => e.getName() == variables.aliasSuggestion && e.getId() == variables.mapID).length != 0) {
+                    return Promise.resolve({data: {approveAliasSuggestion: false}});
+                }
+
                 let suggestion = this.suggestions.filter(e => e.getId() == variables.mapID && e.getName() == variables.aliasSuggestion)[0];
                 this.official.push(suggestion.toAlias());
                 this.suggestions.splice(this.suggestions.indexOf(suggestion), 1);

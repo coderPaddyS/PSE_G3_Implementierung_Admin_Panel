@@ -10,6 +10,7 @@ import render from "./__setup__/pageRenderer";
 import { OpenFramework } from "./__setup__/__mocks__/OpenFramework";
 import { Alias } from "$lib/model/tables/official/OfficialAliases";
 import { AliasSuggestionsEntry } from "$lib/model/tables/suggestions/AliasSuggestions";
+import timer from "./__setup__/logger"
 
 expect.extend(matchers);
 
@@ -226,13 +227,19 @@ describe("Testing normal interactions as user", () => {
         test.each([
             ...interactions
         ])("interaction", async (steps: interaction) => {
+            timer.start("blacklist");
             page = await render.blacklist();
+            timer.stop();
             expect(page).toHaveAllRows(blacklist);
             
+            timer.start("suggestion");
             page = await render.suggestion();
+            timer.stop();
             expect(page).toHaveAllRows(suggestions);
 
+            timer.start("official");
             page = await render.official();
+            timer.stop();
             expect(page).toHaveAllRows(official);
 
             for (let step of steps) {
@@ -248,46 +255,60 @@ describe("Testing normal interactions as user", () => {
                     expChanges
                 ]] = step;
 
+                timer.start("blacklist");
                 page = await render.blacklist();
+                timer.stop();
                 let indicesBlacklist = blacklistActions.map(([index, action]) => {
                     clickOnButtonForSomeRows(page, [index], action);
                     return index;
                 });
 
+                timer.start("blacklist");
                 page = await render.blacklist();
+                timer.stop();
                 if (indicesBlacklist.length > 0) {
                     expect(page).not.toHaveSomeRows(indicesBlacklist, blacklist);
                 }
 
+                timer.start("suggestion");
                 page = await render.suggestion();
+                timer.stop();
                 let indicesSuggestion = suggestionsActions.map(([index, action]) => {
                     clickOnButtonForSomeRows(page, [index], action);
                     return index;
                 });
 
+                timer.start("suggestion");
                 page = await render.suggestion();
+                timer.stop();
                 if (indicesSuggestion.length > 0) {
                     expect(page).not.toHaveSomeRows(indicesSuggestion, suggestions);
                 }
 
+                timer.start("official");
                 page = await render.official();
+                timer.stop();
                 let indicesOfficial = officialActions.map(([index, action]) => {
                     clickOnButtonForSomeRows(page, [index], action);
                     return index;
                 });
 
+                timer.start("official");
                 page = await render.official();
+                timer.stop();
                 if (indicesOfficial.length > 0) {
                     expect(page).not.toHaveSomeRows(indicesOfficial, official);
                 }
 
+                timer.start("changes");
                 page = await render.changes();
+                timer.stop();
                 changesActions.forEach(([index, action]) => {
-                    console.log(action);
                     clickOnButtonForSomeRows(page, [index], action);
                     return index;
                 });
 
+                timer.start("changes");
                 page = await render.changes();
                 let [blacklistMetadata, suggestionsMetadata, officialMetdata] = expChanges;
                 if (blacklistMetadata.length > 0) {
@@ -300,17 +321,21 @@ describe("Testing normal interactions as user", () => {
                     expect(page).toHaveAllMetadata(officialMetdata);
                 }
                 
-                console.log(expOfficial)
-
+                timer.start("blacklist");
                 page = await render.blacklist();
+                timer.stop();
                 expect(page).toHaveAllRows(expBlacklist);
                 expect(serverMock.getBlacklist().length).toBe(expBlacklist.length + blacklistMetadata.length);
 
+                timer.start("official");
                 page = await render.official();
+                timer.stop();
                 expect(page).toHaveAllRows(expOfficial);
                 expect(serverMock.getOfficial().length).toBe(expOfficial.length + officialMetdata.length);
 
+                timer.start("suggestion");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).toHaveAllRows(expSuggestions);
                 expect(serverMock.getSuggestions().length).toBe(expSuggestions.length + suggestionsMetadata.length);
             }

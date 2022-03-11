@@ -18,11 +18,32 @@ export const BUTTON = {
 }
 
 export const INPUT = {
-    BLACKLIST: {
-        ADD: 0
-    },
     SETTINGS: {
         MIN_NEGATIVE_SUGGESTION: 0,
         MIN_POSITIVE_SUGGESTION: 1,
+    }
+}
+
+export const FILTERS = {
+    BLACKLIST: {
+        ENTRY: 0
+    },
+    SUGGESTIONS: {
+        ALIAS: 0,
+        BUILDING: 1,
+        ROOM: 2,
+        UPVOTES: 3,
+        DOWNVOTES: 4
+    },
+    OFFICIAL: {
+        ALIAS: 0,
+        BUILDING: 1,
+        ROOM: 2
+    },
+    CHANGES: {
+        TIME: 0,
+        CATEGORY: 1,
+        DESCRIPTION: 2,
+        METADATA: 3
     }
 }
