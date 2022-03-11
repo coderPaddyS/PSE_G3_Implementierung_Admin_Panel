@@ -7,9 +7,9 @@ import { AliasSuggestionsEntry } from "$lib/model/tables/suggestions/AliasSugges
 import type { Alias } from "$lib/model/tables/official/OfficialAliases";
 import { matchers } from "./__setup__/matcher";
 import render from "./__setup__/pageRenderer";
-import { clickOnButtonForRows, clickOnButtonForSomeRows, getAllRows } from "./__setup__/helpers";
-import { BUTTON } from "./__setup__/constants";
-
+import { clickOnButtonForRows, clickOnButtonForSomeRows, getAllRows, getFilters, setValueOfInput, toggleFilters } from "./__setup__/helpers";
+import { BUTTON, FILTERS, INPUT } from "./__setup__/constants";
+import timer from "./__setup__/logger";
 class OpenFramework extends Framework {
     public constructor() {
         super();
@@ -48,7 +48,9 @@ describe("Testing interactions of suggestions as user", () => {
             serverMock.setBlacklist([]);
             serverMock.setOfficial([]);
             serverMock.setSuggestions([entry]);
+            timer.start(" suggestions");
             page = await render.suggestion();
+            timer.stop();
         });
 
         test("a single entry", async () => {
@@ -70,26 +72,36 @@ describe("Testing interactions of suggestions as user", () => {
                 serverMock.setBlacklist([]);
                 serverMock.setOfficial([]);
                 serverMock.setSuggestions([entry]);
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
             });
 
             test(action, async () => {
                 expect(page).toHaveARow(entry.toDisplayData());
                 clickOnButtonForRows(page, actionIndex);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).not.toHaveARow(entry.toDisplayData())
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).toHaveARow(entry.toDisplayData())
 
                 clickOnButtonForRows(page, BUTTON.CHANGES.ACCEPT)
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).not.toHaveARow(entry.toDisplayData())
                 expect(getAllRows(page).length).toBe(0);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).not.toHaveARow(entry.toDisplayData())
                 expect(serverMock.getSuggestions()).toEqual(expectedSuggestions);
                 expect(serverMock.getBlacklist()).toEqual(expectedBlacklist);
@@ -100,19 +112,27 @@ describe("Testing interactions of suggestions as user", () => {
                 expect(page).toHaveARow(entry.toDisplayData())
                 clickOnButtonForRows(page, actionIndex);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).not.toHaveARow(entry.toDisplayData())
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).toHaveARow(entry.toDisplayData())
 
                 clickOnButtonForRows(page, BUTTON.CHANGES.CANCEL)
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).not.toHaveARow(entry.toDisplayData())
                 expect(getAllRows(page).length).toBe(0);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).toHaveARow(entry.toDisplayData())
                 expect(serverMock.getSuggestions()).toEqual([entry]);
                 expect(serverMock.getBlacklist()).toEqual([]);
@@ -132,7 +152,9 @@ describe("Testing interactions of suggestions as user", () => {
             serverMock.setBlacklist([]);
             serverMock.setOfficial([]);
             serverMock.setSuggestions([...entries]);
+            timer.start(" suggestions");
             page = await render.suggestion();
+            timer.stop();
         });
 
         test("all rendered", async () => {
@@ -152,7 +174,9 @@ describe("Testing interactions of suggestions as user", () => {
                 serverMock.setBlacklist([]);
                 serverMock.setOfficial([]);
                 serverMock.setSuggestions([...entries]);
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
             });
 
             test.each([
@@ -223,20 +247,30 @@ describe("Testing interactions of suggestions as user", () => {
                 expect(page).toHaveAllRows(entries);
                 clickOnButtonForSomeRows(page, affected, actionIndex);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
+
                 expect(page).not.toHaveSomeRows(affected, entries);
                 expect(page).toHaveSomeRows(notAffected, entries);
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
+
                 expect(page).toHaveSomeMetadata(affected, entries);
 
                 clickOnButtonForRows(page, BUTTON.CHANGES.ACCEPT);
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).not.toHaveSomeMetadata(affected, entries);
                 expect(getAllRows(page).length).toBe(0);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).not.toHaveSomeRows(affected, entries);
                 expect(page).toHaveSomeRows(notAffected, entries);
                 expect(serverMock.getSuggestions()).toEqual(expectedSuggestions[actionIndex]);
@@ -267,25 +301,135 @@ describe("Testing interactions of suggestions as user", () => {
                 expect(page).toHaveAllRows(entries);
                 clickOnButtonForSomeRows(page, affected, actionIndex);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).not.toHaveSomeRows(affected, entries);
                 expect(page).toHaveSomeRows(notAffected, entries)
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).toHaveSomeMetadata(affected, entries);
 
                 clickOnButtonForRows(page, BUTTON.CHANGES.CANCEL);
 
+                timer.start(" changes");
                 page = await render.changes();
+                timer.stop();
                 expect(page).not.toHaveSomeMetadata(affected, entries)
                 expect(getAllRows(page).length).toBe(0);
 
+                timer.start(" suggestions");
                 page = await render.suggestion();
+                timer.stop();
                 expect(page).toHaveAllRows(entries);
                 expect(serverMock.getSuggestions()).toEqual(entries);
                 expect(serverMock.getBlacklist()).toEqual([]);
                 expect(serverMock.getOfficial()).toEqual([]);
             });
         });
+    });
+
+    describe("testing behavior on blacklisted terms", () => {
+
+        const blacklist = [
+            new BlacklistEntry("Depp"),
+            new BlacklistEntry("Idiot")
+        ];
+
+        const entries = [
+            new AliasSuggestionsEntry("Infobau", "50.34", "-", 503400000, 10, 0, "tester"),
+            new AliasSuggestionsEntry("Mathebau", "20.30", "-", 203000000, 8, 1, "tester2"),
+            new AliasSuggestionsEntry("Seminarraum", "50.34", "-108", 503499108, 11, 3, "tester3"),
+            new AliasSuggestionsEntry("Depp", "50.34", "-108", 503499108, 0, 45, "tester4"),
+            new AliasSuggestionsEntry("Idiot", "50.34", "-108", 503499108, 0, 50, "tester5"),
+        ];
+
+        beforeEach(async () => {
+            serverMock.setOfficial([]);
+            serverMock.setBlacklist([...blacklist]);
+            serverMock.setSuggestions([...entries]);
+            page = await render.suggestion();
+        });
+
+        test.each([
+            [[3,4]]
+        ])(`blacklisting`, async (affected: number[]) => {
+            expect(page).toHaveAllRows(entries);
+            clickOnButtonForSomeRows(page, affected, BUTTON.SUGGESTIONS.BLACKLIST);
+
+            page = await render.changes();
+            expect(page).toHaveSomeMetadata(affected, entries);
+            clickOnButtonForRows(page, BUTTON.CHANGES.ACCEPT);
+
+            page = await render.suggestion();
+            expect(page).not.toHaveSomeRows(affected, entries);
+
+            expect(serverMock.getBlacklist()).toEqual(blacklist);
+            expect(serverMock.getOfficial()).toEqual([]);
+        });
+
+        test.each([
+            [[3,4]]
+        ])(`cannot accept blacklisted`, async (affected: number[]) => {
+            page = await render.blacklist();
+            page = await render.suggestion();
+            expect(page).toHaveAllRows(entries);
+            clickOnButtonForSomeRows(page, affected, BUTTON.SUGGESTIONS.ACCEPT);
+
+            page = await render.changes();
+            expect(page).toHaveSomeMetadata(affected, entries);
+            clickOnButtonForRows(page, BUTTON.CHANGES.ACCEPT);
+
+            page = await render.suggestion();
+            expect(page).not.toHaveSomeRows(affected, entries);
+
+            expect(serverMock.getBlacklist()).toEqual(blacklist);
+            expect(serverMock.getOfficial()).toEqual([]);
+        });
+    });
+
+    describe("testing filtering", () => {
+
+        const entries = [
+            new AliasSuggestionsEntry("Infobau", "50.34", "-", 503400000, 10, 0, "tester"),
+            new AliasSuggestionsEntry("Mathebau", "20.30", "-", 203000000, 8, 1, "tester2"),
+            new AliasSuggestionsEntry("Seminarraum", "50.34", "-108", 503499108, 11, 3, "tester3"),
+            new AliasSuggestionsEntry("Depp", "50.34", "-108", 503499108, 0, 45, "tester4"),
+            new AliasSuggestionsEntry("Idiot", "50.34", "-108", 503499108, 0, 50, "tester5"),
+        ];
+
+        beforeEach(async () => {
+            serverMock.setOfficial([]);
+            serverMock.setBlacklist([]);
+            serverMock.setSuggestions([...entries]);
+            page = await render.suggestion();
+        });
+
+        test.each([
+            [[0,0, 2, 2], [0,1,2,3,4], [2]],
+            [[1,1, 2, 2], [1,2], [2]],
+        ])("on-site filtering", async (
+            [settingsPos, settingsNeg, filterPos, filterNeg],
+            expectedAfterSettings,
+            expectedAfterFiltering
+        ) => {
+            expect(page).toHaveAllRows(entries);
+
+            page = await render.settings();
+            await setValueOfInput(page, INPUT.SETTINGS.MIN_POSITIVE_SUGGESTION, settingsPos);
+            await setValueOfInput(page, INPUT.SETTINGS.MIN_NEGATIVE_SUGGESTION, settingsNeg);
+
+            page = await render.suggestion();
+            expect(page).toHaveSomeRows(expectedAfterSettings, entries);
+            expect(getAllRows(page).length).toBe(expectedAfterSettings.length);
+
+            await toggleFilters(getFilters(page));
+            await setValueOfInput(getFilters(page), FILTERS.SUGGESTIONS.UPVOTES, filterPos);
+            await setValueOfInput(getFilters(page), FILTERS.SUGGESTIONS.DOWNVOTES, filterNeg);
+            expect(page).toHaveSomeRows(expectedAfterFiltering, entries);
+            expect(getAllRows(page).length).toBe(expectedAfterFiltering.length);
+        })
     });
 });

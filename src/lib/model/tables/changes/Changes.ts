@@ -87,7 +87,10 @@ export class Changes extends TableManager<ChangeAction, ChangeTitle>{
                 actions: [
                     {
                         onClick: (entry: ChangeAction) => [
-                            async () => await entry.perform() && this.remove(entry),
+                            async () => {
+                                await entry.perform();
+                                this.remove(entry);
+                            },
                         ],
                         text: Changes.butAccept,
                     }, {

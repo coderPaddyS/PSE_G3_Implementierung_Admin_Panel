@@ -1,15 +1,12 @@
 
 import { Framework } from "$lib/controller/framework";
-import { BlacklistEntry } from "$lib/model/tables/blacklist/Blacklist";
 import { jest } from "@jest/globals";
 import { ServerMock } from "./__setup__/serverMock";
 import { AliasSuggestionsEntry } from "$lib/model/tables/suggestions/AliasSuggestions";
-import type { Alias } from "$lib/model/tables/official/OfficialAliases";
 import { matchers } from "./__setup__/matcher";
 import render from "./__setup__/pageRenderer";
-import { clickOnButtonForRows, clickOnButtonForSomeRows, getAllInputs, getAllRows, setValueOfInput } from "./__setup__/helpers";
-import { BUTTON, INPUT } from "./__setup__/constants";
-import { fireEvent } from "@testing-library/svelte";
+import { setValueOfInput } from "./__setup__/helpers";
+import { INPUT } from "./__setup__/constants";
 
 class OpenFramework extends Framework {
     public constructor() {
