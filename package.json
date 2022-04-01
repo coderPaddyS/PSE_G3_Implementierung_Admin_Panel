@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "svelte-kit dev",
     "build": " npm run test:all && svelte-kit build",
+    "build:w/tests": "svelte-kit build",
     "package": "npm run test:all && svelte-kit package",
     "preview": "svelte-kit preview",
     "test": "NODE_OPTIONS=--experimental-vm-modules jest src --config jest.config.json",
@@ -18,8 +19,6 @@
   "devDependencies": {
     "@babel/core": "^7.14.0",
     "@babel/preset-env": "^7.14.0",
-    "@sveltejs/adapter-auto": "next",
-    "@sveltejs/adapter-node": "^1.0.0-next.71",
     "@sveltejs/adapter-static": "^1.0.0-next.26",
     "@sveltejs/kit": "next",
     "@testing-library/jest-dom": "^5.14.0",
@@ -36,7 +35,6 @@
     "svelte-check": "^2.2.6",
     "svelte-jester": "^2.0.1",
     "svelte-preprocess": "^4.9.4",
-    "sveltekit-adapter-html-like": "^0.2.1",
     "ts-jest": "^27.0.0",
     "ts-node": "^10.7.0",
     "tslib": "^2.3.1",
